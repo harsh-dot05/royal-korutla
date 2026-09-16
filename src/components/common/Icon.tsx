@@ -10,7 +10,7 @@ interface IconProps {
 }
 
 export const Icon: React.FC<IconProps> = ({ name, className = 'w-5 h-5', size }) => {
-  // @ts-expect-error - Lucide dynamic key lookup
-  const IconComponent = Icons[name] || Icons.HelpCircle;
+  const iconMap = Icons as unknown as Record<string, React.ComponentType<{ className?: string; size?: number }>>;
+  const IconComponent = iconMap[name] || Icons.HelpCircle;
   return <IconComponent className={className} size={size} />;
 };
