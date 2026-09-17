@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Crown, MapPin, Search, Menu, X, PhoneCall, Utensils, Briefcase, Home, Wrench, Store, ShoppingBag, Tag } from 'lucide-react';
+import { Crown, MapPin, Search, Menu, X, PhoneCall, Utensils, Briefcase, Home, Wrench, Store, ShoppingBag, Tag, Camera } from 'lucide-react';
 import { MobileNav } from './MobileNav';
 
 export const Header: React.FC = () => {
@@ -35,7 +35,7 @@ export const Header: React.FC = () => {
             </Link>
 
             {/* Desktop Navigation */}
-            <nav className="hidden lg:flex items-center gap-5">
+            <nav className="hidden lg:flex items-center gap-4">
               <Link href="/" className="text-sm font-semibold text-blue-700 transition-colors">
                 Home
               </Link>
@@ -46,6 +46,10 @@ export const Header: React.FC = () => {
               <Link href="/grocery" className="text-sm font-medium text-slate-700 hover:text-blue-700 transition-colors flex items-center gap-1.5">
                 <Store className="w-4 h-4 text-blue-700" />
                 <span>Groceries</span>
+              </Link>
+              <Link href="/photography" className="text-sm font-medium text-slate-700 hover:text-blue-700 transition-colors flex items-center gap-1.5">
+                <Camera className="w-4 h-4 text-blue-700" />
+                <span>Photography</span>
               </Link>
               <Link href="/shopping" className="text-sm font-medium text-slate-700 hover:text-blue-700 transition-colors flex items-center gap-1.5">
                 <ShoppingBag className="w-4 h-4 text-blue-700" />

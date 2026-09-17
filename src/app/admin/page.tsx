@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import {
@@ -14,25 +13,35 @@ import {
   PROPERTIES,
   HOSPITALS,
   DOCTORS,
-  REWARD_VOUCHERS,
   STORIES_REELS,
-  EMERGENCY_CONTACTS,
+  PHOTOGRAPHY_BUSINESSES,
+  HERO_SLIDES as HOMEPAGE_SLIDES,
 } from '@/data/mockData';
-import { Promotion, PromotionType, LocalBusiness, Offer, FoodMenuItem, JobListing, RealEstateProperty, HospitalDetail, Doctor, Review, StoryReel } from '@/types';
+import {
+  Promotion,
+  PromotionType,
+  LocalBusiness,
+  Offer,
+  FoodMenuItem,
+  JobListing,
+  RealEstateProperty,
+  HospitalDetail,
+  Doctor,
+  Review,
+  StoryReel,
+  PhotographyBusiness,
+  PhotographyType,
+  HomepageSlide,
+} from '@/types';
 import {
   Shield,
   Sparkles,
   Building2,
   CheckCircle2,
-  TrendingUp,
   DollarSign,
-  Calendar,
   Plus,
-  ArrowRight,
   LogOut,
   Lock,
-  Search,
-  Filter,
   Edit3,
   Trash2,
   Tag,
@@ -56,19 +65,16 @@ import {
   Eye,
   AlertCircle,
   RefreshCw,
-  X,
-  Check,
-  ExternalLink,
-  Image as ImageIcon,
-  Clock,
-  MapPin,
+  Camera,
+  ArrowUp,
+  ArrowDown,
+  Layers,
   Phone,
-  Mail,
+  MapPin,
+  Check,
+  Star,
   Zap,
   Sliders,
-  CheckSquare,
-  AlertTriangle,
-  Send
 } from 'lucide-react';
 
 type AdminTab =
@@ -78,6 +84,7 @@ type AdminTab =
   | 'edit-business'
   | 'verify-business'
   | 'featured-businesses'
+  | 'photography'
   | 'promotions'
   | 'offers'
   | 'food'
@@ -98,10 +105,21 @@ type AdminTab =
   | 'homepage-content'
   | 'settings';
 
+const ALL_PHOTO_TYPES: PhotographyType[] = [
+  'Wedding',
+  'Portrait',
+  'Events',
+  'Drone',
+  'Pre-wedding',
+  'Newborn',
+  'Studio',
+  'Fashion',
+  'Commercial',
+];
+
 export default function AdminDashboardPage() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<AdminTab>('dashboard');
-  const [searchTerm, setSearchTerm] = useState('');
   const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   // Business state
@@ -117,6 +135,26 @@ export default function AdminDashboardPage() {
   const [newBizTiming, setNewBizTiming] = useState('09:00 AM - 09:00 PM');
   const [newBizImage, setNewBizImage] = useState('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=600&auto=format&fit=crop&q=80');
   const [newBizVerified, setNewBizVerified] = useState(true);
+
+  // Photography State
+  const [photographyList, setPhotographyList] = useState<PhotographyBusiness[]>(PHOTOGRAPHY_BUSINESSES);
+  const [loadingPhoto, setLoadingPhoto] = useState(false);
+  const [editingPhotoStudio, setEditingPhotoStudio] = useState<PhotographyBusiness | null>(null);
+
+  // Photography Form State
+  const [photoName, setPhotoName] = useState('');
+  const [photoProfile, setPhotoProfile] = useState('');
+  const [photoCover, setPhotoCover] = useState('');
+  const [photoLocation, setPhotoLocation] = useState('Korutla Town');
+  const [photoLandmark, setPhotoLandmark] = useState('Main Road');
+  const [photoPhone, setPhotoPhone] = useState('');
+  const [photoWhatsapp, setPhotoWhatsapp] = useState('');
+  const [photoInstagram, setPhotoInstagram] = useState('');
+  const [photoDesc, setPhotoDesc] = useState('');
+  const [photoTypes, setPhotoTypes] = useState<PhotographyType[]>(['Wedding', 'Events']);
+  const [photoPrice, setPhotoPrice] = useState('₹15,000 / day');
+  const [photoVerified, setPhotoVerified] = useState(true);
+  const [photoFeatured, setPhotoFeatured] = useState(false);
 
   // Promotions State
   const [promotions, setPromotions] = useState<Promotion[]>([]);
@@ -134,29 +172,22 @@ export default function AdminDashboardPage() {
   const [promStartDate, setPromStartDate] = useState(new Date().toISOString().split('T')[0]);
   const [promEndDate, setPromEndDate] = useState(new Date(Date.now() + 30 * 86400000).toISOString().split('T')[0]);
 
+  // Homepage Content State
+  const [heroSlides, setHeroSlides] = useState<HomepageSlide[]>(HOMEPAGE_SLIDES);
+  const [newSlideTitle, setNewSlideTitle] = useState('');
+  const [newSlideSubtitle, setNewSlideSubtitle] = useState('');
+  const [newSlideCtaText, setNewSlideCtaText] = useState('Explore Deals');
+  const [newSlideCtaLink, setNewSlideCtaLink] = useState('/offers');
+  const [newSlideBg, setNewSlideBg] = useState('https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=1200&auto=format&fit=crop&q=80');
+
   // Offers State
   const [offers, setOffers] = useState<Offer[]>(FEATURED_OFFERS);
-  const [newOfferTitle, setNewOfferTitle] = useState('');
-  const [newOfferBiz, setNewOfferBiz] = useState('');
-  const [newOfferDiscount, setNewOfferDiscount] = useState('20% OFF');
 
   // Food Menu Items State
   const [foodItems, setFoodItems] = useState<FoodMenuItem[]>(FOOD_MENU_ITEMS);
-  const [newDishName, setNewDishName] = useState('');
-  const [newDishPrice, setNewDishPrice] = useState(250);
-  const [newDishIsVeg, setNewDishIsVeg] = useState(false);
 
   // Jobs State
   const [jobs, setJobs] = useState<JobListing[]>(LOCAL_JOBS);
-
-  // Real Estate State
-  const [properties, setProperties] = useState<RealEstateProperty[]>(PROPERTIES);
-
-  // Hospitals State
-  const [hospitalsList, setHospitalsList] = useState<HospitalDetail[]>(HOSPITALS);
-
-  // Doctors State
-  const [doctorsList, setDoctorsList] = useState<Doctor[]>(DOCTORS);
 
   // Users State
   const [usersList, setUsersList] = useState([
@@ -166,25 +197,11 @@ export default function AdminDashboardPage() {
     { id: 'usr-4', name: 'Ravali Textiles', email: 'ravali.textiles@gmail.com', role: 'BUSINESS_OWNER', phone: '+91 98492 55443', status: 'ACTIVE', joinedDate: '2026-03-12' },
   ]);
 
-  // Reviews State
-  const [reviewsList, setReviewsList] = useState<Review[]>([
-    { id: 'rev-1', businessId: 'biz-1', userName: 'Rajesh K.', rating: 5, comment: 'Best Dum Biryani in Korutla! Clean AC ambience and super quick service.', date: '2026-09-14' },
-    { id: 'rev-2', businessId: 'biz-3', userName: 'Priya Sharma', rating: 5, comment: 'Purchased Pattu sarees for wedding. Wholesale prices and high quality.', date: '2026-09-12' },
-    { id: 'rev-3', businessId: 'biz-2', userName: 'Mahesh B.', rating: 4, comment: 'Doctor consultation was clear and emergency care was fast.', date: '2026-09-10' },
-  ]);
-
-  // Orders State
-  const [ordersList, setOrdersList] = useState([
-    { id: 'ORD-9821', customerName: 'Srinivas Goud', phone: '+91 94401 88776', items: '2x Royal Chicken Dum Biryani', total: '₹560', status: 'DELIVERED', time: '10 mins ago' },
-    { id: 'ORD-9822', customerName: 'Ramesh Reddy', phone: '+91 98491 22334', items: '1x Family Biryani Bucket + Salan', total: '₹750', status: 'DISPATCHED', time: '25 mins ago' },
-    { id: 'ORD-9823', customerName: 'Anitha P.', phone: '+91 99890 11223', items: '1x Paneer Butter Masala + Naan', total: '₹220', status: 'PREPARING', time: '40 mins ago' },
-  ]);
-
   // Stories & Reels
   const [storiesList, setStoriesList] = useState<StoryReel[]>(STORIES_REELS);
 
   // Settings State
-  const [siteName, setSiteName] = useState('Royal Korutla 👑');
+  const [siteName, setSiteName] = useState('Royal Korutla Directory');
   const [supportPhone, setSupportPhone] = useState('+91 98480 12345');
   const [supportEmail, setSupportEmail] = useState('support@royalkorutla.com');
   const [maintenanceMode, setMaintenanceMode] = useState(false);
@@ -205,8 +222,25 @@ export default function AdminDashboardPage() {
     }
   };
 
+  // Fetch Photography Studios from API
+  const fetchPhotography = async () => {
+    setLoadingPhoto(true);
+    try {
+      const res = await fetch('/api/admin/photography');
+      const data = await res.json();
+      if (data.success && data.data) {
+        setPhotographyList(data.data);
+      }
+    } catch (e) {
+      console.error('Failed to fetch photography studios', e);
+    } finally {
+      setLoadingPhoto(false);
+    }
+  };
+
   useEffect(() => {
     fetchPromotions();
+    fetchPhotography();
   }, []);
 
   const showToast = (message: string, type: 'success' | 'error' = 'success') => {
@@ -263,7 +297,142 @@ export default function AdminDashboardPage() {
     setActiveTab('businesses');
   };
 
-  // Promotion Publisher Action (Zero Code Edit!)
+  const handleStartEditBiz = (biz: LocalBusiness) => {
+    setEditingBiz(biz);
+    setNewBizName(biz.name);
+    setNewBizCategory(biz.categorySlug);
+    setNewBizSubCategory(biz.subCategory || '');
+    setNewBizPhone(biz.phone || '');
+    setNewBizAddress(biz.address || '');
+    setNewBizTiming(biz.timing || '09:00 AM - 09:00 PM');
+    setNewBizImage(biz.image);
+    setNewBizVerified(biz.isVerified);
+    setActiveTab('edit-business');
+  };
+
+  const handleSaveEditBiz = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingBiz) return;
+    setBusinesses(businesses.map(b => b.id === editingBiz.id ? {
+      ...b,
+      name: newBizName,
+      categorySlug: newBizCategory as any,
+      subCategory: newBizSubCategory,
+      phone: newBizPhone,
+      address: newBizAddress,
+      timing: newBizTiming,
+      image: newBizImage,
+      isVerified: newBizVerified,
+    } : b));
+    showToast(`Updated "${newBizName}" details successfully.`);
+    setEditingBiz(null);
+    setActiveTab('businesses');
+  };
+
+  // Photography Actions
+  const handleSavePhotographyStudio = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!photoName || !photoPhone) {
+      showToast('Studio Name and Phone Number are required', 'error');
+      return;
+    }
+
+    try {
+      const isEdit = !!editingPhotoStudio;
+      const url = '/api/admin/photography';
+      const method = isEdit ? 'PUT' : 'POST';
+      const body = {
+        ...(isEdit ? { id: editingPhotoStudio.id } : {}),
+        name: photoName,
+        profileImage: photoProfile || 'https://images.unsplash.com/photo-1537633552985-df8429e8048b?w=600&auto=format&fit=crop&q=80',
+        coverImage: photoCover || 'https://images.unsplash.com/photo-1519741497674-611481863552?w=1200&auto=format&fit=crop&q=80',
+        location: photoLocation,
+        landmark: photoLandmark,
+        phone: photoPhone,
+        whatsapp: photoWhatsapp || photoPhone,
+        instagram: photoInstagram,
+        description: photoDesc,
+        photographyTypes: photoTypes,
+        startingPrice: photoPrice,
+        isVerified: photoVerified,
+        isFeatured: photoFeatured,
+      };
+
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        showToast(isEdit ? `Updated "${photoName}" studio!` : `Added "${photoName}" photography studio!`);
+        fetchPhotography();
+        resetPhotoForm();
+      } else {
+        showToast(data.message || 'Failed to save photography studio', 'error');
+      }
+    } catch (err) {
+      showToast('Error saving photography studio', 'error');
+    }
+  };
+
+  const resetPhotoForm = () => {
+    setEditingPhotoStudio(null);
+    setPhotoName('');
+    setPhotoProfile('');
+    setPhotoCover('');
+    setPhotoLocation('Korutla Town');
+    setPhotoLandmark('Main Road');
+    setPhotoPhone('');
+    setPhotoWhatsapp('');
+    setPhotoInstagram('');
+    setPhotoDesc('');
+    setPhotoTypes(['Wedding', 'Events']);
+    setPhotoPrice('₹15,000 / day');
+    setPhotoVerified(true);
+    setPhotoFeatured(false);
+  };
+
+  const handleEditPhotoStudio = (studio: PhotographyBusiness) => {
+    setEditingPhotoStudio(studio);
+    setPhotoName(studio.name);
+    setPhotoProfile(studio.profileImage);
+    setPhotoCover(studio.coverImage);
+    setPhotoLocation(studio.location);
+    setPhotoLandmark(studio.landmark || '');
+    setPhotoPhone(studio.phone);
+    setPhotoWhatsapp(studio.whatsapp || studio.phone);
+    setPhotoInstagram(studio.instagram || '');
+    setPhotoDesc(studio.description);
+    setPhotoTypes(studio.photographyTypes);
+    setPhotoPrice(studio.startingPrice || '₹15,000 / day');
+    setPhotoVerified(studio.isVerified);
+    setPhotoFeatured(studio.isFeatured);
+  };
+
+  const handleDeletePhotoStudio = async (id: string) => {
+    try {
+      const res = await fetch(`/api/admin/photography?id=${id}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (data.success) {
+        showToast('Photography studio removed successfully.');
+        fetchPhotography();
+      }
+    } catch (err) {
+      showToast('Error removing studio', 'error');
+    }
+  };
+
+  const togglePhotoTypeSelection = (t: PhotographyType) => {
+    if (photoTypes.includes(t)) {
+      setPhotoTypes(photoTypes.filter(item => item !== t));
+    } else {
+      setPhotoTypes([...photoTypes, t]);
+    }
+  };
+
+  // Promotion Publisher Action
   const handlePublishPromotion = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!promBizName) {
@@ -292,7 +461,7 @@ export default function AdminDashboardPage() {
 
       const data = await res.json();
       if (res.ok && data.success) {
-        showToast(`🎉 Promotion Published! "${promBizName}" is now active in ${promPlacement}!`);
+        showToast(`Promotion Published! "${promBizName}" is now active in ${promPlacement}!`);
         fetchPromotions();
         setPromBizName('');
         setPromTitle('');
@@ -318,6 +487,36 @@ export default function AdminDashboardPage() {
     }
   };
 
+  // Homepage Slide Action
+  const handleAddSlide = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newSlideTitle) return;
+    const slide: HomepageSlide = {
+      id: `slide-${Date.now()}`,
+      title: newSlideTitle,
+      subtitle: newSlideSubtitle,
+      ctaText: newSlideCtaText,
+      ctaLink: newSlideCtaLink,
+      image: newSlideBg,
+      badgeText: 'HOT DEAL',
+    };
+    setHeroSlides([...heroSlides, slide]);
+    setNewSlideTitle('');
+    setNewSlideSubtitle('');
+    showToast('Hero slide added to homepage banner carousel!');
+  };
+
+  const moveBusinessOrder = (index: number, direction: 'up' | 'down') => {
+    const updated = [...businesses];
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+    if (targetIndex < 0 || targetIndex >= updated.length) return;
+    const temp = updated[index];
+    updated[index] = updated[targetIndex];
+    updated[targetIndex] = temp;
+    setBusinesses(updated);
+    showToast('Featured business order updated');
+  };
+
   // Tab definitions
   const tabsList: { id: AdminTab; label: string; icon: any; badge?: string }[] = [
     { id: 'dashboard', label: 'Dashboard', icon: Layout },
@@ -326,7 +525,9 @@ export default function AdminDashboardPage() {
     { id: 'edit-business', label: 'Edit Business', icon: Edit3 },
     { id: 'verify-business', label: 'Verify Badges', icon: CheckCircle2 },
     { id: 'featured-businesses', label: 'Featured Ticker', icon: Crown },
-    { id: 'promotions', label: 'Promotions (No-Code)', icon: Sparkles, badge: `${promotions.length}` },
+    { id: 'photography', label: 'Photography & Studios', icon: Camera, badge: `${photographyList.length}` },
+    { id: 'promotions', label: 'Promotions (Paid)', icon: Sparkles, badge: `${promotions.length}` },
+    { id: 'homepage-content', label: 'Homepage Content', icon: Eye },
     { id: 'offers', label: 'Offers & Deals', icon: Tag },
     { id: 'food', label: 'Food & Menus', icon: Utensils },
     { id: 'grocery', label: 'Grocery Stock', icon: ShoppingBag },
@@ -339,11 +540,9 @@ export default function AdminDashboardPage() {
     { id: 'reviews', label: 'Reviews', icon: MessageSquare },
     { id: 'orders', label: 'Orders', icon: ShoppingCart },
     { id: 'royal-points', label: 'Royal Points', icon: Award },
-    { id: 'stories', label: 'Stories', icon: Video },
-    { id: 'reels', label: 'Reels', icon: Film },
+    { id: 'stories', label: 'Stories & Reels', icon: Video },
     { id: 'payments', label: 'Payments', icon: CreditCard },
     { id: 'subscriptions', label: 'Subscriptions', icon: Zap },
-    { id: 'homepage-content', label: 'Homepage Content', icon: Eye },
     { id: 'settings', label: 'Settings', icon: SettingsIcon },
   ];
 
@@ -365,20 +564,18 @@ export default function AdminDashboardPage() {
       <header className="bg-slate-950 border-b border-slate-800 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 via-purple-600 to-indigo-600 p-0.5 flex items-center justify-center shadow-lg shadow-amber-500/10">
-              <div className="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center">
-                <Crown className="w-5 h-5 text-amber-400" />
-              </div>
+            <div className="w-10 h-10 rounded-xl bg-blue-700 p-0.5 flex items-center justify-center shadow-lg">
+              <Crown className="w-5 h-5 text-white" />
             </div>
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="text-base font-extrabold text-white tracking-tight">Royal Korutla Admin</h1>
-                <span className="text-[10px] font-black px-2 py-0.5 rounded-md bg-purple-950 text-purple-300 border border-purple-800 uppercase tracking-wide">
-                  Owner Only
+                <span className="text-[10px] font-black px-2 py-0.5 rounded-md bg-blue-950 text-blue-300 border border-blue-800 uppercase tracking-wide">
+                  Owner Admin
                 </span>
               </div>
               <p className="text-[11px] text-slate-400 flex items-center gap-1">
-                <Lock className="w-3 h-3 text-emerald-400 inline" /> Session: <strong className="text-slate-200 font-medium">admin@royalkorutla.com (ME)</strong>
+                <Lock className="w-3 h-3 text-emerald-400 inline" /> Session: <strong className="text-slate-200 font-medium">admin@royalkorutla.com</strong>
               </p>
             </div>
           </div>
@@ -405,8 +602,8 @@ export default function AdminDashboardPage() {
         {/* Module Sidebar Navigation */}
         <aside className="w-full md:w-64 shrink-0 space-y-2">
           <div className="p-3 bg-slate-950/80 rounded-2xl border border-slate-800">
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-3 mb-2">Owner Controls (25 Modules)</p>
-            <nav className="space-y-0.5 max-h-[70vh] md:max-h-none overflow-y-auto pr-1">
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-3 mb-2">Admin Modules ({tabsList.length})</p>
+            <nav className="space-y-0.5 max-h-[75vh] overflow-y-auto pr-1">
               {tabsList.map((tab) => {
                 const IconComp = tab.icon;
                 const isActive = activeTab === tab.id;
@@ -416,17 +613,17 @@ export default function AdminDashboardPage() {
                     onClick={() => setActiveTab(tab.id)}
                     className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium transition-all ${
                       isActive
-                        ? 'bg-amber-500 text-slate-950 font-extrabold shadow-md shadow-amber-500/20'
+                        ? 'bg-blue-700 text-white font-extrabold shadow-md'
                         : 'text-slate-300 hover:bg-slate-800 hover:text-white'
                     }`}
                   >
                     <div className="flex items-center gap-2.5">
-                      <IconComp className={`w-4 h-4 shrink-0 ${isActive ? 'text-slate-950' : 'text-slate-400'}`} />
+                      <IconComp className={`w-4 h-4 shrink-0 ${isActive ? 'text-white' : 'text-slate-400'}`} />
                       <span className="truncate">{tab.label}</span>
                     </div>
                     {tab.badge && (
                       <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
-                        isActive ? 'bg-slate-950 text-amber-400' : 'bg-slate-800 text-slate-400'
+                        isActive ? 'bg-white text-blue-900' : 'bg-slate-800 text-slate-400'
                       }`}>
                         {tab.badge}
                       </span>
@@ -444,22 +641,22 @@ export default function AdminDashboardPage() {
           {/* TAB 1: DASHBOARD OVERVIEW */}
           {activeTab === 'dashboard' && (
             <div className="space-y-6">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-6 rounded-2xl bg-gradient-to-r from-amber-950/40 via-purple-950/30 to-slate-900 border border-amber-500/30">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-6 rounded-2xl bg-slate-900 border border-slate-800">
                 <div>
-                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-[11px] font-bold mb-2">
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-900/40 border border-blue-700 text-blue-300 text-[11px] font-bold mb-2">
                     <Shield className="w-3.5 h-3.5" />
                     <span>Royal Korutla Private Control Center</span>
                   </div>
-                  <h2 className="text-2xl font-black text-white">Welcome, Owner Admin 👑</h2>
+                  <h2 className="text-2xl font-black text-white">Welcome, Owner Admin</h2>
                   <p className="text-xs text-slate-400 mt-1 max-w-lg">
-                    Full control over all 25 modules of Royal Korutla. Manage businesses, verify badges, publish paid promotions without code editing, moderate reviews, and track revenue.
+                    Manage town businesses, photography studios, paid promotions, homepage banners, and verified listing badges.
                   </p>
                 </div>
                 <button
                   onClick={() => setActiveTab('promotions')}
-                  className="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs flex items-center gap-2 shadow-lg shadow-amber-500/20 shrink-0 transition-all"
+                  className="px-4 py-2.5 rounded-xl bg-blue-700 hover:bg-blue-800 text-white font-extrabold text-xs flex items-center gap-2 shrink-0 transition-all"
                 >
-                  <Sparkles className="w-4 h-4 fill-slate-950" />
+                  <Sparkles className="w-4 h-4" />
                   <span>Publish New Promotion</span>
                 </button>
               </div>
@@ -469,10 +666,19 @@ export default function AdminDashboardPage() {
                 <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-1">
                   <div className="flex items-center justify-between text-slate-400 text-xs font-semibold">
                     <span>Total Businesses</span>
-                    <Building2 className="w-4 h-4 text-indigo-400" />
+                    <Building2 className="w-4 h-4 text-blue-400" />
                   </div>
                   <p className="text-2xl font-black text-white">{businesses.length}</p>
                   <p className="text-[10px] text-emerald-400 font-semibold">{businesses.filter(b=>b.isVerified).length} Verified</p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-1">
+                  <div className="flex items-center justify-between text-slate-400 text-xs font-semibold">
+                    <span>Photography Studios</span>
+                    <Camera className="w-4 h-4 text-purple-400" />
+                  </div>
+                  <p className="text-2xl font-black text-white">{photographyList.length}</p>
+                  <p className="text-[10px] text-purple-300 font-semibold">Korutla Studios</p>
                 </div>
 
                 <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-1">
@@ -481,71 +687,327 @@ export default function AdminDashboardPage() {
                     <Sparkles className="w-4 h-4 text-amber-400" />
                   </div>
                   <p className="text-2xl font-black text-amber-400">{promotions.filter(p=>p.status==='ACTIVE').length}</p>
-                  <p className="text-[10px] text-amber-300 font-semibold">Zero-code published</p>
+                  <p className="text-[10px] text-amber-300 font-semibold">Live on website</p>
                 </div>
 
                 <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-1">
                   <div className="flex items-center justify-between text-slate-400 text-xs font-semibold">
-                    <span>Monthly Ad Revenue</span>
-                    <DollarSign className="w-4 h-4 text-emerald-400" />
+                    <span>Town Coverage</span>
+                    <MapPin className="w-4 h-4 text-emerald-400" />
                   </div>
-                  <p className="text-2xl font-black text-emerald-400">₹48,500</p>
-                  <p className="text-[10px] text-emerald-300 font-semibold">+24% vs last month</p>
-                </div>
-
-                <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-1">
-                  <div className="flex items-center justify-between text-slate-400 text-xs font-semibold">
-                    <span>Registered Users</span>
-                    <Users className="w-4 h-4 text-purple-400" />
-                  </div>
-                  <p className="text-2xl font-black text-white">{usersList.length * 350}+</p>
-                  <p className="text-[10px] text-slate-400">Korutla residents</p>
+                  <p className="text-2xl font-black text-white">505326</p>
+                  <p className="text-[10px] text-slate-400">Korutla Town Portal</p>
                 </div>
               </div>
 
               {/* Quick Actions Grid */}
               <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
                 <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                  <Sliders className="w-4 h-4 text-amber-400" />
+                  <Sliders className="w-4 h-4 text-blue-400" />
                   <span>Quick Admin Short-Cuts</span>
                 </h3>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+                  <button onClick={() => setActiveTab('photography')} className="p-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-left space-y-1 transition-all">
+                    <Camera className="w-4 h-4 text-purple-400" />
+                    <p className="font-bold text-white">Photography Studios</p>
+                    <p className="text-[10px] text-slate-400">Add studio / wedding photography</p>
+                  </button>
                   <button onClick={() => setActiveTab('add-business')} className="p-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-left space-y-1 transition-all">
-                    <Plus className="w-4 h-4 text-amber-400" />
+                    <Plus className="w-4 h-4 text-blue-400" />
                     <p className="font-bold text-white">Add New Business</p>
                     <p className="text-[10px] text-slate-400">Register shop in Korutla</p>
                   </button>
                   <button onClick={() => setActiveTab('promotions')} className="p-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-left space-y-1 transition-all">
                     <Sparkles className="w-4 h-4 text-amber-400" />
                     <p className="font-bold text-white">Publish Paid Promo</p>
-                    <p className="text-[10px] text-slate-400">Image &amp; dates placement</p>
+                    <p className="text-[10px] text-slate-400">Banner &amp; date placement</p>
                   </button>
-                  <button onClick={() => setActiveTab('verify-business')} className="p-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-left space-y-1 transition-all">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                    <p className="font-bold text-white">Verify Badges</p>
-                    <p className="text-[10px] text-slate-400">Toggle RK Verified tick</p>
-                  </button>
-                  <button onClick={() => setActiveTab('reviews')} className="p-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-left space-y-1 transition-all">
-                    <MessageSquare className="w-4 h-4 text-purple-400" />
-                    <p className="font-bold text-white">Moderate Reviews</p>
-                    <p className="text-[10px] text-slate-400">Approve or flag comments</p>
+                  <button onClick={() => setActiveTab('homepage-content')} className="p-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-left space-y-1 transition-all">
+                    <Eye className="w-4 h-4 text-emerald-400" />
+                    <p className="font-bold text-white">Homepage Banners</p>
+                    <p className="text-[10px] text-slate-400">Hero slides &amp; featured order</p>
                   </button>
                 </div>
               </div>
             </div>
           )}
 
-          {/* TAB 7: PROMOTIONS (NO-CODE BUSINESS PROMOTION MANAGER) */}
+          {/* TAB: PHOTOGRAPHY & STUDIOS MANAGEMENT */}
+          {activeTab === 'photography' && (
+            <div className="space-y-6">
+              <div className="p-5 rounded-2xl bg-purple-950/30 border border-purple-800 space-y-2">
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-purple-900/40 text-purple-300 text-xs font-bold">
+                  <Camera className="w-3.5 h-3.5" />
+                  <span>Photography &amp; Studios Content Management</span>
+                </div>
+                <h2 className="text-xl font-bold text-white">Manage Photography &amp; Studios</h2>
+                <p className="text-xs text-slate-300 max-w-2xl">
+                  Add, edit, or manage Korutla photo studios, camera rentals, wedding photography teams, pricing, portfolio galleries, and contact details.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Add/Edit Form */}
+                <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
+                  <div className="flex items-center justify-between pb-2 border-b border-slate-800">
+                    <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                      <Camera className="w-4 h-4 text-purple-400" />
+                      <span>{editingPhotoStudio ? 'Edit Studio Profile' : 'Add Photography Studio'}</span>
+                    </h3>
+                    {editingPhotoStudio && (
+                      <button onClick={resetPhotoForm} className="text-[11px] text-slate-400 hover:text-white">
+                        Cancel Edit
+                      </button>
+                    )}
+                  </div>
+
+                  <form onSubmit={handleSavePhotographyStudio} className="space-y-3 text-xs">
+                    <div>
+                      <label className="block text-slate-300 font-bold mb-1">Studio / Photographer Name *</label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="e.g. Royal Digital Photography Studio"
+                        value={photoName}
+                        onChange={(e) => setPhotoName(e.target.value)}
+                        className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <label className="block text-slate-300 font-bold mb-1">Phone Number *</label>
+                        <input
+                          type="text"
+                          required
+                          placeholder="+91 98480 12345"
+                          value={photoPhone}
+                          onChange={(e) => setPhotoPhone(e.target.value)}
+                          className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-slate-300 font-bold mb-1">WhatsApp Number</label>
+                        <input
+                          type="text"
+                          placeholder="+91 98480 12345"
+                          value={photoWhatsapp}
+                          onChange={(e) => setPhotoWhatsapp(e.target.value)}
+                          className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <label className="block text-slate-300 font-bold mb-1">Profile Image URL</label>
+                        <input
+                          type="url"
+                          placeholder="https://images.unsplash.com/..."
+                          value={photoProfile}
+                          onChange={(e) => setPhotoProfile(e.target.value)}
+                          className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-slate-300 font-bold mb-1">Cover Image URL</label>
+                        <input
+                          type="url"
+                          placeholder="https://images.unsplash.com/..."
+                          value={photoCover}
+                          onChange={(e) => setPhotoCover(e.target.value)}
+                          className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <label className="block text-slate-300 font-bold mb-1">Location / Address</label>
+                        <input
+                          type="text"
+                          placeholder="e.g. Main Road, Korutla"
+                          value={photoLocation}
+                          onChange={(e) => setPhotoLocation(e.target.value)}
+                          className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-slate-300 font-bold mb-1">Starting Price</label>
+                        <input
+                          type="text"
+                          placeholder="e.g. ₹15,000 / day"
+                          value={photoPrice}
+                          onChange={(e) => setPhotoPrice(e.target.value)}
+                          className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-slate-300 font-bold mb-1">Instagram Handle</label>
+                      <input
+                        type="text"
+                        placeholder="e.g. @royal_korutla_studios"
+                        value={photoInstagram}
+                        onChange={(e) => setPhotoInstagram(e.target.value)}
+                        className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-slate-300 font-bold mb-1">Description / Services</label>
+                      <textarea
+                        rows={2}
+                        placeholder="Specialist in cinematic wedding photography, candid video shoots, drone coverage in Korutla."
+                        value={photoDesc}
+                        onChange={(e) => setPhotoDesc(e.target.value)}
+                        className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-slate-300 font-bold mb-1">Photography Types</label>
+                      <div className="flex flex-wrap gap-1.5 pt-1">
+                        {ALL_PHOTO_TYPES.map((type) => {
+                          const isSel = photoTypes.includes(type);
+                          return (
+                            <button
+                              type="button"
+                              key={type}
+                              onClick={() => togglePhotoTypeSelection(type)}
+                              className={`px-2.5 py-1 rounded-lg text-[10px] font-bold border transition-colors ${
+                                isSel
+                                  ? 'bg-purple-900/60 text-purple-200 border-purple-600'
+                                  : 'bg-slate-950 text-slate-400 border-slate-800 hover:text-white'
+                              }`}
+                            >
+                              {isSel ? '✓ ' : ''}{type}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-4 pt-1">
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={photoVerified}
+                          onChange={(e) => setPhotoVerified(e.target.checked)}
+                          className="rounded text-blue-700"
+                        />
+                        <span className="text-slate-300 font-bold">Verified</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={photoFeatured}
+                          onChange={(e) => setPhotoFeatured(e.target.checked)}
+                          className="rounded text-blue-700"
+                        />
+                        <span className="text-slate-300 font-bold">Featured Studio</span>
+                      </label>
+                    </div>
+
+                    <button
+                      type="submit"
+                      className="w-full py-3 rounded-xl bg-purple-700 hover:bg-purple-800 text-white font-extrabold text-xs flex items-center justify-center gap-2 shadow-lg transition-all mt-2"
+                    >
+                      <Camera className="w-4 h-4" />
+                      <span>{editingPhotoStudio ? 'Update Studio Profile' : 'Save Photography Studio'}</span>
+                    </button>
+                  </form>
+                </div>
+
+                {/* Studios List */}
+                <div className="lg:col-span-2 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                      <Camera className="w-4 h-4 text-purple-400" />
+                      <span>Korutla Photography Studios ({photographyList.length})</span>
+                    </h3>
+                    <button onClick={fetchPhotography} className="text-xs text-purple-400 hover:underline flex items-center gap-1">
+                      <RefreshCw className="w-3 h-3" /> Refresh
+                    </button>
+                  </div>
+
+                  {loadingPhoto ? (
+                    <div className="p-8 text-center text-slate-400 text-xs">Loading studios...</div>
+                  ) : photographyList.length === 0 ? (
+                    <div className="p-8 text-center text-slate-400 text-xs bg-slate-900 rounded-2xl border border-slate-800">
+                      No photography studios registered yet.
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {photographyList.map((studio) => (
+                        <div key={studio.id} className="p-4 rounded-2xl bg-slate-900 border border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                          <div className="flex items-center gap-3">
+                            <img src={studio.profileImage} alt={studio.name} className="w-14 h-14 object-cover rounded-xl shrink-0" />
+                            <div className="space-y-1">
+                              <div className="flex items-center gap-2">
+                                <h4 className="text-sm font-bold text-white">{studio.name}</h4>
+                                {studio.isVerified && (
+                                  <span className="px-2 py-0.5 rounded-full bg-blue-950 text-blue-300 border border-blue-800 font-bold text-[10px]">
+                                    VERIFIED
+                                  </span>
+                                )}
+                                {studio.isFeatured && (
+                                  <span className="px-2 py-0.5 rounded-full bg-purple-950 text-purple-300 border border-purple-800 font-bold text-[10px]">
+                                    FEATURED
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-xs text-slate-400">{studio.location} • Phone: {studio.phone}</p>
+                              <div className="flex flex-wrap gap-1">
+                                {studio.photographyTypes.map((t) => (
+                                  <span key={t} className="px-2 py-0.5 rounded bg-slate-800 text-[10px] font-medium text-purple-300">
+                                    {t}
+                                  </span>
+                                ))}
+                                {studio.startingPrice && (
+                                  <span className="px-2 py-0.5 rounded bg-emerald-950 text-[10px] font-bold text-emerald-300 border border-emerald-800">
+                                    Starting {studio.startingPrice}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-2 shrink-0">
+                            <button
+                              onClick={() => handleEditPhotoStudio(studio)}
+                              className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs transition-all"
+                            >
+                              <Edit3 className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              onClick={() => handleDeletePhotoStudio(studio.id)}
+                              className="p-2 rounded-xl bg-rose-500/20 hover:bg-rose-600 text-rose-300 hover:text-white border border-rose-500/30 transition-all text-xs"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 7: PROMOTIONS */}
           {activeTab === 'promotions' && (
             <div className="space-y-6">
-              <div className="p-5 rounded-2xl bg-amber-950/30 border border-amber-500/40 space-y-2">
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-xs font-bold">
+              <div className="p-5 rounded-2xl bg-amber-950/30 border border-amber-800 space-y-2">
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-900/40 text-amber-300 text-xs font-bold">
                   <Sparkles className="w-3.5 h-3.5" />
-                  <span>No-Code Paid Business Promotion Publisher</span>
+                  <span>Paid Business Promotion Publisher</span>
                 </div>
                 <h2 className="text-xl font-bold text-white">Publish Paid Business Promotions</h2>
                 <p className="text-xs text-slate-300 max-w-2xl">
-                  When a local business pays for promotion, enter the details here. Select the business, upload/paste the banner image, set start and end dates, and publish! The site automatically renders active campaigns and hides them on expiry.
+                  When a local business pays for promotion, enter the details here. Select the business, upload/paste the banner image, set start and end dates, and publish live on Royal Korutla.
                 </p>
               </div>
 
@@ -629,6 +1091,7 @@ export default function AdminDashboardPage() {
                           className="w-full bg-slate-950 border border-slate-700 rounded-xl px-2.5 py-2 text-white focus:outline-none focus:border-amber-500"
                         >
                           <option value="Homepage Top Banner">Homepage Top Banner</option>
+                          <option value="Photography Header">Photography Header</option>
                           <option value="Food Section Header">Food Section Header</option>
                           <option value="Shopping Section Header">Shopping Header</option>
                           <option value="Hospitals Section">Hospitals Section</option>
@@ -659,9 +1122,9 @@ export default function AdminDashboardPage() {
 
                     <button
                       type="submit"
-                      className="w-full py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20 transition-all mt-2"
+                      className="w-full py-3 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-extrabold text-xs flex items-center justify-center gap-2 shadow-lg transition-all mt-2"
                     >
-                      <Sparkles className="w-4 h-4 fill-slate-950" />
+                      <Sparkles className="w-4 h-4" />
                       <span>Publish Live on Website</span>
                     </button>
                   </form>
@@ -695,10 +1158,10 @@ export default function AdminDashboardPage() {
                             )}
                             <div className="space-y-1">
                               <div className="flex items-center gap-2">
-                                <span className="px-2 py-0.5 rounded-full bg-amber-500 text-slate-950 font-extrabold text-[10px] uppercase">
+                                <span className="px-2 py-0.5 rounded bg-amber-600 text-white font-extrabold text-[10px] uppercase">
                                   {p.badgeLabel || 'PROMOTED'}
                                 </span>
-                                <span className="text-[11px] font-semibold text-purple-400">{p.placement}</span>
+                                <span className="text-[11px] font-semibold text-blue-400">{p.placement}</span>
                               </div>
                               <h4 className="text-sm font-bold text-white">{p.businessName}</h4>
                               {p.offerText && <p className="text-xs text-amber-300 font-semibold">{p.offerText}</p>}
@@ -738,7 +1201,7 @@ export default function AdminDashboardPage() {
                   <h3 className="text-lg font-bold text-white">Korutla Local Businesses ({businesses.length})</h3>
                   <p className="text-xs text-slate-400">Manage listings, toggle RK verified badge, pin to featured section.</p>
                 </div>
-                <button onClick={() => setActiveTab('add-business')} className="px-3.5 py-2 rounded-xl bg-amber-500 text-slate-950 font-extrabold text-xs flex items-center gap-1.5">
+                <button onClick={() => setActiveTab('add-business')} className="px-3.5 py-2 rounded-xl bg-blue-700 text-white font-extrabold text-xs flex items-center gap-1.5">
                   <Plus className="w-4 h-4" /> Add New Business
                 </button>
               </div>
@@ -769,11 +1232,11 @@ export default function AdminDashboardPage() {
                             onClick={() => handleToggleVerifyBiz(b.id)}
                             className={`px-2.5 py-1 rounded-full text-[10px] font-bold flex items-center gap-1 ${
                               b.isVerified
-                                ? 'bg-emerald-950 text-emerald-300 border border-emerald-800'
+                                ? 'bg-blue-950 text-blue-300 border border-blue-800'
                                 : 'bg-slate-800 text-slate-400'
                             }`}
                           >
-                            <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                            <CheckCircle2 className="w-3 h-3 text-blue-400" />
                             <span>{b.isVerified ? 'VERIFIED' : 'Not Verified'}</span>
                           </button>
                         </td>
@@ -789,7 +1252,13 @@ export default function AdminDashboardPage() {
                             {b.isFeatured ? 'FEATURED' : 'Standard'}
                           </button>
                         </td>
-                        <td className="p-3 text-right">
+                        <td className="p-3 text-right space-x-1">
+                          <button
+                            onClick={() => handleStartEditBiz(b)}
+                            className="p-1.5 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700"
+                          >
+                            <Edit3 className="w-3.5 h-3.5" />
+                          </button>
                           <button
                             onClick={() => setBusinesses(businesses.filter(item => item.id !== b.id))}
                             className="p-1.5 rounded-lg bg-rose-500/20 text-rose-300 hover:bg-rose-600 hover:text-white"
@@ -809,7 +1278,7 @@ export default function AdminDashboardPage() {
           {activeTab === 'add-business' && (
             <div className="max-w-2xl mx-auto space-y-4">
               <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                <Plus className="w-5 h-5 text-amber-400" />
+                <Plus className="w-5 h-5 text-blue-400" />
                 <span>Register New Business in Korutla</span>
               </h3>
               <form onSubmit={handleAddBusiness} className="p-6 bg-slate-900 rounded-2xl border border-slate-800 space-y-4 text-xs">
@@ -821,20 +1290,21 @@ export default function AdminDashboardPage() {
                     placeholder="e.g. Royal Sweets & Bakery"
                     value={newBizName}
                     onChange={(e) => setNewBizName(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white focus:border-amber-500 focus:outline-none"
+                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white focus:border-blue-500 focus:outline-none"
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-slate-300 font-bold mb-1">Category Slug</label>
+                    <label className="block text-slate-300 font-bold mb-1">Category</label>
                     <select
                       value={newBizCategory}
                       onChange={(e) => setNewBizCategory(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white focus:border-amber-500 focus:outline-none"
+                      className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white focus:border-blue-500 focus:outline-none"
                     >
                       <option value="food">Food &amp; Dining</option>
                       <option value="groceries">Groceries &amp; Marts</option>
+                      <option value="photography">Photography &amp; Studios</option>
                       <option value="shopping">Shopping &amp; Apparel</option>
                       <option value="services">Services &amp; Repair</option>
                       <option value="hospitals">Hospitals &amp; Doctors</option>
@@ -849,7 +1319,7 @@ export default function AdminDashboardPage() {
                       placeholder="e.g. Bakery & Confectionery"
                       value={newBizSubCategory}
                       onChange={(e) => setNewBizSubCategory(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white focus:border-amber-500 focus:outline-none"
+                      className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white focus:border-blue-500 focus:outline-none"
                     />
                   </div>
                 </div>
@@ -862,7 +1332,7 @@ export default function AdminDashboardPage() {
                       placeholder="+91 98480 12345"
                       value={newBizPhone}
                       onChange={(e) => setNewBizPhone(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white focus:border-amber-500 focus:outline-none"
+                      className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white focus:border-blue-500 focus:outline-none"
                     />
                   </div>
                   <div>
@@ -871,7 +1341,7 @@ export default function AdminDashboardPage() {
                       type="text"
                       value={newBizTiming}
                       onChange={(e) => setNewBizTiming(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white focus:border-amber-500 focus:outline-none"
+                      className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white focus:border-blue-500 focus:outline-none"
                     />
                   </div>
                 </div>
@@ -883,7 +1353,7 @@ export default function AdminDashboardPage() {
                     placeholder="e.g. Main Road, Korutla"
                     value={newBizAddress}
                     onChange={(e) => setNewBizAddress(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white focus:border-amber-500 focus:outline-none"
+                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white focus:border-blue-500 focus:outline-none"
                   />
                 </div>
 
@@ -893,7 +1363,7 @@ export default function AdminDashboardPage() {
                     type="url"
                     value={newBizImage}
                     onChange={(e) => setNewBizImage(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white focus:border-amber-500 focus:outline-none"
+                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white focus:border-blue-500 focus:outline-none"
                   />
                 </div>
 
@@ -903,20 +1373,272 @@ export default function AdminDashboardPage() {
                     id="v-check"
                     checked={newBizVerified}
                     onChange={(e) => setNewBizVerified(e.target.checked)}
-                    className="rounded text-amber-500 focus:ring-amber-500"
+                    className="rounded text-blue-700"
                   />
                   <label htmlFor="v-check" className="text-slate-300 font-bold">
-                    Grant Royal Korutla Verified Badge Immediately
+                    Grant Royal Korutla Verified Badge
                   </label>
                 </div>
 
                 <button
                   type="submit"
-                  className="w-full py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs shadow-lg shadow-amber-500/20"
+                  className="w-full py-3 rounded-xl bg-blue-700 hover:bg-blue-800 text-white font-extrabold text-xs shadow-lg"
                 >
                   Save Business Listing
                 </button>
               </form>
+            </div>
+          )}
+
+          {/* TAB 4: EDIT BUSINESS */}
+          {activeTab === 'edit-business' && (
+            <div className="max-w-2xl mx-auto space-y-4">
+              <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                <Edit3 className="w-5 h-5 text-blue-400" />
+                <span>Edit Business Details {editingBiz ? `(${editingBiz.name})` : ''}</span>
+              </h3>
+              {editingBiz ? (
+                <form onSubmit={handleSaveEditBiz} className="p-6 bg-slate-900 rounded-2xl border border-slate-800 space-y-4 text-xs">
+                  <div>
+                    <label className="block text-slate-300 font-bold mb-1">Business Name *</label>
+                    <input
+                      type="text"
+                      required
+                      value={newBizName}
+                      onChange={(e) => setNewBizName(e.target.value)}
+                      className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white focus:border-blue-500 focus:outline-none"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-slate-300 font-bold mb-1">Category</label>
+                      <select
+                        value={newBizCategory}
+                        onChange={(e) => setNewBizCategory(e.target.value)}
+                        className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white focus:border-blue-500 focus:outline-none"
+                      >
+                        <option value="food">Food &amp; Dining</option>
+                        <option value="groceries">Groceries &amp; Marts</option>
+                        <option value="photography">Photography &amp; Studios</option>
+                        <option value="shopping">Shopping &amp; Apparel</option>
+                        <option value="services">Services &amp; Repair</option>
+                        <option value="hospitals">Hospitals &amp; Doctors</option>
+                        <option value="jobs">Local Jobs</option>
+                        <option value="real-estate">Real Estate</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-slate-300 font-bold mb-1">Sub-Category</label>
+                      <input
+                        type="text"
+                        value={newBizSubCategory}
+                        onChange={(e) => setNewBizSubCategory(e.target.value)}
+                        className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white focus:border-blue-500 focus:outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-slate-300 font-bold mb-1">Phone Number</label>
+                      <input
+                        type="text"
+                        value={newBizPhone}
+                        onChange={(e) => setNewBizPhone(e.target.value)}
+                        className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white focus:border-blue-500 focus:outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-slate-300 font-bold mb-1">Timing</label>
+                      <input
+                        type="text"
+                        value={newBizTiming}
+                        onChange={(e) => setNewBizTiming(e.target.value)}
+                        className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white focus:border-blue-500 focus:outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-slate-300 font-bold mb-1">Address</label>
+                    <input
+                      type="text"
+                      value={newBizAddress}
+                      onChange={(e) => setNewBizAddress(e.target.value)}
+                      className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white focus:border-blue-500 focus:outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-slate-300 font-bold mb-1">Image URL</label>
+                    <input
+                      type="url"
+                      value={newBizImage}
+                      onChange={(e) => setNewBizImage(e.target.value)}
+                      className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white focus:border-blue-500 focus:outline-none"
+                    />
+                  </div>
+
+                  <div className="flex items-center gap-2 pt-2">
+                    <input
+                      type="checkbox"
+                      id="ve-check"
+                      checked={newBizVerified}
+                      onChange={(e) => setNewBizVerified(e.target.checked)}
+                      className="rounded text-blue-700"
+                    />
+                    <label htmlFor="ve-check" className="text-slate-300 font-bold">
+                      Royal Korutla Verified Badge Active
+                    </label>
+                  </div>
+
+                  <div className="flex gap-2">
+                    <button
+                      type="submit"
+                      className="flex-1 py-3 rounded-xl bg-blue-700 hover:bg-blue-800 text-white font-extrabold text-xs"
+                    >
+                      Update Changes
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab('businesses')}
+                      className="px-4 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </form>
+              ) : (
+                <div className="p-8 text-center text-slate-400 bg-slate-900 rounded-2xl border border-slate-800 text-xs">
+                  Please select a business from the <button onClick={() => setActiveTab('businesses')} className="text-blue-400 underline">Businesses tab</button> to edit.
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* TAB: HOMEPAGE CONTENT MANAGEMENT */}
+          {activeTab === 'homepage-content' && (
+            <div className="space-y-6">
+              <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-2">
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-900/40 text-blue-300 text-xs font-bold">
+                  <Eye className="w-3.5 h-3.5" />
+                  <span>Homepage Content &amp; Layout Manager</span>
+                </div>
+                <h2 className="text-xl font-bold text-white">Homepage Banners &amp; Featured Order</h2>
+                <p className="text-xs text-slate-400 max-w-2xl">
+                  Add custom hero banner slides, reorder featured businesses shown on homepage, and update town spotlights.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Hero Slides */}
+                <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
+                  <h3 className="text-sm font-bold text-white flex items-center justify-between pb-2 border-b border-slate-800">
+                    <span className="flex items-center gap-2"><Layers className="w-4 h-4 text-blue-400" /> Hero Slides ({heroSlides.length})</span>
+                  </h3>
+
+                  <form onSubmit={handleAddSlide} className="space-y-3 text-xs bg-slate-950 p-4 rounded-xl border border-slate-800">
+                    <p className="font-bold text-slate-200">Add New Banner Slide</p>
+                    <input
+                      type="text"
+                      required
+                      placeholder="Slide Main Title (e.g. Festival Season Sale)"
+                      value={newSlideTitle}
+                      onChange={(e) => setNewSlideTitle(e.target.value)}
+                      className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Subtitle (e.g. Up to 40% discount across stores)"
+                      value={newSlideSubtitle}
+                      onChange={(e) => setNewSlideSubtitle(e.target.value)}
+                      className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none"
+                    />
+                    <div className="grid grid-cols-2 gap-2">
+                      <input
+                        type="text"
+                        placeholder="Button Text"
+                        value={newSlideCtaText}
+                        onChange={(e) => setNewSlideCtaText(e.target.value)}
+                        className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none"
+                      />
+                      <input
+                        type="text"
+                        placeholder="Button Link (e.g. /offers)"
+                        value={newSlideCtaLink}
+                        onChange={(e) => setNewSlideCtaLink(e.target.value)}
+                        className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none"
+                      />
+                    </div>
+                    <input
+                      type="url"
+                      placeholder="Background Image URL"
+                      value={newSlideBg}
+                      onChange={(e) => setNewSlideBg(e.target.value)}
+                      className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none"
+                    />
+                    <button type="submit" className="w-full py-2 bg-blue-700 hover:bg-blue-800 text-white font-extrabold rounded-lg">
+                      Add Hero Slide
+                    </button>
+                  </form>
+
+                  <div className="space-y-2">
+                    {heroSlides.map((slide) => (
+                      <div key={slide.id} className="p-3 bg-slate-950 rounded-xl border border-slate-800 flex items-center justify-between text-xs">
+                        <div>
+                          <p className="font-bold text-white">{slide.title}</p>
+                          <p className="text-[11px] text-slate-400">{slide.subtitle}</p>
+                        </div>
+                        <button
+                          onClick={() => setHeroSlides(heroSlides.filter(s => s.id !== slide.id))}
+                          className="p-1.5 rounded-lg bg-rose-500/20 text-rose-300 hover:bg-rose-600 hover:text-white"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Featured Business Reordering */}
+                <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
+                  <h3 className="text-sm font-bold text-white flex items-center gap-2 pb-2 border-b border-slate-800">
+                    <Crown className="w-4 h-4 text-amber-400" />
+                    <span>Featured Businesses Order</span>
+                  </h3>
+                  <p className="text-xs text-slate-400">Reorder featured listings shown on homepage carousel:</p>
+
+                  <div className="space-y-2">
+                    {businesses.slice(0, 8).map((biz, idx) => (
+                      <div key={biz.id} className="p-3 bg-slate-950 rounded-xl border border-slate-800 flex items-center justify-between text-xs">
+                        <div className="flex items-center gap-2">
+                          <span className="w-5 h-5 rounded bg-slate-800 flex items-center justify-center font-bold text-[10px] text-slate-400">
+                            #{idx + 1}
+                          </span>
+                          <span className="font-bold text-white">{biz.name}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <button
+                            disabled={idx === 0}
+                            onClick={() => moveBusinessOrder(idx, 'up')}
+                            className="p-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 disabled:opacity-30"
+                          >
+                            <ArrowUp className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            disabled={idx === businesses.slice(0, 8).length - 1}
+                            onClick={() => moveBusinessOrder(idx, 'down')}
+                            className="p-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 disabled:opacity-30"
+                          >
+                            <ArrowDown className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
             </div>
           )}
 
@@ -927,7 +1649,7 @@ export default function AdminDashboardPage() {
                 <CheckCircle2 className="w-5 h-5 text-emerald-400" />
                 <span>Verify Business Badges &amp; Audits</span>
               </h3>
-              <p className="text-xs text-slate-400">Click to grant or remove the Royal Korutla Verified blue tick badge.</p>
+              <p className="text-xs text-slate-400">Click to grant or remove the Royal Korutla Verified badge.</p>
               
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {businesses.map((b) => (
@@ -943,11 +1665,11 @@ export default function AdminDashboardPage() {
                       onClick={() => handleToggleVerifyBiz(b.id)}
                       className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1 ${
                         b.isVerified
-                          ? 'bg-emerald-950 text-emerald-300 border border-emerald-700'
-                          : 'bg-slate-800 text-slate-300 hover:bg-emerald-900'
+                          ? 'bg-blue-950 text-blue-300 border border-blue-700'
+                          : 'bg-slate-800 text-slate-300 hover:bg-blue-900'
                       }`}
                     >
-                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                      <CheckCircle2 className="w-3.5 h-3.5 text-blue-400" />
                       <span>{b.isVerified ? 'VERIFIED' : 'Grant Badge'}</span>
                     </button>
                   </div>
@@ -967,7 +1689,7 @@ export default function AdminDashboardPage() {
                 {offers.map((off) => (
                   <div key={off.id} className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-2">
                     <img src={off.image} alt={off.title} className="w-full h-28 object-cover rounded-xl" />
-                    <span className="px-2 py-0.5 rounded-full bg-amber-500 text-slate-950 font-black text-[10px]">{off.discount}</span>
+                    <span className="px-2 py-0.5 rounded bg-blue-700 text-white font-black text-[10px]">{off.discount}</span>
                     <h4 className="text-xs font-bold text-white">{off.title}</h4>
                     <p className="text-[11px] text-slate-400">{off.businessName}</p>
                   </div>
@@ -1049,7 +1771,7 @@ export default function AdminDashboardPage() {
                         <td className="p-3 text-slate-300">{u.email}</td>
                         <td className="p-3">
                           <span className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold ${
-                            u.role === 'ADMIN' ? 'bg-amber-500 text-slate-950' : 'bg-slate-800 text-slate-300'
+                            u.role === 'ADMIN' ? 'bg-blue-700 text-white' : 'bg-slate-800 text-slate-300'
                           }`}>
                             {u.role}
                           </span>
@@ -1067,7 +1789,7 @@ export default function AdminDashboardPage() {
           {activeTab === 'settings' && (
             <div className="max-w-xl space-y-4">
               <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                <SettingsIcon className="w-5 h-5 text-amber-400" />
+                <SettingsIcon className="w-5 h-5 text-blue-400" />
                 <span>Platform Settings &amp; Configuration</span>
               </h3>
               <div className="p-6 bg-slate-900 rounded-2xl border border-slate-800 space-y-4 text-xs">
@@ -1118,7 +1840,7 @@ export default function AdminDashboardPage() {
 
                 <button
                   onClick={() => showToast('Platform settings saved successfully.')}
-                  className="w-full py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold"
+                  className="w-full py-2.5 rounded-xl bg-blue-700 hover:bg-blue-800 text-white font-extrabold"
                 >
                   Save Settings
                 </button>
@@ -1127,9 +1849,9 @@ export default function AdminDashboardPage() {
           )}
 
           {/* FALLBACK FOR OTHER TABS */}
-          {!['dashboard', 'promotions', 'businesses', 'add-business', 'verify-business', 'offers', 'food', 'jobs', 'users', 'settings'].includes(activeTab) && (
+          {!['dashboard', 'photography', 'promotions', 'businesses', 'add-business', 'edit-business', 'verify-business', 'homepage-content', 'offers', 'food', 'jobs', 'users', 'settings'].includes(activeTab) && (
             <div className="p-8 text-center space-y-3 bg-slate-900 rounded-2xl border border-slate-800">
-              <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center mx-auto text-amber-400">
+              <div className="w-12 h-12 rounded-2xl bg-blue-900/40 border border-blue-700 flex items-center justify-center mx-auto text-white">
                 <Crown className="w-6 h-6" />
               </div>
               <h3 className="text-base font-bold text-white capitalize">{activeTab.replace('-', ' ')} Module</h3>

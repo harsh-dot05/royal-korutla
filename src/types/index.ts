@@ -9,7 +9,8 @@ export type CategorySlug =
   | 'jobs'
   | 'real-estate'
   | 'businesses'
-  | 'offers';
+  | 'offers'
+  | 'photography';
 
 export interface Category {
   id: string;
@@ -318,4 +319,45 @@ export interface UserSession {
   businessId?: string;
   createdAt: string;
 }
+
+export type PhotographyType =
+  | 'Wedding'
+  | 'Pre-wedding'
+  | 'Birthday'
+  | 'Events'
+  | 'Portrait'
+  | 'Product Photography'
+  | 'Video'
+  | 'Reels'
+  | 'Drone'
+  | 'Newborn'
+  | 'Studio'
+  | 'Fashion'
+  | 'Commercial';
+
+export interface PhotographyBusiness {
+  id: string;
+  name: string;
+  profileImage: string;
+  coverImage: string;
+  location: string;
+  landmark?: string;
+  phone: string;
+  whatsapp?: string;
+  instagram?: string;
+  description: string;
+  photographyTypes: PhotographyType[];
+  startingPrice?: string;
+  openingHours: string;
+  isVerified: boolean;
+  isFeatured: boolean;
+  galleryImages: string[];
+  rating?: number;
+  reviewCount?: number;
+}
+
+export type Business = LocalBusiness;
+export type FeaturedBusiness = LocalBusiness;
+export type HomepageSlide = HeroBannerSlide;
+
 

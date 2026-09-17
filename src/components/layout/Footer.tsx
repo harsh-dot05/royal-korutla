@@ -10,6 +10,7 @@ export const Footer: React.FC = () => {
     switch (slug) {
       case 'food': return '/food';
       case 'groceries': case 'grocery': return '/grocery';
+      case 'photography': case 'photography-studios': return '/photography';
       case 'shopping': return '/shopping';
       case 'services': return '/services';
       case 'hospitals': return '/hospitals';

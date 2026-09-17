@@ -17,6 +17,7 @@ import {
   StoryReel,
   Promotion,
   ServiceProvider,
+  PhotographyBusiness,
 } from '../types';
 
 export const CATEGORIES: Category[] = [
@@ -123,6 +124,16 @@ export const CATEGORIES: Category[] = [
     itemCount: 31,
     badge: 'Save Big',
     colorGradient: 'from-yellow-400 to-amber-500',
+  },
+  {
+    id: 'cat-12',
+    name: 'Photography & Studios',
+    slug: 'photography',
+    iconName: 'Camera',
+    description: 'Wedding, pre-wedding, event shoots, portraits & video reels in Korutla.',
+    itemCount: 18,
+    badge: 'Trending',
+    colorGradient: 'from-blue-600 to-indigo-700',
   },
 ];
 
@@ -889,3 +900,66 @@ export const STORIES_REELS: StoryReel[] = [
     linkUrl: '/grocery',
   },
 ];
+
+export const PHOTOGRAPHY_BUSINESSES: PhotographyBusiness[] = [
+  {
+    id: 'photo-1',
+    name: 'Royal Color Lab & Digital Studio',
+    profileImage: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&auto=format&fit=crop&q=80',
+    coverImage: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=800&auto=format&fit=crop&q=80',
+    location: 'Main Road, Near Gandhi Statue Center, Korutla',
+    phone: '+91 98480 99887',
+    whatsapp: '+91 98480 99887',
+    instagram: 'https://instagram.com/royalcolorlab_korutla',
+    description: 'Leading wedding photography studio in Korutla specializing in cinematic wedding films, candid pre-wedding shoots, 4K video recording, drone shots, and instant photo printing.',
+    photographyTypes: ['Wedding', 'Pre-wedding', 'Birthday', 'Events', 'Video', 'Reels'],
+    startingPrice: '₹15,000 / Day',
+    openingHours: '09:00 AM - 09:00 PM (Mon-Sat)',
+    isVerified: true,
+    isFeatured: true,
+    galleryImages: [
+      'https://images.unsplash.com/photo-1519741497674-611481863552?w=600&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=600&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=600&auto=format&fit=crop&q=80',
+    ],
+  },
+  {
+    id: 'photo-2',
+    name: 'Sri Sai Digital Studio & Cinematic Films',
+    profileImage: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&auto=format&fit=crop&q=80',
+    coverImage: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=800&auto=format&fit=crop&q=80',
+    location: 'High School Road, Opp Old Bus Stand, Korutla',
+    phone: '+91 94401 22334',
+    whatsapp: '+91 94401 22334',
+    instagram: 'https://instagram.com/srisaidigital_ktl',
+    description: 'Specialist photo studio in Korutla offering high-definition portraits, product photography, outdoor pre-wedding photography, and family event coverage.',
+    photographyTypes: ['Portrait', 'Product Photography', 'Birthday', 'Events', 'Video'],
+    startingPrice: '₹5,000 / Event',
+    openingHours: '09:30 AM - 08:30 PM (Mon-Sat)',
+    isVerified: true,
+    isFeatured: false,
+    galleryImages: [
+      'https://images.unsplash.com/photo-1537633552985-df8429e8048b?w=600&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1520854221256-17451cc331bf?w=600&auto=format&fit=crop&q=80',
+    ],
+  },
+  {
+    id: 'photo-3',
+    name: 'Venkateshwara Video & Photo Studio',
+    profileImage: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=300&auto=format&fit=crop&q=80',
+    coverImage: 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=800&auto=format&fit=crop&q=80',
+    location: 'Temple Street, Korutla',
+    phone: '+91 98492 66778',
+    whatsapp: '+91 98492 66778',
+    description: 'Experienced traditional and modern wedding videography, crane operations, live streaming for ceremonies, and birthday celebration shoots in Korutla.',
+    photographyTypes: ['Wedding', 'Events', 'Video', 'Reels'],
+    startingPrice: '₹10,000 / Day',
+    openingHours: '10:00 AM - 08:00 PM (Everyday)',
+    isVerified: true,
+    isFeatured: false,
+    galleryImages: [
+      'https://images.unsplash.com/photo-1519741497674-611481863552?w=600&auto=format&fit=crop&q=80',
+    ],
+  },
+];
+
