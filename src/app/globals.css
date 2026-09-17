@@ -10,19 +10,11 @@
     --text-secondary: #475569;
     --text-muted: #64748b;
     
-    /* Soft Pastel Color Palette */
-    --pastel-lavender: #7c3aed;
-    --pastel-lavender-bg: #f3e8ff;
-    --pastel-peach: #ea580c;
-    --pastel-peach-bg: #ffedd5;
-    --pastel-yellow: #d97706;
-    --pastel-yellow-bg: #fef9c3;
-    --pastel-mint: #059669;
-    --pastel-mint-bg: #dcfce7;
-    --pastel-pink: #db2777;
-    --pastel-pink-bg: #fce7f3;
-    --pastel-blue: #0284c7;
-    --pastel-blue-bg: #e0f2fe;
+    /* Single Primary Accent Color System (Royal Blue) */
+    --primary-accent: #1d4ed8;
+    --primary-accent-hover: #1e40af;
+    --primary-accent-bg: #eff6ff;
+    --primary-accent-border: #bfdbfe;
   }
 
   body {
@@ -41,58 +33,43 @@
   }
 }
 
-/* Premium Soft Pastel Card System */
-.pastel-card {
+/* Premium Clean Card System */
+.pastel-card, .glass-card {
   background: #ffffff;
   border: 1px solid #e2e8f0;
-  border-radius: 1.25rem;
-  box-shadow: 0 4px 20px -2px rgba(124, 58, 237, 0.05);
+  border-radius: 1rem;
+  box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.05);
 }
 
 .pastel-card-hover {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .pastel-card-hover:hover {
   background: #ffffff;
-  border-color: #c084fc;
-  transform: translateY(-4px);
-  box-shadow: 0 16px 32px -8px rgba(124, 58, 237, 0.15);
+  border-color: #93c5fd;
+  box-shadow: 0 4px 12px -2px rgba(29, 78, 216, 0.08);
 }
 
 .pastel-header {
-  background: rgba(255, 255, 255, 0.94);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-bottom: 1px solid #f1f5f9;
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
 }
 
 .pastel-bottom-nav {
-  background: rgba(255, 255, 255, 0.96);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: #ffffff;
   border-top: 1px solid #e2e8f0;
 }
 
-/* Pastel Gradients & Badges */
-.gradient-text-royal {
-  background: linear-gradient(135deg, #7c3aed 0%, #6366f1 50%, #2563eb 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
+/* Single Accent Color Utility Classes (Replacing Gradients) */
+.gradient-text-royal,
 .gradient-text-gold {
-  background: linear-gradient(135deg, #d97706 0%, #ea580c 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: #1d4ed8;
+  font-weight: 800;
 }
 
 .hero-glow-light {
-  position: absolute;
-  border-radius: 9999px;
-  filter: blur(100px);
-  opacity: 0.4;
-  pointer-events: none;
+  display: none;
 }
 
 /* Custom scrollbars */

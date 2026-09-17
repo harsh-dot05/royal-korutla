@@ -22,7 +22,7 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
     <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-6 gap-4">
       <div>
         {badge && (
-          <span className="inline-block px-3 py-1 text-xs font-bold uppercase tracking-wider text-purple-700 bg-purple-100 border border-purple-200 rounded-full mb-2 shadow-2xs">
+          <span className="inline-block px-3 py-1 text-xs font-bold uppercase tracking-wider text-blue-700 bg-blue-50 border border-blue-200 rounded-md mb-2">
             {badge}
           </span>
         )}
@@ -39,20 +39,20 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
       {actionText && actionHref && (
         <Link
           href={actionHref}
-          className="self-start sm:self-auto text-sm font-bold text-purple-700 hover:text-purple-900 transition-colors flex items-center gap-1 group"
+          className="self-start sm:self-auto text-sm font-bold text-blue-700 hover:text-blue-800 transition-colors flex items-center gap-1"
         >
           {actionText}
-          <span className="group-hover:translate-x-1 transition-transform">→</span>
+          <span>→</span>
         </Link>
       )}
 
       {actionText && !actionHref && (
         <button
           onClick={onActionClick}
-          className="self-start sm:self-auto text-sm font-bold text-purple-700 hover:text-purple-900 transition-colors flex items-center gap-1 group"
+          className="self-start sm:self-auto text-sm font-bold text-blue-700 hover:text-blue-800 transition-colors flex items-center gap-1"
         >
           {actionText}
-          <span className="group-hover:translate-x-1 transition-transform">→</span>
+          <span>→</span>
         </button>
       )}
     </div>

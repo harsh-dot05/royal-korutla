@@ -17,23 +17,17 @@ export const FloatingWhatsApp: React.FC = () => {
   const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${defaultMsg}`;
 
   return (
-    <aside aria-label="Floating Contact Options">
+    <aside aria-label="Floating WhatsApp Contact">
       <a
         href={whatsappUrl}
         target="_blank"
         rel="noopener noreferrer"
         aria-label="Chat with Royal Korutla on WhatsApp"
-        className="fixed bottom-20 right-5 sm:bottom-6 sm:right-6 z-50 flex items-center gap-2.5 p-3 sm:px-4 sm:py-3 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-xs sm:text-sm shadow-2xl shadow-emerald-600/40 border-2 border-white/20 transition-all duration-300 hover:scale-105 active:scale-95 group"
+        className="fixed bottom-16 right-4 sm:bottom-6 sm:right-6 z-50 flex items-center gap-2.5 px-4 py-3 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm shadow-md border border-emerald-500 transition-colors"
       >
-        <div className="relative">
-          <MessageCircle className="w-6 h-6 fill-white text-emerald-500" />
-          <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-200 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-200"></span>
-          </span>
-        </div>
-        <span className="hidden sm:inline-block font-extrabold tracking-wide">
-          Korutla Helpdesk
+        <MessageCircle className="w-5 h-5 fill-white text-emerald-600" />
+        <span className="hidden sm:inline-block tracking-wide">
+          WhatsApp Support
         </span>
       </a>
     </aside>

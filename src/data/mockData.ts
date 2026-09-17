@@ -316,7 +316,7 @@ export const TODAY_ITEMS: TodayItem[] = [
     description: 'Fresh farm vegetables, cold-pressed oils & organic grains delivered home.',
     image: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=600&auto=format&fit=crop&q=80',
     linkText: 'Shop Groceries',
-    linkHref: '/groceries',
+    linkHref: '/grocery',
   },
 ];
 
@@ -886,6 +886,6 @@ export const STORIES_REELS: StoryReel[] = [
     mediaType: 'image',
     viewsCount: 650,
     isNew: true,
-    linkUrl: '/groceries',
+    linkUrl: '/grocery',
   },
 ];

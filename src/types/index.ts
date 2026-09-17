@@ -181,7 +181,7 @@ export interface JobListing {
 export interface RealEstateProperty {
   id: string;
   title: string;
-  type: 'Buy' | 'Rent' | 'Lease';
+  type: 'Buy' | 'Rent' | 'Lease' | 'Sell';
   category: 'Plot' | 'House' | 'Commercial' | 'Agriculture';
   price: string;
   pricePerSqft?: string;
