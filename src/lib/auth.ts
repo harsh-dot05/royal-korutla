@@ -4,7 +4,7 @@ import { UserSession } from '@/types';
 export const SESSION_COOKIE_NAME = 'rk_session_token';
 
 // Server-side secret key for token signature
-const AUTH_SECRET = process.env.AUTH_SECRET || 'rk_super_secret_owner_key_2026_korutla';
+const AUTH_SECRET = process.env.AUTH_SECRET || process.env.ADMIN_SECRET_KEY || 'rk_super_secret_owner_key_2026_korutla';
 
 // Default Owner/Admin account credentials (never exposed to browser bundles)
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@royalkorutla.com';
@@ -59,14 +59,17 @@ export function verifySessionToken(token: string | undefined | null): UserSessio
  * Authenticate Admin credentials securely on server-side
  */
 export function authenticateAdminCredentials(email: string, password: string): UserSession | null {
-  const cleanEmail = email.trim().toLowerCase();
-  const targetEmail = ADMIN_EMAIL.toLowerCase();
+  const currentAdminEmail = process.env.ADMIN_EMAIL || ADMIN_EMAIL;
+  const currentAdminPassword = process.env.ADMIN_PASSWORD || ADMIN_PASSWORD;
 
-  if (cleanEmail === targetEmail && password === ADMIN_PASSWORD) {
+  const cleanEmail = (email || '').trim().toLowerCase();
+  const targetEmail = (currentAdminEmail || '').trim().toLowerCase();
+
+  if (cleanEmail === targetEmail && password === currentAdminPassword) {
     return {
       id: 'admin-owner-001',
       name: 'Royal Korutla Owner (Admin)',
-      email: ADMIN_EMAIL,
+      email: currentAdminEmail,
       role: 'ADMIN',
       createdAt: new Date().toISOString(),
     };

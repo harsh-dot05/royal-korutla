@@ -25,23 +25,23 @@ export const JobsSpotlight: React.FC = () => {
           >
             <div>
               <div className="flex items-center justify-between gap-2 mb-2">
-                <span className="text-[10px] font-extrabold text-purple-700 uppercase tracking-wider">{job.category}</span>
-                <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold text-[10px] border border-emerald-200">
+                <span className="text-[10px] font-extrabold text-blue-700 uppercase tracking-wider">{job.category}</span>
+                <span className="px-2 py-0.5 rounded-full bg-blue-50 text-blue-800 font-bold text-[10px] border border-blue-200">
                   {job.type}
                 </span>
               </div>
 
-              <h3 className="text-base font-bold text-slate-900 hover:text-purple-700 transition-colors">
+              <h3 className="text-base font-bold text-slate-900 hover:text-blue-700 transition-colors">
                 {job.title}
               </h3>
-              <p className="text-xs font-bold text-amber-800 flex items-center gap-1.5 mt-1">
-                <Building className="w-3.5 h-3.5" />
+              <p className="text-xs font-bold text-slate-800 flex items-center gap-1.5 mt-1">
+                <Building className="w-3.5 h-3.5 text-blue-700" />
                 <span>{job.shopName}</span>
               </p>
 
               <div className="mt-3 flex items-center justify-between text-xs text-slate-600 font-medium">
                 <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5 text-slate-400" /> {job.location}</span>
-                <span className="text-emerald-700 font-bold">{job.salary}</span>
+                <span className="text-slate-900 font-bold">{job.salary}</span>
               </div>
             </div>
 
@@ -49,7 +49,7 @@ export const JobsSpotlight: React.FC = () => {
               <span className="text-[11px] text-slate-500 font-medium">Posted {job.postedDate}</span>
               <Link
                 href="/jobs"
-                className="text-xs font-bold text-purple-700 hover:text-purple-900 flex items-center gap-1"
+                className="text-xs font-bold text-blue-700 hover:text-blue-800 flex items-center gap-1"
               >
                 <span>View Opening</span>
                 <ArrowRight className="w-3.5 h-3.5" />

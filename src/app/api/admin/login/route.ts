@@ -10,10 +10,10 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           success: false,
-          error: 'INVALID_CREDENTIALS',
-          message: 'Email and password are required',
+          error: 'UNAUTHORIZED',
+          message: 'Invalid admin credentials.',
         },
-        { status: 400 }
+        { status: 401 }
       );
     }
 
@@ -24,7 +24,7 @@ export async function POST(request: Request) {
         {
           success: false,
           error: 'UNAUTHORIZED',
-          message: 'Invalid Admin credentials. Access denied.',
+          message: 'Invalid admin credentials.',
         },
         { status: 401 }
       );
@@ -36,7 +36,7 @@ export async function POST(request: Request) {
       success: true,
       user: adminSession,
       token,
-      message: 'Admin login successful 👑',
+      message: 'Admin login successful',
     });
 
     // Set secure HTTP-Only cookie
@@ -46,6 +46,7 @@ export async function POST(request: Request) {
       httpOnly: true,
       path: '/',
       sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
       maxAge: 86400 * 7, // 7 days
     });
 

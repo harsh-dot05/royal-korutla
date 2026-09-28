@@ -18,7 +18,7 @@ export const Hero: React.FC = () => {
   };
 
   return (
-    <section className="relative pt-6 pb-10 lg:pt-10 lg:pb-12 bg-slate-50 border-b border-slate-200">
+    <section className="relative pt-6 pb-10 lg:pt-10 lg:pb-12 bg-white border-b border-slate-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto">
           {/* Local Directory Badge */}
@@ -71,6 +71,7 @@ export const Hero: React.FC = () => {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full bg-transparent px-4 py-2 text-sm text-slate-900 placeholder-slate-400 focus:outline-none font-medium"
+                  suppressHydrationWarning
                 />
               </div>
 

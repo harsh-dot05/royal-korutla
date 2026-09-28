@@ -14,22 +14,22 @@ export const Badge: React.FC<BadgeProps> = ({
   size = 'sm',
 }) => {
   const variantStyles = {
-    primary: 'bg-indigo-500/15 text-indigo-400 border-indigo-500/30',
-    gold: 'bg-amber-500/15 text-amber-400 border-amber-500/30',
-    emerald: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
-    rose: 'bg-rose-500/15 text-rose-400 border-rose-500/30',
-    outline: 'bg-transparent text-slate-300 border-slate-700',
-    slate: 'bg-slate-800/80 text-slate-300 border-slate-700/60',
+    primary: 'bg-blue-50 text-blue-700 border-blue-200 font-semibold',
+    gold: 'bg-blue-700 text-white border-blue-700 font-bold',
+    emerald: 'bg-emerald-50 text-emerald-800 border-emerald-200 font-semibold',
+    rose: 'bg-rose-50 text-rose-800 border-rose-200 font-semibold',
+    outline: 'bg-transparent text-slate-700 border-slate-300 font-medium',
+    slate: 'bg-slate-100 text-slate-800 border-slate-200 font-medium',
   };
 
   const sizeStyles = {
-    sm: 'px-2.5 py-0.5 text-xs font-medium',
-    md: 'px-3 py-1 text-sm font-medium',
+    sm: 'px-2.5 py-0.5 text-xs',
+    md: 'px-3 py-1 text-sm',
   };
 
   return (
     <span
-      className={`inline-flex items-center gap-1 rounded-full border backdrop-blur-md ${variantStyles[variant]} ${sizeStyles[size]} ${className}`}
+      className={`inline-flex items-center gap-1 rounded-full border ${variantStyles[variant]} ${sizeStyles[size]} ${className}`}
     >
       {children}
     </span>

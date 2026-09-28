@@ -2,24 +2,24 @@
 
 @layer base {
   :root {
-    --background: #f8fafc;
-    --foreground: #0f172a;
+    --background: #ffffff;
+    --foreground: #09090b;
     --card: #ffffff;
     --card-border: #e2e8f0;
-    --text-primary: #0f172a;
+    --text-primary: #09090b;
     --text-secondary: #475569;
     --text-muted: #64748b;
     
     /* Single Primary Accent Color System (Royal Blue) */
-    --primary-accent: #1d4ed8;
-    --primary-accent-hover: #1e40af;
+    --primary-accent: #2563eb;
+    --primary-accent-hover: #1d4ed8;
     --primary-accent-bg: #eff6ff;
     --primary-accent-border: #bfdbfe;
   }
 
   body {
-    background-color: #f8fafc;
-    color: #0f172a;
+    background-color: #ffffff;
+    color: #09090b;
     font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
@@ -33,12 +33,12 @@
   }
 }
 
-/* Premium Clean Card System */
+/* Premium Clean Surface & Card System */
 .pastel-card, .glass-card {
   background: #ffffff;
   border: 1px solid #e2e8f0;
   border-radius: 1rem;
-  box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.05);
+  box-shadow: 0 1px 3px 0 rgba(9, 9, 11, 0.04);
 }
 
 .pastel-card-hover {
@@ -47,8 +47,8 @@
 
 .pastel-card-hover:hover {
   background: #ffffff;
-  border-color: #93c5fd;
-  box-shadow: 0 4px 12px -2px rgba(29, 78, 216, 0.08);
+  border-color: #2563eb;
+  box-shadow: 0 4px 12px -2px rgba(37, 99, 235, 0.08);
 }
 
 .pastel-header {
@@ -61,10 +61,10 @@
   border-top: 1px solid #e2e8f0;
 }
 
-/* Single Accent Color Utility Classes (Replacing Gradients) */
+/* Accent Color Utilities */
 .gradient-text-royal,
 .gradient-text-gold {
-  color: #1d4ed8;
+  color: #2563eb;
   font-weight: 800;
 }
 
@@ -79,7 +79,7 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: #f8fafc;
 }
 
 ::-webkit-scrollbar-thumb {

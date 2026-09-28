@@ -19,7 +19,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="scroll-smooth">
-      <body className={`${inter.className} min-h-screen bg-slate-50 text-slate-900 antialiased selection:bg-purple-500 selection:text-white flex flex-col justify-between`}>
+      <body className={`${inter.className} min-h-screen bg-white text-slate-900 antialiased selection:bg-blue-600 selection:text-white flex flex-col justify-between`}>
         {children}
         <FloatingWhatsApp />
         <MobileBottomNav />

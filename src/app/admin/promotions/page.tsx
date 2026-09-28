@@ -6,7 +6,7 @@ import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { FEATURED_BUSINESSES } from '@/data/mockData';
 import { Promotion, PromotionType } from '@/types';
-import { Sparkles, Shield, Plus, CheckCircle2, Calendar, Tag, Trash2, ArrowLeft, RefreshCw } from 'lucide-react';
+import { Sparkles, Plus, Calendar, Trash2, ArrowLeft, RefreshCw } from 'lucide-react';
 
 export default function AdminPromotionsPage() {
   const [promotionsList, setPromotionsList] = useState<Promotion[]>([]);
@@ -96,21 +96,21 @@ export default function AdminPromotionsPage() {
 
       <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         <div className="flex items-center gap-2 text-xs text-slate-400 font-semibold">
-          <Link href="/admin" className="hover:text-amber-400 flex items-center gap-1 transition-colors">
+          <Link href="/admin" className="hover:text-blue-400 flex items-center gap-1 transition-colors">
             <ArrowLeft className="w-3.5 h-3.5" /> Back to Owner Control Center
           </Link>
         </div>
 
         {/* Header */}
-        <div className="rounded-3xl p-6 sm:p-8 border border-amber-500/30 bg-gradient-to-r from-amber-950/40 via-purple-950/30 to-slate-900 shadow-sm">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 text-xs font-bold mb-3">
-            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+        <div className="rounded-3xl p-6 sm:p-8 border border-blue-800 bg-slate-950 shadow-sm space-y-2">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-900/40 border border-blue-700 text-blue-300 text-xs font-bold">
+            <Sparkles className="w-3.5 h-3.5 text-blue-400" />
             <span>Zero-Code Paid Promotion Engine</span>
           </div>
           <h1 className="text-2xl sm:text-4xl font-extrabold text-white">
             Publish Business Promotion Campaigns
           </h1>
-          <p className="text-xs sm:text-sm text-slate-300 mt-2 max-w-2xl">
+          <p className="text-xs sm:text-sm text-slate-300 max-w-2xl">
             When a local business pays for promotion in Korutla, select the business, set banner image &amp; dates, and publish without editing code. Active promotions display dynamically on the website and auto-hide on expiry.
           </p>
         </div>
@@ -120,7 +120,7 @@ export default function AdminPromotionsPage() {
           {/* Add Promotion Form */}
           <div className="rounded-2xl p-6 border border-slate-800 bg-slate-950/80 space-y-4">
             <h2 className="text-base font-bold text-white flex items-center gap-2 pb-3 border-b border-slate-800">
-              <Plus className="w-5 h-5 text-amber-400" />
+              <Plus className="w-5 h-5 text-blue-400" />
               <span>Create Paid Promotion</span>
             </h2>
 
@@ -130,7 +130,7 @@ export default function AdminPromotionsPage() {
                 <select
                   value={selectedBizId}
                   onChange={(e) => setSelectedBizId(e.target.value)}
-                  className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-white font-medium focus:outline-none focus:border-amber-500"
+                  className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-white font-medium focus:outline-none focus:border-blue-500"
                 >
                   {FEATURED_BUSINESSES.map((b) => (
                     <option key={b.id} value={b.id}>
@@ -147,7 +147,7 @@ export default function AdminPromotionsPage() {
                   placeholder="e.g. Korutla Fresh Juice Center"
                   value={customBizName}
                   onChange={(e) => setCustomBizName(e.target.value)}
-                  className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-amber-500"
+                  className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-blue-500"
                 />
               </div>
 
@@ -158,7 +158,7 @@ export default function AdminPromotionsPage() {
                   required
                   value={promImage}
                   onChange={(e) => setPromImage(e.target.value)}
-                  className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-amber-500"
+                  className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-blue-500"
                 />
               </div>
 
@@ -167,7 +167,7 @@ export default function AdminPromotionsPage() {
                 <select
                   value={promotionType}
                   onChange={(e) => setPromotionType(e.target.value as PromotionType)}
-                  className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-white font-medium focus:outline-none focus:border-amber-500"
+                  className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-white font-medium focus:outline-none focus:border-blue-500"
                 >
                   <option value="HOMEPAGE_FEATURED">Homepage Featured</option>
                   <option value="FEATURED_BUSINESS">Featured Business Ticker</option>
@@ -185,7 +185,7 @@ export default function AdminPromotionsPage() {
                   placeholder="e.g. PROMOTED, SPONSORED, RK FEATURED"
                   value={badgeLabel}
                   onChange={(e) => setBadgeLabel(e.target.value)}
-                  className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-amber-500"
+                  className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-blue-500"
                 />
               </div>
 
@@ -194,7 +194,7 @@ export default function AdminPromotionsPage() {
                 <select
                   value={placement}
                   onChange={(e) => setPlacement(e.target.value)}
-                  className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-white font-medium focus:outline-none focus:border-amber-500"
+                  className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-white font-medium focus:outline-none focus:border-blue-500"
                 >
                   <option value="Homepage Top Banner">Homepage Top Section</option>
                   <option value="Food Section Header">Food Category Header</option>
@@ -210,7 +210,7 @@ export default function AdminPromotionsPage() {
                   placeholder="e.g. Flat 20% OFF on all purchases"
                   value={offerText}
                   onChange={(e) => setOfferText(e.target.value)}
-                  className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-amber-500"
+                  className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-blue-500"
                 />
               </div>
 
@@ -221,7 +221,7 @@ export default function AdminPromotionsPage() {
                     type="date"
                     value={startDate}
                     onChange={(e) => setStartDate(e.target.value)}
-                    className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-amber-500"
+                    className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-blue-500"
                   />
                 </div>
                 <div>
@@ -230,16 +230,16 @@ export default function AdminPromotionsPage() {
                     type="date"
                     value={endDate}
                     onChange={(e) => setEndDate(e.target.value)}
-                    className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-amber-500"
+                    className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-blue-500"
                   />
                 </div>
               </div>
 
               <button
                 type="submit"
-                className="w-full py-3.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20 transition-all"
+                className="w-full py-3.5 rounded-xl bg-blue-700 hover:bg-blue-800 text-white font-extrabold text-xs flex items-center justify-center gap-2 shadow-lg transition-all"
               >
-                <Sparkles className="w-4 h-4 fill-slate-950" />
+                <Sparkles className="w-4 h-4 fill-white text-white" />
                 <span>Publish Promotion Live</span>
               </button>
             </form>
@@ -249,10 +249,10 @@ export default function AdminPromotionsPage() {
           <div className="lg:col-span-2 rounded-2xl p-6 border border-slate-800 bg-slate-950/80 space-y-4">
             <div className="flex items-center justify-between border-b border-slate-800 pb-3">
               <h2 className="text-base font-bold text-white flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-amber-400" />
+                <Sparkles className="w-4 h-4 text-blue-400" />
                 <span>Current Promotional Campaigns ({promotionsList.length})</span>
               </h2>
-              <button onClick={loadPromotions} className="text-xs text-amber-400 hover:underline flex items-center gap-1">
+              <button onClick={loadPromotions} className="text-xs text-blue-400 hover:underline flex items-center gap-1">
                 <RefreshCw className="w-3.5 h-3.5" /> Refresh
               </button>
             </div>
@@ -268,14 +268,14 @@ export default function AdminPromotionsPage() {
                   >
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
-                        <span className="px-2.5 py-0.5 rounded-full bg-amber-500 text-slate-950 font-black text-[10px] uppercase">
+                        <span className="px-2.5 py-0.5 rounded-full bg-blue-700 text-white font-black text-[10px] uppercase">
                           {prom.badgeLabel || 'PROMOTED'}
                         </span>
-                        <span className="text-[11px] font-semibold text-purple-400">{prom.placement}</span>
+                        <span className="text-[11px] font-semibold text-blue-300">{prom.placement}</span>
                       </div>
 
                       <h3 className="text-base font-bold text-white">{prom.businessName}</h3>
-                      {prom.offerText && <p className="text-xs text-amber-300 font-semibold">{prom.offerText}</p>}
+                      {prom.offerText && <p className="text-xs text-blue-300 font-semibold">{prom.offerText}</p>}
                       <p className="text-[11px] text-slate-400 flex items-center gap-1">
                         <Calendar className="w-3 h-3 text-slate-500" />
                         <span>{prom.startDate} to {prom.endDate}</span>

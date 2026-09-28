@@ -238,10 +238,28 @@ export default function AdminDashboardPage() {
     }
   };
 
+  const [checkingAuth, setCheckingAuth] = useState(true);
+
   useEffect(() => {
+    async function checkAdminSession() {
+      try {
+        const res = await fetch('/api/admin/me');
+        const data = await res.json();
+        if (!res.ok || !data.success || data.user?.role !== 'ADMIN') {
+          router.replace('/admin/login');
+          return;
+        }
+      } catch (err) {
+        router.replace('/admin/login');
+        return;
+      } finally {
+        setCheckingAuth(false);
+      }
+    }
+    checkAdminSession();
     fetchPromotions();
     fetchPhotography();
-  }, []);
+  }, [router]);
 
   const showToast = (message: string, type: 'success' | 'error' = 'success') => {
     setNotification({ type, message });
@@ -254,7 +272,7 @@ export default function AdminDashboardPage() {
     } catch (e) {
       // ignore error
     }
-    router.push('/admin/login');
+    router.replace('/admin/login');
     router.refresh();
   };
 
@@ -546,6 +564,17 @@ export default function AdminDashboardPage() {
     { id: 'settings', label: 'Settings', icon: SettingsIcon },
   ];
 
+  if (checkingAuth) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center text-slate-400 text-xs font-semibold">
+        <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-slate-900 border border-slate-800">
+          <Shield className="w-5 h-5 text-blue-500 animate-pulse" />
+          <span>Verifying Admin Authorization...</span>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-slate-900 text-slate-100 font-sans">
       {/* Toast Notification */}
@@ -675,19 +704,19 @@ export default function AdminDashboardPage() {
                 <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-1">
                   <div className="flex items-center justify-between text-slate-400 text-xs font-semibold">
                     <span>Photography Studios</span>
-                    <Camera className="w-4 h-4 text-purple-400" />
+                    <Camera className="w-4 h-4 text-blue-400" />
                   </div>
                   <p className="text-2xl font-black text-white">{photographyList.length}</p>
-                  <p className="text-[10px] text-purple-300 font-semibold">Korutla Studios</p>
+                  <p className="text-[10px] text-blue-300 font-semibold">Korutla Studios</p>
                 </div>
 
                 <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-1">
                   <div className="flex items-center justify-between text-slate-400 text-xs font-semibold">
                     <span>Active Promotions</span>
-                    <Sparkles className="w-4 h-4 text-amber-400" />
+                    <Sparkles className="w-4 h-4 text-blue-400" />
                   </div>
-                  <p className="text-2xl font-black text-amber-400">{promotions.filter(p=>p.status==='ACTIVE').length}</p>
-                  <p className="text-[10px] text-amber-300 font-semibold">Live on website</p>
+                  <p className="text-2xl font-black text-blue-400">{promotions.filter(p=>p.status==='ACTIVE').length}</p>
+                  <p className="text-[10px] text-blue-300 font-semibold">Live on website</p>
                 </div>
 
                 <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-1">
@@ -708,7 +737,7 @@ export default function AdminDashboardPage() {
                 </h3>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
                   <button onClick={() => setActiveTab('photography')} className="p-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-left space-y-1 transition-all">
-                    <Camera className="w-4 h-4 text-purple-400" />
+                    <Camera className="w-4 h-4 text-blue-400" />
                     <p className="font-bold text-white">Photography Studios</p>
                     <p className="text-[10px] text-slate-400">Add studio / wedding photography</p>
                   </button>
@@ -718,7 +747,7 @@ export default function AdminDashboardPage() {
                     <p className="text-[10px] text-slate-400">Register shop in Korutla</p>
                   </button>
                   <button onClick={() => setActiveTab('promotions')} className="p-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-left space-y-1 transition-all">
-                    <Sparkles className="w-4 h-4 text-amber-400" />
+                    <Sparkles className="w-4 h-4 text-blue-400" />
                     <p className="font-bold text-white">Publish Paid Promo</p>
                     <p className="text-[10px] text-slate-400">Banner &amp; date placement</p>
                   </button>
@@ -735,9 +764,9 @@ export default function AdminDashboardPage() {
           {/* TAB: PHOTOGRAPHY & STUDIOS MANAGEMENT */}
           {activeTab === 'photography' && (
             <div className="space-y-6">
-              <div className="p-5 rounded-2xl bg-purple-950/30 border border-purple-800 space-y-2">
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-purple-900/40 text-purple-300 text-xs font-bold">
-                  <Camera className="w-3.5 h-3.5" />
+              <div className="p-5 rounded-2xl bg-blue-950/30 border border-blue-800 space-y-2">
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-900/40 text-blue-300 text-xs font-bold">
+                  <Camera className="w-3.5 h-3.5 text-blue-400" />
                   <span>Photography &amp; Studios Content Management</span>
                 </div>
                 <h2 className="text-xl font-bold text-white">Manage Photography &amp; Studios</h2>

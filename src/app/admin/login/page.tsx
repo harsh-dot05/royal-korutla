@@ -27,22 +27,22 @@ export default function AdminLoginPage() {
       const data = await res.json();
 
       if (!res.ok || !data.success) {
-        setError(data.message || 'Invalid Admin credentials. Access denied.');
+        setError(data.message || 'Invalid admin credentials.');
         setLoading(false);
         return;
       }
 
       // Successful login -> Redirect to /admin
-      router.push('/admin');
+      router.replace('/admin');
       router.refresh();
     } catch (err) {
-      setError('An error occurred during authentication. Please try again.');
+      setError('Invalid admin credentials.');
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col justify-between p-4 sm:p-6 lg:p-8">
+    <div className="min-h-screen bg-white text-slate-900 flex flex-col justify-between p-4 sm:p-6 lg:p-8">
       {/* Top Bar */}
       <div className="max-w-md mx-auto w-full flex items-center justify-between">
         <Link href="/" className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-900 transition-colors">
@@ -76,11 +76,12 @@ export default function AdminLoginPage() {
 
           <form onSubmit={handleSubmit} className="space-y-4 text-xs">
             <div>
-              <label className="block font-bold text-slate-700 mb-1 flex items-center gap-1.5">
+              <label htmlFor="admin-email" className="block font-bold text-slate-700 mb-1 flex items-center gap-1.5">
                 <Mail className="w-3.5 h-3.5 text-blue-700" />
                 <span>Admin Email Address</span>
               </label>
               <input
+                id="admin-email"
                 type="email"
                 required
                 placeholder="admin@royalkorutla.com"
@@ -91,11 +92,12 @@ export default function AdminLoginPage() {
             </div>
 
             <div>
-              <label className="block font-bold text-slate-700 mb-1 flex items-center gap-1.5">
+              <label htmlFor="admin-password" className="block font-bold text-slate-700 mb-1 flex items-center gap-1.5">
                 <KeyRound className="w-3.5 h-3.5 text-blue-700" />
                 <span>Admin Password</span>
               </label>
               <input
+                id="admin-password"
                 type="password"
                 required
                 placeholder="••••••••••••"
@@ -108,7 +110,7 @@ export default function AdminLoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3.5 rounded-lg bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs flex items-center justify-center gap-2 transition-colors shadow-xs disabled:opacity-50"
+              className="w-full py-3.5 rounded-lg bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs flex items-center justify-center gap-2 transition-colors shadow-xs disabled:opacity-50 cursor-pointer"
             >
               {loading ? (
                 <span>Verifying Credentials...</span>
