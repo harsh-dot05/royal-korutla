@@ -12,7 +12,8 @@ export const FloatingWhatsApp: React.FC = () => {
     return null;
   }
 
-  const whatsappNumber = (process.env.NEXT_PUBLIC_ROYAL_KORUTLA_WHATSAPP || '+919848012345').replace(/[^0-9]/g, '');
+  const rawNumber = process.env.NEXT_PUBLIC_ROYAL_KORUTLA_WHATSAPP || '';
+  const whatsappNumber = rawNumber.replace(/[^0-9]/g, '');
   const defaultMsg = encodeURIComponent('Hi Royal Korutla! I am looking for local shops, food, services or information in Korutla.');
   const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${defaultMsg}`;
 
