@@ -37,17 +37,17 @@ export const FoodSpotlight: React.FC = () => {
                 />
 
                 <div className="absolute top-3 right-3 px-2.5 py-1 rounded-md bg-white text-xs font-bold text-slate-800 flex items-center gap-1 shadow-xs border border-slate-200">
-                  <Star className="w-3.5 h-3.5 fill-blue-700 text-blue-700" />
+                  <Star className="w-3.5 h-3.5 fill-blue-600 text-blue-600" />
                   <span>{item.rating || 4.8}</span>
                 </div>
 
-                <div className="absolute top-3 left-3 px-2.5 py-1 rounded-md bg-blue-700 text-white font-bold text-xs shadow-xs">
+                <div className="absolute top-3 left-3 px-2.5 py-1 rounded-md bg-blue-600 text-white font-bold text-xs shadow-xs">
                   ₹{item.price}
                 </div>
               </div>
 
               <div className="p-4 space-y-1.5">
-                <span className="text-[10px] font-bold text-blue-700 uppercase tracking-wider block">{foodBiz.name}</span>
+                <span className="text-[10px] font-bold text-blue-600 uppercase tracking-wider block">{foodBiz.name}</span>
                 <h3 className="text-sm font-bold text-slate-900 line-clamp-1">
                   {item.name}
                 </h3>
@@ -60,7 +60,7 @@ export const FoodSpotlight: React.FC = () => {
             <div className="p-4 pt-0">
               <Link
                 href="/food"
-                className="w-full py-2.5 rounded-lg bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs flex items-center justify-center gap-2 transition-colors"
+                className="w-full py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center justify-center gap-2 transition-colors"
               >
                 <MessageSquare className="w-3.5 h-3.5" />
                 <span>Order on WhatsApp</span>

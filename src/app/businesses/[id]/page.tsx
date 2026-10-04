@@ -46,11 +46,11 @@ export default function BusinessDetailPage({ params }: { params: Promise<{ id: s
           <span>/</span>
           <Link href="/businesses" className="hover:text-slate-900">Businesses</Link>
           <span>/</span>
-          <span className="text-indigo-600 font-bold">{business.name}</span>
+          <span className="text-blue-600 font-bold">{business.name}</span>
         </div>
 
         {/* Hero Cover Card */}
-        <div className="relative rounded-3xl overflow-hidden pastel-card border border-slate-200 bg-white shadow-sm">
+        <div className="relative rounded-3xl overflow-hidden border border-slate-200 bg-white shadow-xs">
           <div className="relative h-64 sm:h-80 w-full bg-slate-100">
             <Image
               src={business.image}
@@ -64,14 +64,14 @@ export default function BusinessDetailPage({ params }: { params: Promise<{ id: s
 
             <div className="absolute top-4 left-4 flex gap-2">
               {business.promotionLabel && (
-                <span className="px-3 py-1 rounded-full bg-amber-500 text-white font-black text-xs flex items-center gap-1 shadow-md shadow-amber-500/20">
+                <span className="px-3 py-1 rounded-full bg-blue-600 text-white font-black text-xs flex items-center gap-1 shadow-xs">
                   <Sparkles className="w-3.5 h-3.5 fill-white" />
                   {business.promotionLabel}
                 </span>
               )}
               {business.isVerified && (
-                <span className="px-3 py-1 rounded-full bg-emerald-100 border border-emerald-300 text-xs font-bold text-emerald-800 flex items-center gap-1 shadow-sm">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                <span className="px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-xs font-bold text-blue-800 flex items-center gap-1 shadow-xs">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-blue-600" />
                   Verified Business
                 </span>
               )}
@@ -81,14 +81,14 @@ export default function BusinessDetailPage({ params }: { params: Promise<{ id: s
           <div className="p-6 sm:p-8 relative -mt-16 z-10 space-y-4">
             <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-4">
               <div>
-                <span className="text-xs font-extrabold text-indigo-300 uppercase tracking-wider block mb-1">
+                <span className="text-xs font-extrabold text-blue-200 uppercase tracking-wider block mb-1">
                   {business.subCategory}
                 </span>
                 <h1 className="text-2xl sm:text-4xl font-extrabold text-white">
                   {business.name}
                 </h1>
                 <p className="text-xs sm:text-sm text-slate-200 flex items-center gap-1.5 mt-2">
-                  <MapPin className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <MapPin className="w-4 h-4 text-blue-300 shrink-0" />
                   <span>{business.address} ({business.landmark})</span>
                 </p>
               </div>
@@ -97,7 +97,7 @@ export default function BusinessDetailPage({ params }: { params: Promise<{ id: s
               <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
                 <a
                   href={`tel:${business.phone}`}
-                  className="flex-1 md:flex-initial px-5 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all shadow-md shadow-indigo-600/20"
+                  className="flex-1 md:flex-initial px-5 py-3 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all shadow-xs"
                 >
                   <Phone className="w-4 h-4" />
                   <span>Call {business.phone}</span>
@@ -108,7 +108,7 @@ export default function BusinessDetailPage({ params }: { params: Promise<{ id: s
                     href={`https://wa.me/${business.whatsapp.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hi ${business.name}, I am contacting you via Royal Korutla.`)}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex-1 md:flex-initial px-5 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all shadow-md shadow-emerald-600/20"
+                    className="flex-1 md:flex-initial px-5 py-3 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all shadow-xs"
                   >
                     <MessageSquare className="w-4 h-4 fill-white" />
                     <span>WhatsApp</span>
@@ -123,7 +123,7 @@ export default function BusinessDetailPage({ params }: { params: Promise<{ id: s
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-6">
             {/* Description */}
-            <div className="pastel-card rounded-2xl p-6 border border-slate-100 bg-white shadow-sm space-y-3">
+            <div className="rounded-2xl p-6 border border-slate-200 bg-white shadow-xs space-y-3">
               <h2 className="text-lg font-bold text-slate-900">About Business</h2>
               <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
                 {business.description || 'Welcome to ' + business.name + '. We serve customers across Korutla town with top quality products, reasonable pricing, and exceptional service.'}
@@ -132,7 +132,7 @@ export default function BusinessDetailPage({ params }: { params: Promise<{ id: s
               {business.tags && (
                 <div className="flex flex-wrap gap-2 pt-2">
                   {business.tags.map((tag, idx) => (
-                    <span key={idx} className="px-3 py-1 rounded-lg bg-indigo-50 text-xs font-semibold text-indigo-900 border border-indigo-100">
+                    <span key={idx} className="px-3 py-1 rounded-lg bg-blue-50 text-xs font-semibold text-blue-900 border border-blue-100">
                       #{tag}
                     </span>
                   ))}
@@ -142,7 +142,7 @@ export default function BusinessDetailPage({ params }: { params: Promise<{ id: s
 
             {/* Gallery Images */}
             {business.galleryImages && business.galleryImages.length > 0 && (
-              <div className="pastel-card rounded-2xl p-6 border border-slate-100 bg-white shadow-sm space-y-3">
+              <div className="rounded-2xl p-6 border border-slate-200 bg-white shadow-xs space-y-3">
                 <h2 className="text-lg font-bold text-slate-900">Photo Gallery</h2>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   {business.galleryImages.map((img, idx) => (
@@ -155,10 +155,10 @@ export default function BusinessDetailPage({ params }: { params: Promise<{ id: s
             )}
 
             {/* Reviews Section */}
-            <div className="pastel-card rounded-2xl p-6 border border-slate-100 bg-white shadow-sm space-y-6">
+            <div className="rounded-2xl p-6 border border-slate-200 bg-white shadow-xs space-y-6">
               <div className="flex items-center justify-between">
                 <h2 className="text-lg font-bold text-slate-900">Community Reviews</h2>
-                <div className="flex items-center gap-1.5 text-amber-700 font-bold text-sm">
+                <div className="flex items-center gap-1.5 text-blue-600 font-bold text-sm">
                   <Star className="w-4 h-4 fill-amber-400 text-amber-500" />
                   <span>{business.rating}</span>
                   <span className="text-slate-500 text-xs font-normal">({reviews.length} reviews)</span>
@@ -187,7 +187,7 @@ export default function BusinessDetailPage({ params }: { params: Promise<{ id: s
                   placeholder="Your Name *"
                   value={newName}
                   onChange={(e) => setNewName(e.target.value)}
-                  className="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-amber-500"
+                  className="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-600"
                 />
                 <textarea
                   required
@@ -195,9 +195,9 @@ export default function BusinessDetailPage({ params }: { params: Promise<{ id: s
                   rows={2}
                   value={newComment}
                   onChange={(e) => setNewComment(e.target.value)}
-                  className="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-amber-500"
+                  className="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-600"
                 />
-                <button type="submit" className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs flex items-center gap-1.5 transition-colors shadow-sm">
+                <button type="submit" className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center gap-1.5 transition-colors shadow-xs">
                   <Send className="w-3.5 h-3.5" />
                   <span>Post Review</span>
                 </button>
@@ -209,7 +209,7 @@ export default function BusinessDetailPage({ params }: { params: Promise<{ id: s
                   <div key={rev.id} className="p-4 rounded-xl bg-slate-50 border border-slate-100 space-y-1.5">
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-bold text-slate-900">{rev.name}</span>
-                      <div className="flex items-center gap-1 text-amber-700 text-xs font-bold">
+                      <div className="flex items-center gap-1 text-blue-600 text-xs font-bold">
                         <Star className="w-3 h-3 fill-amber-400 text-amber-500" />
                         <span>{rev.rating}.0</span>
                       </div>
@@ -224,12 +224,12 @@ export default function BusinessDetailPage({ params }: { params: Promise<{ id: s
 
           {/* Sidebar Business Stats & Map */}
           <div className="space-y-6">
-            <div className="pastel-card rounded-2xl p-6 border border-slate-100 bg-white shadow-sm space-y-4 text-xs">
+            <div className="rounded-2xl p-6 border border-slate-200 bg-white shadow-xs space-y-4 text-xs">
               <h3 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2">Business Information</h3>
 
               <div className="flex items-center justify-between text-slate-700">
                 <span className="text-slate-500">Timings:</span>
-                <span className="text-emerald-700 font-bold">{business.timing}</span>
+                <span className="text-slate-900 font-bold">{business.timing}</span>
               </div>
 
               {business.ownerName && (
@@ -242,20 +242,20 @@ export default function BusinessDetailPage({ params }: { params: Promise<{ id: s
               {business.priceRange && (
                 <div className="flex items-center justify-between text-slate-700">
                   <span className="text-slate-500">Price Range:</span>
-                  <span className="font-bold text-amber-700">{business.priceRange}</span>
+                  <span className="font-bold text-blue-600">{business.priceRange}</span>
                 </div>
               )}
 
               <div className="flex items-center justify-between text-slate-700">
                 <span className="text-slate-500">Verification:</span>
-                <span className="text-emerald-700 font-bold">Verified on Royal Korutla ✓</span>
+                <span className="text-blue-600 font-bold">Verified on Royal Korutla ✓</span>
               </div>
             </div>
 
             {/* Map Placeholder */}
-            <div className="pastel-card rounded-2xl p-4 border border-slate-100 bg-white shadow-sm text-center space-y-3">
+            <div className="rounded-2xl p-4 border border-slate-200 bg-white shadow-xs text-center space-y-3">
               <div className="h-36 rounded-xl bg-slate-50 border border-slate-200 flex flex-col items-center justify-center text-slate-500">
-                <Navigation className="w-8 h-8 text-indigo-600 mb-1" />
+                <Navigation className="w-8 h-8 text-blue-600 mb-1" />
                 <span className="text-xs font-semibold text-slate-800">Map &amp; Directions</span>
                 <span className="text-[10px] text-slate-500 px-2">{business.address}</span>
               </div>
@@ -265,7 +265,7 @@ export default function BusinessDetailPage({ params }: { params: Promise<{ id: s
                 rel="noopener noreferrer"
                 className="w-full py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs flex items-center justify-center gap-2 transition-colors"
               >
-                <Navigation className="w-3.5 h-3.5 text-indigo-600" />
+                <Navigation className="w-3.5 h-3.5 text-blue-600" />
                 <span>Open in Google Maps</span>
               </a>
             </div>

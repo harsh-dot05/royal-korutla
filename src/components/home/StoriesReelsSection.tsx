@@ -29,7 +29,7 @@ export const StoriesReelsSection: React.FC = () => {
           >
             {/* Story Thumbnail Avatar Ring */}
             <div className={`relative w-20 h-28 sm:w-24 sm:h-32 rounded-xl p-0.5 overflow-hidden shadow-xs border-2 ${
-              item.isNew ? 'border-blue-700' : 'border-slate-300'
+              item.isNew ? 'border-blue-600' : 'border-slate-300'
             }`}>
               <div className="relative w-full h-full rounded-lg overflow-hidden bg-slate-900">
                 <Image
@@ -49,14 +49,14 @@ export const StoriesReelsSection: React.FC = () => {
                 </div>
 
                 {item.isNew && (
-                  <span className="absolute top-1.5 right-1.5 px-1.5 py-0.2 bg-blue-700 text-[8px] font-bold text-white rounded-md">
+                  <span className="absolute top-1.5 right-1.5 px-1.5 py-0.2 bg-blue-600 text-[8px] font-bold text-white rounded-md">
                     NEW
                   </span>
                 )}
               </div>
             </div>
 
-            <span className="text-[11px] font-semibold text-slate-800 max-w-[90px] truncate text-center group-hover:text-blue-700">
+            <span className="text-[11px] font-semibold text-slate-800 max-w-[90px] truncate text-center group-hover:text-blue-600">
               {item.businessName}
             </span>
           </div>
@@ -66,7 +66,7 @@ export const StoriesReelsSection: React.FC = () => {
       {/* Story Viewer Modal */}
       {activeStory && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/90 p-4">
-          <div className="relative w-full max-w-sm bg-slate-900 rounded-xl overflow-hidden border border-slate-700 shadow-2xl">
+          <div className="relative w-full max-w-sm bg-white rounded-xl overflow-hidden border border-slate-200 shadow-2xl">
             {/* Header */}
             <div className="absolute top-4 left-4 right-4 z-20 flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -99,7 +99,7 @@ export const StoriesReelsSection: React.FC = () => {
                   <Link
                     href={activeStory.linkUrl}
                     onClick={() => setActiveStory(null)}
-                    className="mt-3 inline-flex items-center justify-center w-full px-4 py-2.5 rounded-lg bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs transition-colors shadow-xs"
+                    className="mt-3 inline-flex items-center justify-center w-full px-4 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs transition-colors shadow-xs"
                   >
                     <span>View Listing Details</span>
                   </Link>

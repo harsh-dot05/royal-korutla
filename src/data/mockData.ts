@@ -29,7 +29,7 @@ export const CATEGORIES: Category[] = [
     description: 'Top restaurants, bakeries, tiffin centers & street food in Korutla.',
     itemCount: 45,
     badge: 'Hot Deals',
-    colorGradient: 'from-amber-500 to-red-500',
+    colorGradient: 'bg-blue-600',
   },
   {
     id: 'cat-2',
@@ -38,7 +38,7 @@ export const CATEGORIES: Category[] = [
     iconName: 'ShoppingBag',
     description: 'Fresh vegetables, fruits, supermarkets & daily essentials.',
     itemCount: 32,
-    colorGradient: 'from-emerald-500 to-teal-600',
+    colorGradient: 'bg-blue-600',
   },
   {
     id: 'cat-3',
@@ -48,7 +48,7 @@ export const CATEGORIES: Category[] = [
     description: 'Clothing stores, footwear, jewellery & textile showrooms.',
     itemCount: 58,
     badge: 'Trending',
-    colorGradient: 'from-purple-500 to-pink-500',
+    colorGradient: 'bg-blue-600',
   },
   {
     id: 'cat-4',
@@ -57,7 +57,7 @@ export const CATEGORIES: Category[] = [
     iconName: 'Wrench',
     description: 'Electricians, plumbers, home repair, AC services & carpentry.',
     itemCount: 64,
-    colorGradient: 'from-blue-500 to-cyan-500',
+    colorGradient: 'bg-blue-600',
   },
   {
     id: 'cat-5',
@@ -67,7 +67,7 @@ export const CATEGORIES: Category[] = [
     description: '24/7 Hospitals, diagnostic labs, pharmacies & specialists.',
     itemCount: 28,
     badge: '24/7 Care',
-    colorGradient: 'from-rose-500 to-red-600',
+    colorGradient: 'bg-blue-600',
   },
   {
     id: 'cat-6',
@@ -76,7 +76,7 @@ export const CATEGORIES: Category[] = [
     iconName: 'GraduationCap',
     description: 'Schools, junior colleges, degree institutes & tuition hubs.',
     itemCount: 39,
-    colorGradient: 'from-indigo-500 to-blue-600',
+    colorGradient: 'bg-blue-600',
   },
   {
     id: 'cat-7',
@@ -85,7 +85,7 @@ export const CATEGORIES: Category[] = [
     iconName: 'MapPin',
     description: 'Temples, parks, bus station, municipal services & landmarks.',
     itemCount: 19,
-    colorGradient: 'from-emerald-600 to-green-700',
+    colorGradient: 'bg-blue-600',
   },
   {
     id: 'cat-8',
@@ -95,7 +95,7 @@ export const CATEGORIES: Category[] = [
     description: 'Sales boys/girls, shop staff, billing, drivers, cooks & technicians.',
     itemCount: 24,
     badge: 'Urgent Hiring',
-    colorGradient: 'from-violet-500 to-purple-600',
+    colorGradient: 'bg-blue-600',
   },
   {
     id: 'cat-9',
@@ -104,7 +104,7 @@ export const CATEGORIES: Category[] = [
     iconName: 'Home',
     description: 'Plots, houses for rent, commercial shops & agricultural land.',
     itemCount: 42,
-    colorGradient: 'from-amber-600 to-orange-600',
+    colorGradient: 'bg-blue-600',
   },
   {
     id: 'cat-10',
@@ -113,7 +113,7 @@ export const CATEGORIES: Category[] = [
     iconName: 'Building2',
     description: 'Hardware stores, electronics, printing presses & wholesale.',
     itemCount: 85,
-    colorGradient: 'from-cyan-600 to-blue-700',
+    colorGradient: 'bg-blue-600',
   },
   {
     id: 'cat-11',
@@ -123,7 +123,7 @@ export const CATEGORIES: Category[] = [
     description: 'Exclusive discounts, festival sales & store coupons in Korutla.',
     itemCount: 31,
     badge: 'Save Big',
-    colorGradient: 'from-yellow-400 to-amber-500',
+    colorGradient: 'bg-blue-600',
   },
   {
     id: 'cat-12',
@@ -133,7 +133,7 @@ export const CATEGORIES: Category[] = [
     description: 'Wedding, pre-wedding, event shoots, portraits & video reels in Korutla.',
     itemCount: 18,
     badge: 'Trending',
-    colorGradient: 'from-blue-600 to-indigo-700',
+    colorGradient: 'bg-blue-600',
   },
 ];
 

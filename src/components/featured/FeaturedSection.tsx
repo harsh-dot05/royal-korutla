@@ -62,7 +62,7 @@ export const FeaturedSection: React.FC = () => {
 
                   {/* Rating Badge */}
                   <div className="absolute top-3 right-3 px-2.5 py-1 rounded-md bg-white border border-slate-200 text-xs font-bold text-slate-800 flex items-center gap-1 shadow-xs">
-                    <Star className="w-3.5 h-3.5 fill-blue-700 text-blue-700" />
+                    <Star className="w-3.5 h-3.5 fill-blue-600 text-blue-600" />
                     <span>{biz.rating}</span>
                     <span className="text-slate-500 text-[10px]">({biz.reviewCount})</span>
                   </div>
@@ -70,7 +70,7 @@ export const FeaturedSection: React.FC = () => {
                   {/* Top Left Badges */}
                   <div className="absolute top-3 left-3 flex flex-col gap-1.5 items-start">
                     {biz.promotionLabel && (
-                      <div className="px-2.5 py-0.5 rounded-md bg-blue-700 text-white font-bold text-[10px] uppercase tracking-wider shadow-xs">
+                      <div className="px-2.5 py-0.5 rounded-md bg-blue-600 text-white font-bold text-[10px] uppercase tracking-wider shadow-xs">
                         {biz.promotionLabel === 'Featured' ? 'Featured' : 'Sponsored'}
                       </div>
                     )}
@@ -86,11 +86,11 @@ export const FeaturedSection: React.FC = () => {
 
                 {/* Body Content */}
                 <div className="p-4">
-                  <span className="text-[11px] font-bold text-blue-700 uppercase tracking-wider block mb-1">
+                  <span className="text-[11px] font-bold text-blue-600 uppercase tracking-wider block mb-1">
                     {biz.subCategory}
                   </span>
                   <Link href={`/businesses/${biz.id}`}>
-                    <h3 className="text-base font-bold text-slate-900 line-clamp-1 hover:text-blue-700 transition-colors">
+                    <h3 className="text-base font-bold text-slate-900 line-clamp-1 hover:text-blue-600 transition-colors">
                       {biz.name}
                     </h3>
                   </Link>
@@ -110,7 +110,7 @@ export const FeaturedSection: React.FC = () => {
                     {biz.tags.slice(0, 2).map((tag, idx) => (
                       <span
                         key={idx}
-                        className="px-2 py-0.5 rounded-md bg-blue-50 text-[10px] font-semibold text-blue-800 border border-blue-100"
+                        className="px-2 py-0.5 rounded-md bg-blue-50 text-[10px] font-semibold text-blue-700 border border-blue-100"
                       >
                         {tag}
                       </span>
@@ -125,7 +125,7 @@ export const FeaturedSection: React.FC = () => {
                   href={`tel:${biz.phone}`}
                   className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-800 border border-slate-200 transition-colors"
                 >
-                  <Phone className="w-3.5 h-3.5 text-blue-700" />
+                  <Phone className="w-3.5 h-3.5 text-blue-600" />
                   <span>Call</span>
                 </a>
                 {biz.whatsapp ? (
@@ -133,7 +133,7 @@ export const FeaturedSection: React.FC = () => {
                     href={`https://wa.me/${biz.whatsapp.replace(/[^0-9]/g, '')}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-blue-700 hover:bg-blue-800 text-xs font-bold text-white transition-colors"
+                    className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-xs font-bold text-white transition-colors"
                   >
                     <MessageSquare className="w-3.5 h-3.5" />
                     <span>WhatsApp</span>
@@ -141,7 +141,7 @@ export const FeaturedSection: React.FC = () => {
                 ) : (
                   <Link
                     href={`/businesses/${biz.id}`}
-                    className="flex items-center justify-center px-3 py-2 rounded-lg bg-blue-700 hover:bg-blue-800 text-xs font-bold text-white transition-colors"
+                    className="flex items-center justify-center px-3 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-xs font-bold text-white transition-colors"
                   >
                     Details
                   </Link>
@@ -168,7 +168,7 @@ export const FeaturedSection: React.FC = () => {
             >
               <div>
                 <div className="flex items-center justify-between mb-3">
-                  <span className="px-2.5 py-1 rounded-md bg-blue-700 text-white text-xs font-bold">
+                  <span className="px-2.5 py-1 rounded-md bg-blue-600 text-white text-xs font-bold">
                     {offer.discount}
                   </span>
                   <span className="text-[11px] font-semibold text-slate-500">{offer.expiry}</span>
@@ -177,7 +177,7 @@ export const FeaturedSection: React.FC = () => {
                 <h3 className="text-base font-bold text-slate-900 leading-snug">
                   {offer.title}
                 </h3>
-                <p className="text-xs text-blue-700 font-bold mt-1">
+                <p className="text-xs text-blue-600 font-bold mt-1">
                   At: {offer.businessName} ({offer.location})
                 </p>
               </div>
@@ -191,12 +191,12 @@ export const FeaturedSection: React.FC = () => {
                     </span>
                     <button
                       onClick={() => handleCopyCode(offer.code!)}
-                      className="p-1.5 text-xs font-bold text-blue-700 hover:text-blue-800 flex items-center gap-1"
+                      className="p-1.5 text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1"
                     >
                       {copiedCode === offer.code ? (
                         <>
-                          <Check className="w-3.5 h-3.5 text-blue-700" />
-                          <span className="text-blue-700 text-[10px]">Copied</span>
+                          <Check className="w-3.5 h-3.5 text-blue-600" />
+                          <span className="text-blue-600 text-[10px]">Copied</span>
                         </>
                       ) : (
                         <>
@@ -219,7 +219,7 @@ export const FeaturedSection: React.FC = () => {
       <section id="emergency" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="rounded-xl p-6 sm:p-8 border border-slate-200 bg-white shadow-xs">
           <div className="flex items-center gap-3 mb-6">
-            <div className="p-3 rounded-xl bg-blue-50 text-blue-700 border border-blue-200">
+            <div className="p-3 rounded-xl bg-blue-50 text-blue-600 border border-blue-200">
               <ShieldAlert className="w-6 h-6" />
             </div>
             <div>
@@ -240,7 +240,7 @@ export const FeaturedSection: React.FC = () => {
               >
                 <div>
                   <div className="flex items-center justify-between">
-                    <span className="px-2 py-0.5 rounded-md bg-blue-100 text-blue-800 font-bold text-[10px]">
+                    <span className="px-2 py-0.5 rounded-md bg-blue-100 text-blue-700 font-bold text-[10px]">
                       {contact.category}
                     </span>
                     {contact.available24x7 && (
@@ -253,7 +253,7 @@ export const FeaturedSection: React.FC = () => {
 
                 <a
                   href={`tel:${contact.phone}`}
-                  className="mt-4 flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold transition-colors"
+                  className="mt-4 flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-colors"
                 >
                   <PhoneCall className="w-3.5 h-3.5" />
                   <span>Call {contact.phone}</span>

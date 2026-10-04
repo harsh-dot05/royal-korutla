@@ -1,0 +1,14 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const businessController_1 = require("../controllers/businessController");
+const auth_1 = require("../middleware/auth");
+const validate_1 = require("../middleware/validate");
+const businessValidator_1 = require("../validators/businessValidator");
+const router = (0, express_1.Router)();
+router.get('/businesses', businessController_1.getBusinesses);
+router.get('/businesses/:id', businessController_1.getBusinessById);
+router.post('/businesses', auth_1.requireAdmin, (0, validate_1.validateBody)(businessValidator_1.createBusinessSchema), businessController_1.createBusiness);
+router.put('/businesses/:id', auth_1.requireAdmin, (0, validate_1.validateBody)(businessValidator_1.updateBusinessSchema), businessController_1.updateBusiness);
+router.delete('/businesses/:id', auth_1.requireAdmin, businessController_1.deleteBusiness);
+exports.default = router;

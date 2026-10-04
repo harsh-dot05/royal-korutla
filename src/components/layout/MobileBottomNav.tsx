@@ -29,7 +29,7 @@ export const MobileBottomNav: React.FC = () => {
               href={item.href}
               className={`flex flex-col items-center gap-1 px-3 py-1 rounded-lg transition-colors ${
                 isActive
-                  ? 'text-blue-700 font-bold'
+                  ? 'text-blue-600 font-bold'
                   : 'text-slate-500 font-medium hover:text-slate-900'
               }`}
             >

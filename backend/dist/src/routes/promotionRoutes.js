@@ -1,0 +1,13 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const promotionController_1 = require("../controllers/promotionController");
+const auth_1 = require("../middleware/auth");
+const validate_1 = require("../middleware/validate");
+const promotionValidator_1 = require("../validators/promotionValidator");
+const router = (0, express_1.Router)();
+router.get('/promotions', promotionController_1.getActivePromotions);
+router.get('/admin/promotions', auth_1.requireAdmin, promotionController_1.getAllPromotions);
+router.post('/admin/promotions', auth_1.requireAdmin, (0, validate_1.validateBody)(promotionValidator_1.createPromotionSchema), promotionController_1.createPromotion);
+router.delete('/admin/promotions', auth_1.requireAdmin, promotionController_1.deletePromotion);
+exports.default = router;

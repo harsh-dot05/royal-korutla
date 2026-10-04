@@ -1,0 +1,14 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const photographyController_1 = require("../controllers/photographyController");
+const auth_1 = require("../middleware/auth");
+const validate_1 = require("../middleware/validate");
+const photographyValidator_1 = require("../validators/photographyValidator");
+const router = (0, express_1.Router)();
+router.get('/photography', photographyController_1.getPhotographyStudios);
+router.get('/admin/photography', auth_1.requireAdmin, photographyController_1.getPhotographyStudios);
+router.post('/admin/photography', auth_1.requireAdmin, (0, validate_1.validateBody)(photographyValidator_1.createPhotographySchema), photographyController_1.createPhotographyStudio);
+router.put('/admin/photography', auth_1.requireAdmin, (0, validate_1.validateBody)(photographyValidator_1.updatePhotographySchema), photographyController_1.updatePhotographyStudio);
+router.delete('/admin/photography', auth_1.requireAdmin, photographyController_1.deletePhotographyStudio);
+exports.default = router;

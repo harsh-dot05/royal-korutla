@@ -1,20 +1,40 @@
 @import "tailwindcss";
 
+@theme {
+  --color-primary: #2563eb;
+  --color-primary-hover: #1d4ed8;
+  --color-primary-bg: #eff6ff;
+  --color-primary-border: #bfdbfe;
+
+  --color-surface: #ffffff;
+  --color-surface-subtle: #f8fafc;
+  --color-surface-muted: #f1f5f9;
+
+  --color-border-subtle: #e2e8f0;
+  --color-border-default: #cbd5e1;
+
+  --color-text-main: #09090b;
+  --color-text-muted: #64748b;
+  --color-text-subtle: #94a3b8;
+}
+
 @layer base {
   :root {
     --background: #ffffff;
     --foreground: #09090b;
     --card: #ffffff;
     --card-border: #e2e8f0;
+    --surface: #f8fafc;
+    --border: #e2e8f0;
+
     --text-primary: #09090b;
     --text-secondary: #475569;
     --text-muted: #64748b;
-    
-    /* Single Primary Accent Color System (Royal Blue) */
-    --primary-accent: #2563eb;
-    --primary-accent-hover: #1d4ed8;
-    --primary-accent-bg: #eff6ff;
-    --primary-accent-border: #bfdbfe;
+
+    --accent: #2563eb;
+    --accent-hover: #1d4ed8;
+    --accent-bg: #eff6ff;
+    --accent-border: #bfdbfe;
   }
 
   body {
@@ -98,3 +118,4 @@
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+

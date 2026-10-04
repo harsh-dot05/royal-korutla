@@ -16,14 +16,14 @@ export const Button: React.FC<ButtonProps> = ({
   className = '',
   ...props
 }) => {
-  const baseStyles = 'inline-flex items-center justify-center font-semibold transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-700 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none rounded-xl';
+  const baseStyles = 'inline-flex items-center justify-center font-semibold transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none rounded-xl';
 
   const variants = {
-    primary: 'bg-blue-700 hover:bg-blue-800 text-white shadow-xs',
-    gold: 'bg-blue-700 hover:bg-blue-800 text-white font-bold shadow-xs',
-    dark: 'bg-black hover:bg-slate-900 text-white font-bold shadow-xs',
+    primary: 'bg-blue-600 hover:bg-blue-700 text-white shadow-xs',
+    gold: 'bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-xs',
+    dark: 'bg-slate-900 hover:bg-slate-800 text-white font-bold shadow-xs',
     secondary: 'bg-slate-100 hover:bg-slate-200 text-slate-900 border border-slate-200',
-    outline: 'bg-transparent border border-slate-300 hover:bg-slate-50 text-slate-800',
+    outline: 'bg-white border border-slate-200 hover:bg-slate-50 text-slate-900',
     ghost: 'bg-transparent hover:bg-slate-100 text-slate-700 hover:text-slate-900',
   };
 

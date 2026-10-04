@@ -25,17 +25,17 @@ export const JobsSpotlight: React.FC = () => {
           >
             <div>
               <div className="flex items-center justify-between gap-2 mb-2">
-                <span className="text-[10px] font-extrabold text-blue-700 uppercase tracking-wider">{job.category}</span>
-                <span className="px-2 py-0.5 rounded-full bg-blue-50 text-blue-800 font-bold text-[10px] border border-blue-200">
+                <span className="text-[10px] font-extrabold text-blue-600 uppercase tracking-wider">{job.category}</span>
+                <span className="px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 font-bold text-[10px] border border-blue-200">
                   {job.type}
                 </span>
               </div>
 
-              <h3 className="text-base font-bold text-slate-900 hover:text-blue-700 transition-colors">
+              <h3 className="text-base font-bold text-slate-900 hover:text-blue-600 transition-colors">
                 {job.title}
               </h3>
               <p className="text-xs font-bold text-slate-800 flex items-center gap-1.5 mt-1">
-                <Building className="w-3.5 h-3.5 text-blue-700" />
+                <Building className="w-3.5 h-3.5 text-blue-600" />
                 <span>{job.shopName}</span>
               </p>
 
@@ -49,7 +49,7 @@ export const JobsSpotlight: React.FC = () => {
               <span className="text-[11px] text-slate-500 font-medium">Posted {job.postedDate}</span>
               <Link
                 href="/jobs"
-                className="text-xs font-bold text-blue-700 hover:text-blue-800 flex items-center gap-1"
+                className="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1"
               >
                 <span>View Opening</span>
                 <ArrowRight className="w-3.5 h-3.5" />

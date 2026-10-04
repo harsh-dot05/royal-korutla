@@ -566,8 +566,8 @@ export default function AdminDashboardPage() {
 
   if (checkingAuth) {
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center text-slate-400 text-xs font-semibold">
-        <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-slate-900 border border-slate-800">
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center text-slate-500 text-xs font-semibold">
+        <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-white border border-slate-200">
           <Shield className="w-5 h-5 text-blue-500 animate-pulse" />
           <span>Verifying Admin Authorization...</span>
         </div>
@@ -576,7 +576,7 @@ export default function AdminDashboardPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-900 text-slate-100 font-sans">
+    <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 font-sans">
       {/* Toast Notification */}
       {notification && (
         <div className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-xl shadow-2xl flex items-center gap-2 border text-xs font-bold transition-all ${
@@ -584,39 +584,39 @@ export default function AdminDashboardPage() {
             ? 'bg-emerald-900/90 text-emerald-200 border-emerald-500'
             : 'bg-rose-900/90 text-rose-200 border-rose-500'
         }`}>
-          {notification.type === 'success' ? <CheckCircle2 className="w-4 h-4 text-emerald-400" /> : <AlertCircle className="w-4 h-4 text-rose-400" />}
+          {notification.type === 'success' ? <CheckCircle2 className="w-4 h-4 text-emerald-700" /> : <AlertCircle className="w-4 h-4 text-rose-700" />}
           <span>{notification.message}</span>
         </div>
       )}
 
       {/* Top Security Header */}
-      <header className="bg-slate-950 border-b border-slate-800 sticky top-0 z-40">
+      <header className="bg-white border-b border-slate-200 shadow-xs sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-blue-700 p-0.5 flex items-center justify-center shadow-lg">
+            <div className="w-10 h-10 rounded-xl bg-blue-600 p-0.5 flex items-center justify-center shadow-lg">
               <Crown className="w-5 h-5 text-white" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-base font-extrabold text-white tracking-tight">Royal Korutla Admin</h1>
-                <span className="text-[10px] font-black px-2 py-0.5 rounded-md bg-blue-950 text-blue-300 border border-blue-800 uppercase tracking-wide">
+                <h1 className="text-base font-extrabold text-slate-900 tracking-tight">Royal Korutla Admin</h1>
+                <span className="text-[10px] font-black px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-200 uppercase tracking-wide">
                   Owner Admin
                 </span>
               </div>
-              <p className="text-[11px] text-slate-400 flex items-center gap-1">
-                <Lock className="w-3 h-3 text-emerald-400 inline" /> Session: <strong className="text-slate-200 font-medium">admin@royalkorutla.com</strong>
+              <p className="text-[11px] text-slate-500 flex items-center gap-1">
+                <Lock className="w-3 h-3 text-emerald-700 inline" /> Session: <strong className="text-slate-800 font-medium">admin@royalkorutla.com</strong>
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
-            <Link href="/" target="_blank" className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-300 transition-colors">
+            <Link href="/" target="_blank" className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-semibold text-slate-700 transition-colors">
               <Eye className="w-3.5 h-3.5" />
               <span>Preview Website</span>
             </Link>
             <button
               onClick={handleLogout}
-              className="px-3.5 py-1.5 rounded-xl bg-rose-600/20 hover:bg-rose-600 text-rose-300 hover:text-white border border-rose-500/30 text-xs font-bold flex items-center gap-1.5 transition-all"
+              className="px-3.5 py-1.5 rounded-xl bg-rose-600/20 hover:bg-rose-600 text-rose-800 hover:text-white border border-rose-500/30 text-xs font-bold flex items-center gap-1.5 transition-all"
             >
               <LogOut className="w-3.5 h-3.5" />
               <span>Admin Logout</span>
@@ -630,8 +630,8 @@ export default function AdminDashboardPage() {
         
         {/* Module Sidebar Navigation */}
         <aside className="w-full md:w-64 shrink-0 space-y-2">
-          <div className="p-3 bg-slate-950/80 rounded-2xl border border-slate-800">
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-3 mb-2">Admin Modules ({tabsList.length})</p>
+          <div className="p-3 bg-white rounded-2xl border border-slate-200">
+            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider px-3 mb-2">Admin Modules ({tabsList.length})</p>
             <nav className="space-y-0.5 max-h-[75vh] overflow-y-auto pr-1">
               {tabsList.map((tab) => {
                 const IconComp = tab.icon;
@@ -642,17 +642,17 @@ export default function AdminDashboardPage() {
                     onClick={() => setActiveTab(tab.id)}
                     className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium transition-all ${
                       isActive
-                        ? 'bg-blue-700 text-white font-extrabold shadow-md'
-                        : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                        ? 'bg-blue-600 text-white font-extrabold shadow-md'
+                        : 'text-slate-700 hover:bg-slate-100 hover:text-white'
                     }`}
                   >
                     <div className="flex items-center gap-2.5">
-                      <IconComp className={`w-4 h-4 shrink-0 ${isActive ? 'text-white' : 'text-slate-400'}`} />
+                      <IconComp className={`w-4 h-4 shrink-0 ${isActive ? 'text-white' : 'text-slate-500'}`} />
                       <span className="truncate">{tab.label}</span>
                     </div>
                     {tab.badge && (
                       <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
-                        isActive ? 'bg-white text-blue-900' : 'bg-slate-800 text-slate-400'
+                        isActive ? 'bg-white text-blue-900' : 'bg-slate-100 text-slate-500'
                       }`}>
                         {tab.badge}
                       </span>
@@ -665,25 +665,25 @@ export default function AdminDashboardPage() {
         </aside>
 
         {/* Content Area */}
-        <main className="flex-1 bg-slate-950/60 rounded-3xl border border-slate-800 p-4 sm:p-6 space-y-6">
+        <main className="flex-1 bg-white rounded-3xl border border-slate-200 p-4 sm:p-6 space-y-6">
 
           {/* TAB 1: DASHBOARD OVERVIEW */}
           {activeTab === 'dashboard' && (
             <div className="space-y-6">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-6 rounded-2xl bg-slate-900 border border-slate-800">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-6 rounded-2xl bg-white border border-slate-200">
                 <div>
-                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-900/40 border border-blue-700 text-blue-300 text-[11px] font-bold mb-2">
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-[11px] font-bold mb-2">
                     <Shield className="w-3.5 h-3.5" />
                     <span>Royal Korutla Private Control Center</span>
                   </div>
-                  <h2 className="text-2xl font-black text-white">Welcome, Owner Admin</h2>
-                  <p className="text-xs text-slate-400 mt-1 max-w-lg">
+                  <h2 className="text-2xl font-black text-slate-900">Welcome, Owner Admin</h2>
+                  <p className="text-xs text-slate-500 mt-1 max-w-lg">
                     Manage town businesses, photography studios, paid promotions, homepage banners, and verified listing badges.
                   </p>
                 </div>
                 <button
                   onClick={() => setActiveTab('promotions')}
-                  className="px-4 py-2.5 rounded-xl bg-blue-700 hover:bg-blue-800 text-white font-extrabold text-xs flex items-center gap-2 shrink-0 transition-all"
+                  className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs flex items-center gap-2 shrink-0 transition-all"
                 >
                   <Sparkles className="w-4 h-4" />
                   <span>Publish New Promotion</span>
@@ -692,69 +692,69 @@ export default function AdminDashboardPage() {
 
               {/* Stats Cards Grid */}
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-1">
-                  <div className="flex items-center justify-between text-slate-400 text-xs font-semibold">
+                <div className="p-4 rounded-2xl bg-white border border-slate-200 space-y-1">
+                  <div className="flex items-center justify-between text-slate-500 text-xs font-semibold">
                     <span>Total Businesses</span>
-                    <Building2 className="w-4 h-4 text-blue-400" />
+                    <Building2 className="w-4 h-4 text-blue-600" />
                   </div>
-                  <p className="text-2xl font-black text-white">{businesses.length}</p>
-                  <p className="text-[10px] text-emerald-400 font-semibold">{businesses.filter(b=>b.isVerified).length} Verified</p>
+                  <p className="text-2xl font-black text-slate-900">{businesses.length}</p>
+                  <p className="text-[10px] text-emerald-700 font-semibold">{businesses.filter(b=>b.isVerified).length} Verified</p>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-1">
-                  <div className="flex items-center justify-between text-slate-400 text-xs font-semibold">
+                <div className="p-4 rounded-2xl bg-white border border-slate-200 space-y-1">
+                  <div className="flex items-center justify-between text-slate-500 text-xs font-semibold">
                     <span>Photography Studios</span>
-                    <Camera className="w-4 h-4 text-blue-400" />
+                    <Camera className="w-4 h-4 text-blue-600" />
                   </div>
-                  <p className="text-2xl font-black text-white">{photographyList.length}</p>
-                  <p className="text-[10px] text-blue-300 font-semibold">Korutla Studios</p>
+                  <p className="text-2xl font-black text-slate-900">{photographyList.length}</p>
+                  <p className="text-[10px] text-blue-700 font-semibold">Korutla Studios</p>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-1">
-                  <div className="flex items-center justify-between text-slate-400 text-xs font-semibold">
+                <div className="p-4 rounded-2xl bg-white border border-slate-200 space-y-1">
+                  <div className="flex items-center justify-between text-slate-500 text-xs font-semibold">
                     <span>Active Promotions</span>
-                    <Sparkles className="w-4 h-4 text-blue-400" />
+                    <Sparkles className="w-4 h-4 text-blue-600" />
                   </div>
-                  <p className="text-2xl font-black text-blue-400">{promotions.filter(p=>p.status==='ACTIVE').length}</p>
-                  <p className="text-[10px] text-blue-300 font-semibold">Live on website</p>
+                  <p className="text-2xl font-black text-blue-600">{promotions.filter(p=>p.status==='ACTIVE').length}</p>
+                  <p className="text-[10px] text-blue-700 font-semibold">Live on website</p>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-1">
-                  <div className="flex items-center justify-between text-slate-400 text-xs font-semibold">
+                <div className="p-4 rounded-2xl bg-white border border-slate-200 space-y-1">
+                  <div className="flex items-center justify-between text-slate-500 text-xs font-semibold">
                     <span>Town Coverage</span>
-                    <MapPin className="w-4 h-4 text-emerald-400" />
+                    <MapPin className="w-4 h-4 text-emerald-700" />
                   </div>
-                  <p className="text-2xl font-black text-white">505326</p>
-                  <p className="text-[10px] text-slate-400">Korutla Town Portal</p>
+                  <p className="text-2xl font-black text-slate-900">505326</p>
+                  <p className="text-[10px] text-slate-500">Korutla Town Portal</p>
                 </div>
               </div>
 
               {/* Quick Actions Grid */}
-              <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
-                <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                  <Sliders className="w-4 h-4 text-blue-400" />
+              <div className="p-5 rounded-2xl bg-white border border-slate-200 space-y-3">
+                <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                  <Sliders className="w-4 h-4 text-blue-600" />
                   <span>Quick Admin Short-Cuts</span>
                 </h3>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-                  <button onClick={() => setActiveTab('photography')} className="p-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-left space-y-1 transition-all">
-                    <Camera className="w-4 h-4 text-blue-400" />
+                  <button onClick={() => setActiveTab('photography')} className="p-3 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-200 text-left space-y-1 transition-all">
+                    <Camera className="w-4 h-4 text-blue-600" />
                     <p className="font-bold text-white">Photography Studios</p>
-                    <p className="text-[10px] text-slate-400">Add studio / wedding photography</p>
+                    <p className="text-[10px] text-slate-500">Add studio / wedding photography</p>
                   </button>
-                  <button onClick={() => setActiveTab('add-business')} className="p-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-left space-y-1 transition-all">
-                    <Plus className="w-4 h-4 text-blue-400" />
+                  <button onClick={() => setActiveTab('add-business')} className="p-3 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-200 text-left space-y-1 transition-all">
+                    <Plus className="w-4 h-4 text-blue-600" />
                     <p className="font-bold text-white">Add New Business</p>
-                    <p className="text-[10px] text-slate-400">Register shop in Korutla</p>
+                    <p className="text-[10px] text-slate-500">Register shop in Korutla</p>
                   </button>
-                  <button onClick={() => setActiveTab('promotions')} className="p-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-left space-y-1 transition-all">
-                    <Sparkles className="w-4 h-4 text-blue-400" />
+                  <button onClick={() => setActiveTab('promotions')} className="p-3 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-200 text-left space-y-1 transition-all">
+                    <Sparkles className="w-4 h-4 text-blue-600" />
                     <p className="font-bold text-white">Publish Paid Promo</p>
-                    <p className="text-[10px] text-slate-400">Banner &amp; date placement</p>
+                    <p className="text-[10px] text-slate-500">Banner &amp; date placement</p>
                   </button>
-                  <button onClick={() => setActiveTab('homepage-content')} className="p-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-left space-y-1 transition-all">
-                    <Eye className="w-4 h-4 text-emerald-400" />
+                  <button onClick={() => setActiveTab('homepage-content')} className="p-3 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-200 text-left space-y-1 transition-all">
+                    <Eye className="w-4 h-4 text-emerald-700" />
                     <p className="font-bold text-white">Homepage Banners</p>
-                    <p className="text-[10px] text-slate-400">Hero slides &amp; featured order</p>
+                    <p className="text-[10px] text-slate-500">Hero slides &amp; featured order</p>
                   </button>
                 </div>
               </div>
@@ -764,27 +764,27 @@ export default function AdminDashboardPage() {
           {/* TAB: PHOTOGRAPHY & STUDIOS MANAGEMENT */}
           {activeTab === 'photography' && (
             <div className="space-y-6">
-              <div className="p-5 rounded-2xl bg-blue-950/30 border border-blue-800 space-y-2">
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-900/40 text-blue-300 text-xs font-bold">
-                  <Camera className="w-3.5 h-3.5 text-blue-400" />
+              <div className="p-5 rounded-2xl bg-blue-50 border border-blue-200 space-y-2">
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 text-xs font-bold">
+                  <Camera className="w-3.5 h-3.5 text-blue-600" />
                   <span>Photography &amp; Studios Content Management</span>
                 </div>
-                <h2 className="text-xl font-bold text-white">Manage Photography &amp; Studios</h2>
-                <p className="text-xs text-slate-300 max-w-2xl">
+                <h2 className="text-xl font-bold text-slate-900">Manage Photography &amp; Studios</h2>
+                <p className="text-xs text-slate-700 max-w-2xl">
                   Add, edit, or manage Korutla photo studios, camera rentals, wedding photography teams, pricing, portfolio galleries, and contact details.
                 </p>
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Add/Edit Form */}
-                <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
-                  <div className="flex items-center justify-between pb-2 border-b border-slate-800">
-                    <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                      <Camera className="w-4 h-4 text-purple-400" />
+                <div className="p-5 rounded-2xl bg-white border border-slate-200 space-y-4">
+                  <div className="flex items-center justify-between pb-2 border-b border-slate-200">
+                    <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                      <Camera className="w-4 h-4 text-blue-600" />
                       <span>{editingPhotoStudio ? 'Edit Studio Profile' : 'Add Photography Studio'}</span>
                     </h3>
                     {editingPhotoStudio && (
-                      <button onClick={resetPhotoForm} className="text-[11px] text-slate-400 hover:text-white">
+                      <button onClick={resetPhotoForm} className="text-[11px] text-slate-500 hover:text-white">
                         Cancel Edit
                       </button>
                     )}
@@ -792,111 +792,111 @@ export default function AdminDashboardPage() {
 
                   <form onSubmit={handleSavePhotographyStudio} className="space-y-3 text-xs">
                     <div>
-                      <label className="block text-slate-300 font-bold mb-1">Studio / Photographer Name *</label>
+                      <label className="block text-slate-700 font-bold mb-1">Studio / Photographer Name *</label>
                       <input
                         type="text"
                         required
                         placeholder="e.g. Royal Digital Photography Studio"
                         value={photoName}
                         onChange={(e) => setPhotoName(e.target.value)}
-                        className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
                       />
                     </div>
 
                     <div className="grid grid-cols-2 gap-2">
                       <div>
-                        <label className="block text-slate-300 font-bold mb-1">Phone Number *</label>
+                        <label className="block text-slate-700 font-bold mb-1">Phone Number *</label>
                         <input
                           type="text"
                           required
                           placeholder="+91 98480 12345"
                           value={photoPhone}
                           onChange={(e) => setPhotoPhone(e.target.value)}
-                          className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
                         />
                       </div>
                       <div>
-                        <label className="block text-slate-300 font-bold mb-1">WhatsApp Number</label>
+                        <label className="block text-slate-700 font-bold mb-1">WhatsApp Number</label>
                         <input
                           type="text"
                           placeholder="+91 98480 12345"
                           value={photoWhatsapp}
                           onChange={(e) => setPhotoWhatsapp(e.target.value)}
-                          className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
                         />
                       </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-2">
                       <div>
-                        <label className="block text-slate-300 font-bold mb-1">Profile Image URL</label>
+                        <label className="block text-slate-700 font-bold mb-1">Profile Image URL</label>
                         <input
                           type="url"
                           placeholder="https://images.unsplash.com/..."
                           value={photoProfile}
                           onChange={(e) => setPhotoProfile(e.target.value)}
-                          className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
                         />
                       </div>
                       <div>
-                        <label className="block text-slate-300 font-bold mb-1">Cover Image URL</label>
+                        <label className="block text-slate-700 font-bold mb-1">Cover Image URL</label>
                         <input
                           type="url"
                           placeholder="https://images.unsplash.com/..."
                           value={photoCover}
                           onChange={(e) => setPhotoCover(e.target.value)}
-                          className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
                         />
                       </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-2">
                       <div>
-                        <label className="block text-slate-300 font-bold mb-1">Location / Address</label>
+                        <label className="block text-slate-700 font-bold mb-1">Location / Address</label>
                         <input
                           type="text"
                           placeholder="e.g. Main Road, Korutla"
                           value={photoLocation}
                           onChange={(e) => setPhotoLocation(e.target.value)}
-                          className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
                         />
                       </div>
                       <div>
-                        <label className="block text-slate-300 font-bold mb-1">Starting Price</label>
+                        <label className="block text-slate-700 font-bold mb-1">Starting Price</label>
                         <input
                           type="text"
                           placeholder="e.g. ₹15,000 / day"
                           value={photoPrice}
                           onChange={(e) => setPhotoPrice(e.target.value)}
-                          className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
                         />
                       </div>
                     </div>
 
                     <div>
-                      <label className="block text-slate-300 font-bold mb-1">Instagram Handle</label>
+                      <label className="block text-slate-700 font-bold mb-1">Instagram Handle</label>
                       <input
                         type="text"
                         placeholder="e.g. @royal_korutla_studios"
                         value={photoInstagram}
                         onChange={(e) => setPhotoInstagram(e.target.value)}
-                        className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-slate-300 font-bold mb-1">Description / Services</label>
+                      <label className="block text-slate-700 font-bold mb-1">Description / Services</label>
                       <textarea
                         rows={2}
                         placeholder="Specialist in cinematic wedding photography, candid video shoots, drone coverage in Korutla."
                         value={photoDesc}
                         onChange={(e) => setPhotoDesc(e.target.value)}
-                        className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-slate-300 font-bold mb-1">Photography Types</label>
+                      <label className="block text-slate-700 font-bold mb-1">Photography Types</label>
                       <div className="flex flex-wrap gap-1.5 pt-1">
                         {ALL_PHOTO_TYPES.map((type) => {
                           const isSel = photoTypes.includes(type);
@@ -907,8 +907,8 @@ export default function AdminDashboardPage() {
                               onClick={() => togglePhotoTypeSelection(type)}
                               className={`px-2.5 py-1 rounded-lg text-[10px] font-bold border transition-colors ${
                                 isSel
-                                  ? 'bg-purple-900/60 text-purple-200 border-purple-600'
-                                  : 'bg-slate-950 text-slate-400 border-slate-800 hover:text-white'
+                                  ? 'bg-blue-50 text-blue-700 border-blue-600'
+                                  : 'bg-slate-50 text-slate-500 border-slate-200 hover:text-white'
                               }`}
                             >
                               {isSel ? '✓ ' : ''}{type}
@@ -926,7 +926,7 @@ export default function AdminDashboardPage() {
                           onChange={(e) => setPhotoVerified(e.target.checked)}
                           className="rounded text-blue-700"
                         />
-                        <span className="text-slate-300 font-bold">Verified</span>
+                        <span className="text-slate-700 font-bold">Verified</span>
                       </label>
                       <label className="flex items-center gap-2 cursor-pointer">
                         <input
@@ -935,13 +935,13 @@ export default function AdminDashboardPage() {
                           onChange={(e) => setPhotoFeatured(e.target.checked)}
                           className="rounded text-blue-700"
                         />
-                        <span className="text-slate-300 font-bold">Featured Studio</span>
+                        <span className="text-slate-700 font-bold">Featured Studio</span>
                       </label>
                     </div>
 
                     <button
                       type="submit"
-                      className="w-full py-3 rounded-xl bg-purple-700 hover:bg-purple-800 text-white font-extrabold text-xs flex items-center justify-center gap-2 shadow-lg transition-all mt-2"
+                      className="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs flex items-center justify-center gap-2 shadow-lg transition-all mt-2"
                     >
                       <Camera className="w-4 h-4" />
                       <span>{editingPhotoStudio ? 'Update Studio Profile' : 'Save Photography Studio'}</span>
@@ -952,50 +952,50 @@ export default function AdminDashboardPage() {
                 {/* Studios List */}
                 <div className="lg:col-span-2 space-y-4">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                      <Camera className="w-4 h-4 text-purple-400" />
+                    <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                      <Camera className="w-4 h-4 text-blue-600" />
                       <span>Korutla Photography Studios ({photographyList.length})</span>
                     </h3>
-                    <button onClick={fetchPhotography} className="text-xs text-purple-400 hover:underline flex items-center gap-1">
+                    <button onClick={fetchPhotography} className="text-xs text-blue-600 hover:underline flex items-center gap-1">
                       <RefreshCw className="w-3 h-3" /> Refresh
                     </button>
                   </div>
 
                   {loadingPhoto ? (
-                    <div className="p-8 text-center text-slate-400 text-xs">Loading studios...</div>
+                    <div className="p-8 text-center text-slate-500 text-xs">Loading studios...</div>
                   ) : photographyList.length === 0 ? (
-                    <div className="p-8 text-center text-slate-400 text-xs bg-slate-900 rounded-2xl border border-slate-800">
+                    <div className="p-8 text-center text-slate-500 text-xs bg-white rounded-2xl border border-slate-200">
                       No photography studios registered yet.
                     </div>
                   ) : (
                     <div className="space-y-3">
                       {photographyList.map((studio) => (
-                        <div key={studio.id} className="p-4 rounded-2xl bg-slate-900 border border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                        <div key={studio.id} className="p-4 rounded-2xl bg-white border border-slate-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                           <div className="flex items-center gap-3">
                             <img src={studio.profileImage} alt={studio.name} className="w-14 h-14 object-cover rounded-xl shrink-0" />
                             <div className="space-y-1">
                               <div className="flex items-center gap-2">
-                                <h4 className="text-sm font-bold text-white">{studio.name}</h4>
+                                <h4 className="text-sm font-bold text-slate-900">{studio.name}</h4>
                                 {studio.isVerified && (
-                                  <span className="px-2 py-0.5 rounded-full bg-blue-950 text-blue-300 border border-blue-800 font-bold text-[10px]">
+                                  <span className="px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 font-bold text-[10px]">
                                     VERIFIED
                                   </span>
                                 )}
                                 {studio.isFeatured && (
-                                  <span className="px-2 py-0.5 rounded-full bg-purple-950 text-purple-300 border border-purple-800 font-bold text-[10px]">
+                                  <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200 font-bold text-[10px]">
                                     FEATURED
                                   </span>
                                 )}
                               </div>
-                              <p className="text-xs text-slate-400">{studio.location} • Phone: {studio.phone}</p>
+                              <p className="text-xs text-slate-500">{studio.location} • Phone: {studio.phone}</p>
                               <div className="flex flex-wrap gap-1">
                                 {studio.photographyTypes.map((t) => (
-                                  <span key={t} className="px-2 py-0.5 rounded bg-slate-800 text-[10px] font-medium text-purple-300">
+                                  <span key={t} className="px-2 py-0.5 rounded bg-slate-100 text-[10px] font-medium text-slate-700">
                                     {t}
                                   </span>
                                 ))}
                                 {studio.startingPrice && (
-                                  <span className="px-2 py-0.5 rounded bg-emerald-950 text-[10px] font-bold text-emerald-300 border border-emerald-800">
+                                  <span className="px-2 py-0.5 rounded bg-emerald-50 text-[10px] font-bold text-emerald-800 border border-emerald-200">
                                     Starting {studio.startingPrice}
                                   </span>
                                 )}
@@ -1006,13 +1006,13 @@ export default function AdminDashboardPage() {
                           <div className="flex items-center gap-2 shrink-0">
                             <button
                               onClick={() => handleEditPhotoStudio(studio)}
-                              className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs transition-all"
+                              className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200 text-xs transition-all"
                             >
                               <Edit3 className="w-3.5 h-3.5" />
                             </button>
                             <button
                               onClick={() => handleDeletePhotoStudio(studio.id)}
-                              className="p-2 rounded-xl bg-rose-500/20 hover:bg-rose-600 text-rose-300 hover:text-white border border-rose-500/30 transition-all text-xs"
+                              className="p-2 rounded-xl bg-rose-50 hover:bg-rose-600 text-rose-800 hover:text-white border border-rose-500/30 transition-all text-xs"
                             >
                               <Trash2 className="w-3.5 h-3.5" />
                             </button>
@@ -1029,79 +1029,79 @@ export default function AdminDashboardPage() {
           {/* TAB 7: PROMOTIONS */}
           {activeTab === 'promotions' && (
             <div className="space-y-6">
-              <div className="p-5 rounded-2xl bg-amber-950/30 border border-amber-800 space-y-2">
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-900/40 text-amber-300 text-xs font-bold">
+              <div className="p-5 rounded-2xl bg-blue-50 border border-blue-200 space-y-2">
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-900/40 text-slate-700 text-xs font-bold">
                   <Sparkles className="w-3.5 h-3.5" />
                   <span>Paid Business Promotion Publisher</span>
                 </div>
-                <h2 className="text-xl font-bold text-white">Publish Paid Business Promotions</h2>
-                <p className="text-xs text-slate-300 max-w-2xl">
+                <h2 className="text-xl font-bold text-slate-900">Publish Paid Business Promotions</h2>
+                <p className="text-xs text-slate-700 max-w-2xl">
                   When a local business pays for promotion, enter the details here. Select the business, upload/paste the banner image, set start and end dates, and publish live on Royal Korutla.
                 </p>
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Add Form */}
-                <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
-                  <h3 className="text-sm font-bold text-white flex items-center gap-2 pb-2 border-b border-slate-800">
-                    <Plus className="w-4 h-4 text-amber-400" />
+                <div className="p-5 rounded-2xl bg-white border border-slate-200 space-y-4">
+                  <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2 pb-2 border-b border-slate-200">
+                    <Plus className="w-4 h-4 text-blue-600" />
                     <span>Create Paid Campaign</span>
                   </h3>
 
                   <form onSubmit={handlePublishPromotion} className="space-y-3 text-xs">
                     <div>
-                      <label className="block text-slate-300 font-bold mb-1">Business Name *</label>
+                      <label className="block text-slate-700 font-bold mb-1">Business Name *</label>
                       <input
                         type="text"
                         required
                         placeholder="e.g. Royal Paradise Biryani"
                         value={promBizName}
                         onChange={(e) => setPromBizName(e.target.value)}
-                        className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-amber-500"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-600"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-slate-300 font-bold mb-1">Promotional Image URL *</label>
+                      <label className="block text-slate-700 font-bold mb-1">Promotional Image URL *</label>
                       <input
                         type="url"
                         required
                         placeholder="https://images.unsplash.com/..."
                         value={promImage}
                         onChange={(e) => setPromImage(e.target.value)}
-                        className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-amber-500"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-600"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-slate-300 font-bold mb-1">Promotion Title</label>
+                      <label className="block text-slate-700 font-bold mb-1">Promotion Title</label>
                       <input
                         type="text"
                         placeholder="e.g. Grand Festival Offer 2026"
                         value={promTitle}
                         onChange={(e) => setPromTitle(e.target.value)}
-                        className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-amber-500"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-600"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-slate-300 font-bold mb-1">Offer Tagline / Highlight</label>
+                      <label className="block text-slate-700 font-bold mb-1">Offer Tagline / Highlight</label>
                       <input
                         type="text"
                         placeholder="e.g. Flat 20% OFF on all items"
                         value={promOfferText}
                         onChange={(e) => setPromOfferText(e.target.value)}
-                        className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-amber-500"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-600"
                       />
                     </div>
 
                     <div className="grid grid-cols-2 gap-2">
                       <div>
-                        <label className="block text-slate-300 font-bold mb-1">Promotion Type</label>
+                        <label className="block text-slate-700 font-bold mb-1">Promotion Type</label>
                         <select
                           value={promType}
                           onChange={(e) => setPromType(e.target.value as PromotionType)}
-                          className="w-full bg-slate-950 border border-slate-700 rounded-xl px-2.5 py-2 text-white focus:outline-none focus:border-amber-500"
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-2 text-white focus:outline-none focus:border-blue-600"
                         >
                           <option value="HOMEPAGE_FEATURED">Homepage Featured</option>
                           <option value="FEATURED_BUSINESS">Featured Business Ticker</option>
@@ -1113,11 +1113,11 @@ export default function AdminDashboardPage() {
                       </div>
 
                       <div>
-                        <label className="block text-slate-300 font-bold mb-1">Placement Target</label>
+                        <label className="block text-slate-700 font-bold mb-1">Placement Target</label>
                         <select
                           value={promPlacement}
                           onChange={(e) => setPromPlacement(e.target.value)}
-                          className="w-full bg-slate-950 border border-slate-700 rounded-xl px-2.5 py-2 text-white focus:outline-none focus:border-amber-500"
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-2 text-white focus:outline-none focus:border-blue-600"
                         >
                           <option value="Homepage Top Banner">Homepage Top Banner</option>
                           <option value="Photography Header">Photography Header</option>
@@ -1130,28 +1130,28 @@ export default function AdminDashboardPage() {
 
                     <div className="grid grid-cols-2 gap-2">
                       <div>
-                        <label className="block text-slate-300 font-bold mb-1">Start Date</label>
+                        <label className="block text-slate-700 font-bold mb-1">Start Date</label>
                         <input
                           type="date"
                           value={promStartDate}
                           onChange={(e) => setPromStartDate(e.target.value)}
-                          className="w-full bg-slate-950 border border-slate-700 rounded-xl px-2 py-1.5 text-white focus:outline-none focus:border-amber-500"
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl px-2 py-1.5 text-white focus:outline-none focus:border-blue-600"
                         />
                       </div>
                       <div>
-                        <label className="block text-slate-300 font-bold mb-1">End Date (Expiry)</label>
+                        <label className="block text-slate-700 font-bold mb-1">End Date (Expiry)</label>
                         <input
                           type="date"
                           value={promEndDate}
                           onChange={(e) => setPromEndDate(e.target.value)}
-                          className="w-full bg-slate-950 border border-slate-700 rounded-xl px-2 py-1.5 text-white focus:outline-none focus:border-amber-500"
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl px-2 py-1.5 text-white focus:outline-none focus:border-blue-600"
                         />
                       </div>
                     </div>
 
                     <button
                       type="submit"
-                      className="w-full py-3 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-extrabold text-xs flex items-center justify-center gap-2 shadow-lg transition-all mt-2"
+                      className="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs flex items-center justify-center gap-2 shadow-lg transition-all mt-2"
                     >
                       <Sparkles className="w-4 h-4" />
                       <span>Publish Live on Website</span>
@@ -1162,53 +1162,53 @@ export default function AdminDashboardPage() {
                 {/* Active Promotions List */}
                 <div className="lg:col-span-2 space-y-4">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                      <Sparkles className="w-4 h-4 text-amber-400" />
+                    <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                      <Sparkles className="w-4 h-4 text-blue-600" />
                       <span>Current Campaigns ({promotions.length})</span>
                     </h3>
-                    <button onClick={fetchPromotions} className="text-xs text-amber-400 hover:underline flex items-center gap-1">
+                    <button onClick={fetchPromotions} className="text-xs text-blue-600 hover:underline flex items-center gap-1">
                       <RefreshCw className="w-3 h-3" /> Refresh
                     </button>
                   </div>
 
                   {loadingPromotions ? (
-                    <div className="p-8 text-center text-slate-400 text-xs">Loading promotions...</div>
+                    <div className="p-8 text-center text-slate-500 text-xs">Loading promotions...</div>
                   ) : promotions.length === 0 ? (
-                    <div className="p-8 text-center text-slate-400 text-xs bg-slate-900 rounded-2xl border border-slate-800">
+                    <div className="p-8 text-center text-slate-500 text-xs bg-white rounded-2xl border border-slate-200">
                       No promotion campaigns published yet.
                     </div>
                   ) : (
                     <div className="space-y-3">
                       {promotions.map((p) => (
-                        <div key={p.id} className="p-4 rounded-2xl bg-slate-900 border border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                        <div key={p.id} className="p-4 rounded-2xl bg-white border border-slate-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                           <div className="flex items-center gap-3">
                             {p.bannerImage && (
                               <img src={p.bannerImage} alt={p.businessName} className="w-16 h-12 object-cover rounded-xl shrink-0" />
                             )}
                             <div className="space-y-1">
                               <div className="flex items-center gap-2">
-                                <span className="px-2 py-0.5 rounded bg-amber-600 text-white font-extrabold text-[10px] uppercase">
+                                <span className="px-2 py-0.5 rounded bg-blue-600 text-white font-extrabold text-[10px] uppercase">
                                   {p.badgeLabel || 'PROMOTED'}
                                 </span>
-                                <span className="text-[11px] font-semibold text-blue-400">{p.placement}</span>
+                                <span className="text-[11px] font-semibold text-blue-600">{p.placement}</span>
                               </div>
-                              <h4 className="text-sm font-bold text-white">{p.businessName}</h4>
-                              {p.offerText && <p className="text-xs text-amber-300 font-semibold">{p.offerText}</p>}
-                              <p className="text-[10px] text-slate-400">Valid: {p.startDate} to {p.endDate}</p>
+                              <h4 className="text-sm font-bold text-slate-900">{p.businessName}</h4>
+                              {p.offerText && <p className="text-xs text-slate-700 font-semibold">{p.offerText}</p>}
+                              <p className="text-[10px] text-slate-500">Valid: {p.startDate} to {p.endDate}</p>
                             </div>
                           </div>
 
                           <div className="flex items-center gap-2 shrink-0">
                             <span className={`px-2 py-1 rounded-full text-[10px] font-extrabold border ${
                               p.status === 'ACTIVE'
-                                ? 'bg-emerald-950 text-emerald-300 border-emerald-800'
-                                : 'bg-rose-950 text-rose-300 border-rose-800'
+                                ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                                : 'bg-rose-50 text-rose-800 border-rose-200'
                             }`}>
                               {p.status}
                             </span>
                             <button
                               onClick={() => handleDeletePromotion(p.id)}
-                              className="p-2 rounded-xl bg-rose-500/20 hover:bg-rose-600 text-rose-300 hover:text-white border border-rose-500/30 transition-all text-xs"
+                              className="p-2 rounded-xl bg-rose-50 hover:bg-rose-600 text-rose-800 hover:text-white border border-rose-500/30 transition-all text-xs"
                             >
                               <Trash2 className="w-3.5 h-3.5" />
                             </button>
@@ -1227,17 +1227,17 @@ export default function AdminDashboardPage() {
             <div className="space-y-4">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
-                  <h3 className="text-lg font-bold text-white">Korutla Local Businesses ({businesses.length})</h3>
-                  <p className="text-xs text-slate-400">Manage listings, toggle RK verified badge, pin to featured section.</p>
+                  <h3 className="text-lg font-bold text-slate-900">Korutla Local Businesses ({businesses.length})</h3>
+                  <p className="text-xs text-slate-500">Manage listings, toggle RK verified badge, pin to featured section.</p>
                 </div>
-                <button onClick={() => setActiveTab('add-business')} className="px-3.5 py-2 rounded-xl bg-blue-700 text-white font-extrabold text-xs flex items-center gap-1.5">
+                <button onClick={() => setActiveTab('add-business')} className="px-3.5 py-2 rounded-xl bg-blue-600 text-white font-extrabold text-xs flex items-center gap-1.5">
                   <Plus className="w-4 h-4" /> Add New Business
                 </button>
               </div>
 
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs border-collapse">
-                  <thead className="bg-slate-900 text-slate-400 font-semibold border-b border-slate-800">
+                  <thead className="bg-white text-slate-500 font-semibold border-b border-slate-200">
                     <tr>
                       <th className="p-3">Business</th>
                       <th className="p-3">Category</th>
@@ -1247,9 +1247,9 @@ export default function AdminDashboardPage() {
                       <th className="p-3 text-right">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-800 text-slate-300">
+                  <tbody className="divide-y divide-slate-800 text-slate-700">
                     {businesses.map((b) => (
-                      <tr key={b.id} className="hover:bg-slate-900/60">
+                      <tr key={b.id} className="hover:bg-slate-50">
                         <td className="p-3 font-bold text-white flex items-center gap-2">
                           <img src={b.image} alt={b.name} className="w-8 h-8 rounded-lg object-cover" />
                           <span>{b.name}</span>
@@ -1261,11 +1261,11 @@ export default function AdminDashboardPage() {
                             onClick={() => handleToggleVerifyBiz(b.id)}
                             className={`px-2.5 py-1 rounded-full text-[10px] font-bold flex items-center gap-1 ${
                               b.isVerified
-                                ? 'bg-blue-950 text-blue-300 border border-blue-800'
-                                : 'bg-slate-800 text-slate-400'
+                                ? 'bg-blue-50 text-blue-700 border border-blue-200'
+                                : 'bg-slate-100 text-slate-500'
                             }`}
                           >
-                            <CheckCircle2 className="w-3 h-3 text-blue-400" />
+                            <CheckCircle2 className="w-3 h-3 text-blue-600" />
                             <span>{b.isVerified ? 'VERIFIED' : 'Not Verified'}</span>
                           </button>
                         </td>
@@ -1274,8 +1274,8 @@ export default function AdminDashboardPage() {
                             onClick={() => handleToggleFeaturedBiz(b.id)}
                             className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${
                               b.isFeatured
-                                ? 'bg-amber-950 text-amber-300 border border-amber-800'
-                                : 'bg-slate-800 text-slate-400'
+                                ? 'bg-slate-100 text-slate-700 border border-slate-200'
+                                : 'bg-slate-100 text-slate-500'
                             }`}
                           >
                             {b.isFeatured ? 'FEATURED' : 'Standard'}
@@ -1284,13 +1284,13 @@ export default function AdminDashboardPage() {
                         <td className="p-3 text-right space-x-1">
                           <button
                             onClick={() => handleStartEditBiz(b)}
-                            className="p-1.5 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700"
+                            className="p-1.5 rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200"
                           >
                             <Edit3 className="w-3.5 h-3.5" />
                           </button>
                           <button
                             onClick={() => setBusinesses(businesses.filter(item => item.id !== b.id))}
-                            className="p-1.5 rounded-lg bg-rose-500/20 text-rose-300 hover:bg-rose-600 hover:text-white"
+                            className="p-1.5 rounded-lg bg-rose-50 text-rose-800 hover:bg-rose-600 hover:text-white"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
@@ -1306,30 +1306,30 @@ export default function AdminDashboardPage() {
           {/* TAB 3: ADD BUSINESS */}
           {activeTab === 'add-business' && (
             <div className="max-w-2xl mx-auto space-y-4">
-              <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                <Plus className="w-5 h-5 text-blue-400" />
+              <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                <Plus className="w-5 h-5 text-blue-600" />
                 <span>Register New Business in Korutla</span>
               </h3>
-              <form onSubmit={handleAddBusiness} className="p-6 bg-slate-900 rounded-2xl border border-slate-800 space-y-4 text-xs">
+              <form onSubmit={handleAddBusiness} className="p-6 bg-white rounded-2xl border border-slate-200 space-y-4 text-xs">
                 <div>
-                  <label className="block text-slate-300 font-bold mb-1">Business / Shop Name *</label>
+                  <label className="block text-slate-700 font-bold mb-1">Business / Shop Name *</label>
                   <input
                     type="text"
                     required
                     placeholder="e.g. Royal Sweets & Bakery"
                     value={newBizName}
                     onChange={(e) => setNewBizName(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white focus:border-blue-500 focus:outline-none"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-white focus:border-blue-500 focus:outline-none"
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-slate-300 font-bold mb-1">Category</label>
+                    <label className="block text-slate-700 font-bold mb-1">Category</label>
                     <select
                       value={newBizCategory}
                       onChange={(e) => setNewBizCategory(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white focus:border-blue-500 focus:outline-none"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-white focus:border-blue-500 focus:outline-none"
                     >
                       <option value="food">Food &amp; Dining</option>
                       <option value="groceries">Groceries &amp; Marts</option>
@@ -1342,57 +1342,57 @@ export default function AdminDashboardPage() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-slate-300 font-bold mb-1">Sub-Category</label>
+                    <label className="block text-slate-700 font-bold mb-1">Sub-Category</label>
                     <input
                       type="text"
                       placeholder="e.g. Bakery & Confectionery"
                       value={newBizSubCategory}
                       onChange={(e) => setNewBizSubCategory(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white focus:border-blue-500 focus:outline-none"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-white focus:border-blue-500 focus:outline-none"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-slate-300 font-bold mb-1">Phone Number</label>
+                    <label className="block text-slate-700 font-bold mb-1">Phone Number</label>
                     <input
                       type="text"
                       placeholder="+91 98480 12345"
                       value={newBizPhone}
                       onChange={(e) => setNewBizPhone(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white focus:border-blue-500 focus:outline-none"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-white focus:border-blue-500 focus:outline-none"
                     />
                   </div>
                   <div>
-                    <label className="block text-slate-300 font-bold mb-1">Timing</label>
+                    <label className="block text-slate-700 font-bold mb-1">Timing</label>
                     <input
                       type="text"
                       value={newBizTiming}
                       onChange={(e) => setNewBizTiming(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white focus:border-blue-500 focus:outline-none"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-white focus:border-blue-500 focus:outline-none"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-slate-300 font-bold mb-1">Address / Location</label>
+                  <label className="block text-slate-700 font-bold mb-1">Address / Location</label>
                   <input
                     type="text"
                     placeholder="e.g. Main Road, Korutla"
                     value={newBizAddress}
                     onChange={(e) => setNewBizAddress(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white focus:border-blue-500 focus:outline-none"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-white focus:border-blue-500 focus:outline-none"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-slate-300 font-bold mb-1">Cover Image URL</label>
+                  <label className="block text-slate-700 font-bold mb-1">Cover Image URL</label>
                   <input
                     type="url"
                     value={newBizImage}
                     onChange={(e) => setNewBizImage(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white focus:border-blue-500 focus:outline-none"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-white focus:border-blue-500 focus:outline-none"
                   />
                 </div>
 
@@ -1404,14 +1404,14 @@ export default function AdminDashboardPage() {
                     onChange={(e) => setNewBizVerified(e.target.checked)}
                     className="rounded text-blue-700"
                   />
-                  <label htmlFor="v-check" className="text-slate-300 font-bold">
+                  <label htmlFor="v-check" className="text-slate-700 font-bold">
                     Grant Royal Korutla Verified Badge
                   </label>
                 </div>
 
                 <button
                   type="submit"
-                  className="w-full py-3 rounded-xl bg-blue-700 hover:bg-blue-800 text-white font-extrabold text-xs shadow-lg"
+                  className="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs shadow-lg"
                 >
                   Save Business Listing
                 </button>
@@ -1422,30 +1422,30 @@ export default function AdminDashboardPage() {
           {/* TAB 4: EDIT BUSINESS */}
           {activeTab === 'edit-business' && (
             <div className="max-w-2xl mx-auto space-y-4">
-              <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                <Edit3 className="w-5 h-5 text-blue-400" />
+              <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                <Edit3 className="w-5 h-5 text-blue-600" />
                 <span>Edit Business Details {editingBiz ? `(${editingBiz.name})` : ''}</span>
               </h3>
               {editingBiz ? (
-                <form onSubmit={handleSaveEditBiz} className="p-6 bg-slate-900 rounded-2xl border border-slate-800 space-y-4 text-xs">
+                <form onSubmit={handleSaveEditBiz} className="p-6 bg-white rounded-2xl border border-slate-200 space-y-4 text-xs">
                   <div>
-                    <label className="block text-slate-300 font-bold mb-1">Business Name *</label>
+                    <label className="block text-slate-700 font-bold mb-1">Business Name *</label>
                     <input
                       type="text"
                       required
                       value={newBizName}
                       onChange={(e) => setNewBizName(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white focus:border-blue-500 focus:outline-none"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-white focus:border-blue-500 focus:outline-none"
                     />
                   </div>
 
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-slate-300 font-bold mb-1">Category</label>
+                      <label className="block text-slate-700 font-bold mb-1">Category</label>
                       <select
                         value={newBizCategory}
                         onChange={(e) => setNewBizCategory(e.target.value)}
-                        className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white focus:border-blue-500 focus:outline-none"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-white focus:border-blue-500 focus:outline-none"
                       >
                         <option value="food">Food &amp; Dining</option>
                         <option value="groceries">Groceries &amp; Marts</option>
@@ -1458,54 +1458,54 @@ export default function AdminDashboardPage() {
                       </select>
                     </div>
                     <div>
-                      <label className="block text-slate-300 font-bold mb-1">Sub-Category</label>
+                      <label className="block text-slate-700 font-bold mb-1">Sub-Category</label>
                       <input
                         type="text"
                         value={newBizSubCategory}
                         onChange={(e) => setNewBizSubCategory(e.target.value)}
-                        className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white focus:border-blue-500 focus:outline-none"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-white focus:border-blue-500 focus:outline-none"
                       />
                     </div>
                   </div>
 
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-slate-300 font-bold mb-1">Phone Number</label>
+                      <label className="block text-slate-700 font-bold mb-1">Phone Number</label>
                       <input
                         type="text"
                         value={newBizPhone}
                         onChange={(e) => setNewBizPhone(e.target.value)}
-                        className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white focus:border-blue-500 focus:outline-none"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-white focus:border-blue-500 focus:outline-none"
                       />
                     </div>
                     <div>
-                      <label className="block text-slate-300 font-bold mb-1">Timing</label>
+                      <label className="block text-slate-700 font-bold mb-1">Timing</label>
                       <input
                         type="text"
                         value={newBizTiming}
                         onChange={(e) => setNewBizTiming(e.target.value)}
-                        className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white focus:border-blue-500 focus:outline-none"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-white focus:border-blue-500 focus:outline-none"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-slate-300 font-bold mb-1">Address</label>
+                    <label className="block text-slate-700 font-bold mb-1">Address</label>
                     <input
                       type="text"
                       value={newBizAddress}
                       onChange={(e) => setNewBizAddress(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white focus:border-blue-500 focus:outline-none"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-white focus:border-blue-500 focus:outline-none"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-slate-300 font-bold mb-1">Image URL</label>
+                    <label className="block text-slate-700 font-bold mb-1">Image URL</label>
                     <input
                       type="url"
                       value={newBizImage}
                       onChange={(e) => setNewBizImage(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white focus:border-blue-500 focus:outline-none"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-white focus:border-blue-500 focus:outline-none"
                     />
                   </div>
 
@@ -1517,7 +1517,7 @@ export default function AdminDashboardPage() {
                       onChange={(e) => setNewBizVerified(e.target.checked)}
                       className="rounded text-blue-700"
                     />
-                    <label htmlFor="ve-check" className="text-slate-300 font-bold">
+                    <label htmlFor="ve-check" className="text-slate-700 font-bold">
                       Royal Korutla Verified Badge Active
                     </label>
                   </div>
@@ -1525,22 +1525,22 @@ export default function AdminDashboardPage() {
                   <div className="flex gap-2">
                     <button
                       type="submit"
-                      className="flex-1 py-3 rounded-xl bg-blue-700 hover:bg-blue-800 text-white font-extrabold text-xs"
+                      className="flex-1 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs"
                     >
                       Update Changes
                     </button>
                     <button
                       type="button"
                       onClick={() => setActiveTab('businesses')}
-                      className="px-4 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold"
+                      className="px-4 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold"
                     >
                       Cancel
                     </button>
                   </div>
                 </form>
               ) : (
-                <div className="p-8 text-center text-slate-400 bg-slate-900 rounded-2xl border border-slate-800 text-xs">
-                  Please select a business from the <button onClick={() => setActiveTab('businesses')} className="text-blue-400 underline">Businesses tab</button> to edit.
+                <div className="p-8 text-center text-slate-500 bg-white rounded-2xl border border-slate-200 text-xs">
+                  Please select a business from the <button onClick={() => setActiveTab('businesses')} className="text-blue-600 underline">Businesses tab</button> to edit.
                 </div>
               )}
             </div>
@@ -1549,40 +1549,40 @@ export default function AdminDashboardPage() {
           {/* TAB: HOMEPAGE CONTENT MANAGEMENT */}
           {activeTab === 'homepage-content' && (
             <div className="space-y-6">
-              <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-2">
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-900/40 text-blue-300 text-xs font-bold">
+              <div className="p-5 rounded-2xl bg-white border border-slate-200 space-y-2">
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 text-xs font-bold">
                   <Eye className="w-3.5 h-3.5" />
                   <span>Homepage Content &amp; Layout Manager</span>
                 </div>
-                <h2 className="text-xl font-bold text-white">Homepage Banners &amp; Featured Order</h2>
-                <p className="text-xs text-slate-400 max-w-2xl">
+                <h2 className="text-xl font-bold text-slate-900">Homepage Banners &amp; Featured Order</h2>
+                <p className="text-xs text-slate-500 max-w-2xl">
                   Add custom hero banner slides, reorder featured businesses shown on homepage, and update town spotlights.
                 </p>
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Hero Slides */}
-                <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
-                  <h3 className="text-sm font-bold text-white flex items-center justify-between pb-2 border-b border-slate-800">
-                    <span className="flex items-center gap-2"><Layers className="w-4 h-4 text-blue-400" /> Hero Slides ({heroSlides.length})</span>
+                <div className="p-5 rounded-2xl bg-white border border-slate-200 space-y-4">
+                  <h3 className="text-sm font-bold text-slate-900 flex items-center justify-between pb-2 border-b border-slate-200">
+                    <span className="flex items-center gap-2"><Layers className="w-4 h-4 text-blue-600" /> Hero Slides ({heroSlides.length})</span>
                   </h3>
 
-                  <form onSubmit={handleAddSlide} className="space-y-3 text-xs bg-slate-950 p-4 rounded-xl border border-slate-800">
-                    <p className="font-bold text-slate-200">Add New Banner Slide</p>
+                  <form onSubmit={handleAddSlide} className="space-y-3 text-xs bg-slate-50 p-4 rounded-xl border border-slate-200">
+                    <p className="font-bold text-slate-800">Add New Banner Slide</p>
                     <input
                       type="text"
                       required
                       placeholder="Slide Main Title (e.g. Festival Season Sale)"
                       value={newSlideTitle}
                       onChange={(e) => setNewSlideTitle(e.target.value)}
-                      className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none"
+                      className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-white focus:outline-none"
                     />
                     <input
                       type="text"
                       placeholder="Subtitle (e.g. Up to 40% discount across stores)"
                       value={newSlideSubtitle}
                       onChange={(e) => setNewSlideSubtitle(e.target.value)}
-                      className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none"
+                      className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-white focus:outline-none"
                     />
                     <div className="grid grid-cols-2 gap-2">
                       <input
@@ -1590,14 +1590,14 @@ export default function AdminDashboardPage() {
                         placeholder="Button Text"
                         value={newSlideCtaText}
                         onChange={(e) => setNewSlideCtaText(e.target.value)}
-                        className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none"
+                        className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-white focus:outline-none"
                       />
                       <input
                         type="text"
                         placeholder="Button Link (e.g. /offers)"
                         value={newSlideCtaLink}
                         onChange={(e) => setNewSlideCtaLink(e.target.value)}
-                        className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none"
+                        className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-white focus:outline-none"
                       />
                     </div>
                     <input
@@ -1605,23 +1605,23 @@ export default function AdminDashboardPage() {
                       placeholder="Background Image URL"
                       value={newSlideBg}
                       onChange={(e) => setNewSlideBg(e.target.value)}
-                      className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none"
+                      className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-white focus:outline-none"
                     />
-                    <button type="submit" className="w-full py-2 bg-blue-700 hover:bg-blue-800 text-white font-extrabold rounded-lg">
+                    <button type="submit" className="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white font-extrabold rounded-lg">
                       Add Hero Slide
                     </button>
                   </form>
 
                   <div className="space-y-2">
                     {heroSlides.map((slide) => (
-                      <div key={slide.id} className="p-3 bg-slate-950 rounded-xl border border-slate-800 flex items-center justify-between text-xs">
+                      <div key={slide.id} className="p-3 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-between text-xs">
                         <div>
                           <p className="font-bold text-white">{slide.title}</p>
-                          <p className="text-[11px] text-slate-400">{slide.subtitle}</p>
+                          <p className="text-[11px] text-slate-500">{slide.subtitle}</p>
                         </div>
                         <button
                           onClick={() => setHeroSlides(heroSlides.filter(s => s.id !== slide.id))}
-                          className="p-1.5 rounded-lg bg-rose-500/20 text-rose-300 hover:bg-rose-600 hover:text-white"
+                          className="p-1.5 rounded-lg bg-rose-50 text-rose-800 hover:bg-rose-600 hover:text-white"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
@@ -1631,18 +1631,18 @@ export default function AdminDashboardPage() {
                 </div>
 
                 {/* Featured Business Reordering */}
-                <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
-                  <h3 className="text-sm font-bold text-white flex items-center gap-2 pb-2 border-b border-slate-800">
-                    <Crown className="w-4 h-4 text-amber-400" />
+                <div className="p-5 rounded-2xl bg-white border border-slate-200 space-y-4">
+                  <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2 pb-2 border-b border-slate-200">
+                    <Crown className="w-4 h-4 text-blue-600" />
                     <span>Featured Businesses Order</span>
                   </h3>
-                  <p className="text-xs text-slate-400">Reorder featured listings shown on homepage carousel:</p>
+                  <p className="text-xs text-slate-500">Reorder featured listings shown on homepage carousel:</p>
 
                   <div className="space-y-2">
                     {businesses.slice(0, 8).map((biz, idx) => (
-                      <div key={biz.id} className="p-3 bg-slate-950 rounded-xl border border-slate-800 flex items-center justify-between text-xs">
+                      <div key={biz.id} className="p-3 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-between text-xs">
                         <div className="flex items-center gap-2">
-                          <span className="w-5 h-5 rounded bg-slate-800 flex items-center justify-center font-bold text-[10px] text-slate-400">
+                          <span className="w-5 h-5 rounded bg-slate-100 flex items-center justify-center font-bold text-[10px] text-slate-500">
                             #{idx + 1}
                           </span>
                           <span className="font-bold text-white">{biz.name}</span>
@@ -1651,14 +1651,14 @@ export default function AdminDashboardPage() {
                           <button
                             disabled={idx === 0}
                             onClick={() => moveBusinessOrder(idx, 'up')}
-                            className="p-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 disabled:opacity-30"
+                            className="p-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 disabled:opacity-30"
                           >
                             <ArrowUp className="w-3.5 h-3.5" />
                           </button>
                           <button
                             disabled={idx === businesses.slice(0, 8).length - 1}
                             onClick={() => moveBusinessOrder(idx, 'down')}
-                            className="p-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 disabled:opacity-30"
+                            className="p-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 disabled:opacity-30"
                           >
                             <ArrowDown className="w-3.5 h-3.5" />
                           </button>
@@ -1674,31 +1674,31 @@ export default function AdminDashboardPage() {
           {/* TAB 5: VERIFY BUSINESS */}
           {activeTab === 'verify-business' && (
             <div className="space-y-4">
-              <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+              <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                <CheckCircle2 className="w-5 h-5 text-emerald-700" />
                 <span>Verify Business Badges &amp; Audits</span>
               </h3>
-              <p className="text-xs text-slate-400">Click to grant or remove the Royal Korutla Verified badge.</p>
+              <p className="text-xs text-slate-500">Click to grant or remove the Royal Korutla Verified badge.</p>
               
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {businesses.map((b) => (
-                  <div key={b.id} className="p-4 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-between gap-3">
+                  <div key={b.id} className="p-4 rounded-2xl bg-white border border-slate-200 flex items-center justify-between gap-3">
                     <div className="flex items-center gap-3">
                       <img src={b.image} alt={b.name} className="w-10 h-10 rounded-xl object-cover" />
                       <div>
-                        <h4 className="text-xs font-bold text-white">{b.name}</h4>
-                        <p className="text-[10px] text-slate-400">{b.subCategory}</p>
+                        <h4 className="text-xs font-bold text-slate-900">{b.name}</h4>
+                        <p className="text-[10px] text-slate-500">{b.subCategory}</p>
                       </div>
                     </div>
                     <button
                       onClick={() => handleToggleVerifyBiz(b.id)}
                       className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1 ${
                         b.isVerified
-                          ? 'bg-blue-950 text-blue-300 border border-blue-700'
-                          : 'bg-slate-800 text-slate-300 hover:bg-blue-900'
+                          ? 'bg-blue-50 text-blue-700 border border-blue-700'
+                          : 'bg-slate-100 text-slate-700 hover:bg-blue-900'
                       }`}
                     >
-                      <CheckCircle2 className="w-3.5 h-3.5 text-blue-400" />
+                      <CheckCircle2 className="w-3.5 h-3.5 text-blue-600" />
                       <span>{b.isVerified ? 'VERIFIED' : 'Grant Badge'}</span>
                     </button>
                   </div>
@@ -1710,17 +1710,17 @@ export default function AdminDashboardPage() {
           {/* TAB 8: OFFERS */}
           {activeTab === 'offers' && (
             <div className="space-y-4">
-              <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                <Tag className="w-5 h-5 text-amber-400" />
+              <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                <Tag className="w-5 h-5 text-blue-600" />
                 <span>Town Offers &amp; Discounts ({offers.length})</span>
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 {offers.map((off) => (
-                  <div key={off.id} className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-2">
+                  <div key={off.id} className="p-4 rounded-2xl bg-white border border-slate-200 space-y-2">
                     <img src={off.image} alt={off.title} className="w-full h-28 object-cover rounded-xl" />
-                    <span className="px-2 py-0.5 rounded bg-blue-700 text-white font-black text-[10px]">{off.discount}</span>
-                    <h4 className="text-xs font-bold text-white">{off.title}</h4>
-                    <p className="text-[11px] text-slate-400">{off.businessName}</p>
+                    <span className="px-2 py-0.5 rounded bg-blue-600 text-white font-black text-[10px]">{off.discount}</span>
+                    <h4 className="text-xs font-bold text-slate-900">{off.title}</h4>
+                    <p className="text-[11px] text-slate-500">{off.businessName}</p>
                   </div>
                 ))}
               </div>
@@ -1730,21 +1730,21 @@ export default function AdminDashboardPage() {
           {/* TAB 9: FOOD & MENUS */}
           {activeTab === 'food' && (
             <div className="space-y-4">
-              <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                <Utensils className="w-5 h-5 text-amber-400" />
+              <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                <Utensils className="w-5 h-5 text-blue-600" />
                 <span>Restaurant Dishes &amp; Menus ({foodItems.length})</span>
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {foodItems.map((dish) => (
-                  <div key={dish.id} className="p-4 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-between">
+                  <div key={dish.id} className="p-4 rounded-2xl bg-white border border-slate-200 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <img src={dish.image} alt={dish.name} className="w-12 h-12 rounded-xl object-cover" />
                       <div>
-                        <h4 className="text-xs font-bold text-white">{dish.name}</h4>
-                        <p className="text-[10px] text-amber-400 font-extrabold">₹{dish.price}</p>
+                        <h4 className="text-xs font-bold text-slate-900">{dish.name}</h4>
+                        <p className="text-[10px] text-blue-600 font-extrabold">₹{dish.price}</p>
                       </div>
                     </div>
-                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${dish.isVeg ? 'bg-emerald-950 text-emerald-300' : 'bg-rose-950 text-rose-300'}`}>
+                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${dish.isVeg ? 'bg-emerald-50 text-emerald-800' : 'bg-rose-50 text-rose-800'}`}>
                       {dish.isVeg ? 'VEG' : 'NON-VEG'}
                     </span>
                   </div>
@@ -1756,18 +1756,18 @@ export default function AdminDashboardPage() {
           {/* TAB 12: JOBS */}
           {activeTab === 'jobs' && (
             <div className="space-y-4">
-              <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                <Briefcase className="w-5 h-5 text-purple-400" />
+              <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                <Briefcase className="w-5 h-5 text-blue-600" />
                 <span>Korutla Local Job Listings ({jobs.length})</span>
               </h3>
               <div className="space-y-3">
                 {jobs.map((job) => (
-                  <div key={job.id} className="p-4 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-between">
+                  <div key={job.id} className="p-4 rounded-2xl bg-white border border-slate-200 flex items-center justify-between">
                     <div>
-                      <h4 className="text-sm font-bold text-white">{job.title}</h4>
-                      <p className="text-xs text-slate-400">{job.shopName} • {job.salary}</p>
+                      <h4 className="text-sm font-bold text-slate-900">{job.title}</h4>
+                      <p className="text-xs text-slate-500">{job.shopName} • {job.salary}</p>
                     </div>
-                    <span className="px-2.5 py-1 rounded-full bg-purple-950 text-purple-300 text-[10px] font-bold border border-purple-800">
+                    <span className="px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 text-[10px] font-bold border border-slate-200">
                       {job.type}
                     </span>
                   </div>
@@ -1779,13 +1779,13 @@ export default function AdminDashboardPage() {
           {/* TAB 16: USERS */}
           {activeTab === 'users' && (
             <div className="space-y-4">
-              <h3 className="text-lg font-bold text-white flex items-center gap-2">
+              <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
                 <Users className="w-5 h-5 text-indigo-400" />
                 <span>User Accounts &amp; Access Roles</span>
               </h3>
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs">
-                  <thead className="bg-slate-900 text-slate-400 border-b border-slate-800">
+                  <thead className="bg-white text-slate-500 border-b border-slate-200">
                     <tr>
                       <th className="p-3">User Name</th>
                       <th className="p-3">Email</th>
@@ -1795,17 +1795,17 @@ export default function AdminDashboardPage() {
                   </thead>
                   <tbody className="divide-y divide-slate-800">
                     {usersList.map((u) => (
-                      <tr key={u.id} className="hover:bg-slate-900/60">
+                      <tr key={u.id} className="hover:bg-slate-50">
                         <td className="p-3 font-bold text-white">{u.name}</td>
-                        <td className="p-3 text-slate-300">{u.email}</td>
+                        <td className="p-3 text-slate-700">{u.email}</td>
                         <td className="p-3">
                           <span className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold ${
-                            u.role === 'ADMIN' ? 'bg-blue-700 text-white' : 'bg-slate-800 text-slate-300'
+                            u.role === 'ADMIN' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-700'
                           }`}>
                             {u.role}
                           </span>
                         </td>
-                        <td className="p-3 text-emerald-400 font-bold">{u.status}</td>
+                        <td className="p-3 text-emerald-700 font-bold">{u.status}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -1817,50 +1817,50 @@ export default function AdminDashboardPage() {
           {/* TAB 25: SETTINGS */}
           {activeTab === 'settings' && (
             <div className="max-w-xl space-y-4">
-              <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                <SettingsIcon className="w-5 h-5 text-blue-400" />
+              <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                <SettingsIcon className="w-5 h-5 text-blue-600" />
                 <span>Platform Settings &amp; Configuration</span>
               </h3>
-              <div className="p-6 bg-slate-900 rounded-2xl border border-slate-800 space-y-4 text-xs">
+              <div className="p-6 bg-white rounded-2xl border border-slate-200 space-y-4 text-xs">
                 <div>
-                  <label className="block text-slate-300 font-bold mb-1">Platform Name</label>
+                  <label className="block text-slate-700 font-bold mb-1">Platform Name</label>
                   <input
                     type="text"
                     value={siteName}
                     onChange={(e) => setSiteName(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-white focus:outline-none"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-slate-300 font-bold mb-1">Support Helpline Phone</label>
+                  <label className="block text-slate-700 font-bold mb-1">Support Helpline Phone</label>
                   <input
                     type="text"
                     value={supportPhone}
                     onChange={(e) => setSupportPhone(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-white focus:outline-none"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-slate-300 font-bold mb-1">Support Email</label>
+                  <label className="block text-slate-700 font-bold mb-1">Support Email</label>
                   <input
                     type="email"
                     value={supportEmail}
                     onChange={(e) => setSupportEmail(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-white focus:outline-none"
                   />
                 </div>
 
-                <div className="pt-2 border-t border-slate-800 flex items-center justify-between">
+                <div className="pt-2 border-t border-slate-200 flex items-center justify-between">
                   <div>
                     <p className="font-bold text-white">Maintenance Mode</p>
-                    <p className="text-[10px] text-slate-400">Temporarily restrict public access to Korutla app</p>
+                    <p className="text-[10px] text-slate-500">Temporarily restrict public access to Korutla app</p>
                   </div>
                   <button
                     onClick={() => setMaintenanceMode(!maintenanceMode)}
                     className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                      maintenanceMode ? 'bg-rose-600 text-white' : 'bg-slate-800 text-slate-400'
+                      maintenanceMode ? 'bg-rose-600 text-white' : 'bg-slate-100 text-slate-500'
                     }`}
                   >
                     {maintenanceMode ? 'ENABLED' : 'DISABLED'}
@@ -1869,7 +1869,7 @@ export default function AdminDashboardPage() {
 
                 <button
                   onClick={() => showToast('Platform settings saved successfully.')}
-                  className="w-full py-2.5 rounded-xl bg-blue-700 hover:bg-blue-800 text-white font-extrabold"
+                  className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold"
                 >
                   Save Settings
                 </button>
@@ -1879,15 +1879,15 @@ export default function AdminDashboardPage() {
 
           {/* FALLBACK FOR OTHER TABS */}
           {!['dashboard', 'photography', 'promotions', 'businesses', 'add-business', 'edit-business', 'verify-business', 'homepage-content', 'offers', 'food', 'jobs', 'users', 'settings'].includes(activeTab) && (
-            <div className="p-8 text-center space-y-3 bg-slate-900 rounded-2xl border border-slate-800">
-              <div className="w-12 h-12 rounded-2xl bg-blue-900/40 border border-blue-700 flex items-center justify-center mx-auto text-white">
+            <div className="p-8 text-center space-y-3 bg-white rounded-2xl border border-slate-200">
+              <div className="w-12 h-12 rounded-2xl bg-blue-50 border border-blue-200 flex items-center justify-center mx-auto text-white">
                 <Crown className="w-6 h-6" />
               </div>
               <h3 className="text-base font-bold text-white capitalize">{activeTab.replace('-', ' ')} Module</h3>
-              <p className="text-xs text-slate-400 max-w-sm mx-auto">
+              <p className="text-xs text-slate-500 max-w-sm mx-auto">
                 Module active &amp; connected to Royal Korutla database. Real-time updates active.
               </p>
-              <button onClick={() => setActiveTab('dashboard')} className="px-4 py-2 rounded-xl bg-slate-800 text-slate-200 text-xs font-bold hover:bg-slate-700">
+              <button onClick={() => setActiveTab('dashboard')} className="px-4 py-2 rounded-xl bg-slate-100 text-slate-800 text-xs font-bold hover:bg-slate-200">
                 Return to Dashboard Overview
               </button>
             </div>

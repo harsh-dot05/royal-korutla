@@ -50,7 +50,7 @@ export const HeroSlider: React.FC = () => {
             {/* Content Container */}
             <div className="relative h-full max-w-2xl px-6 sm:px-12 flex flex-col justify-center text-left">
               {/* Badge */}
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-blue-700 text-white text-xs font-bold w-fit mb-3">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-blue-600 text-white text-xs font-bold w-fit mb-3">
                 <span>{slide.badgeText}</span>
               </div>
 
@@ -68,7 +68,7 @@ export const HeroSlider: React.FC = () => {
               <div className="mt-5 sm:mt-6">
                 <Link
                   href={slide.ctaLink}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 sm:px-6 sm:py-3 rounded-xl bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs sm:text-sm transition-colors shadow-xs"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 sm:px-6 sm:py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs sm:text-sm transition-colors shadow-xs"
                 >
                   <span>{slide.ctaText}</span>
                   <ArrowRight className="w-4 h-4" />

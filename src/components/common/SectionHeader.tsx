@@ -22,7 +22,7 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
     <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-6 gap-4">
       <div>
         {badge && (
-          <span className="inline-block px-3 py-1 text-xs font-bold uppercase tracking-wider text-blue-700 bg-blue-50 border border-blue-200 rounded-md mb-2">
+          <span className="inline-block px-3 py-1 text-xs font-bold uppercase tracking-wider text-blue-600 bg-blue-50 border border-blue-200 rounded-md mb-2">
             {badge}
           </span>
         )}
@@ -39,7 +39,7 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
       {actionText && actionHref && (
         <Link
           href={actionHref}
-          className="self-start sm:self-auto text-sm font-bold text-blue-700 hover:text-blue-800 transition-colors flex items-center gap-1"
+          className="self-start sm:self-auto text-sm font-bold text-blue-600 hover:text-blue-700 transition-colors flex items-center gap-1"
         >
           {actionText}
           <span>→</span>
@@ -49,7 +49,7 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
       {actionText && !actionHref && (
         <button
           onClick={onActionClick}
-          className="self-start sm:self-auto text-sm font-bold text-blue-700 hover:text-blue-800 transition-colors flex items-center gap-1"
+          className="self-start sm:self-auto text-sm font-bold text-blue-600 hover:text-blue-700 transition-colors flex items-center gap-1"
         >
           {actionText}
           <span>→</span>

@@ -22,13 +22,14 @@ export const Hero: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto">
           {/* Local Directory Badge */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-800 text-xs sm:text-sm font-bold mb-4">
+          {/* Local Directory Badge */}
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-xs sm:text-sm font-bold mb-4">
             <span>Korutla Local Directory &amp; Services</span>
           </div>
 
           {/* Main Hero Heading (<10 words) */}
           <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 tracking-tight leading-tight">
-            Find What You Need in <span className="text-blue-700">Korutla</span>
+            Find What You Need in <span className="text-blue-600">Korutla</span>
           </h1>
 
           <p className="mt-3 text-sm sm:text-base text-slate-600 font-medium leading-relaxed">
@@ -43,7 +44,7 @@ export const Hero: React.FC = () => {
             <div className="flex flex-col sm:flex-row items-center gap-2">
               {/* Category Selector */}
               <div className="w-full sm:w-auto flex items-center gap-2 px-3 py-2 border-b sm:border-b-0 sm:border-r border-slate-200">
-                <MapPin className="w-4 h-4 text-blue-700 shrink-0" />
+                <MapPin className="w-4 h-4 text-blue-600 shrink-0" />
                 <select
                   value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value)}
@@ -78,7 +79,7 @@ export const Hero: React.FC = () => {
               {/* Search Button */}
               <button
                 type="submit"
-                className="w-full sm:w-auto px-6 py-2.5 rounded-lg bg-blue-700 hover:bg-blue-800 text-white font-bold text-sm flex items-center justify-center gap-2 transition-colors shrink-0"
+                className="w-full sm:w-auto px-6 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm flex items-center justify-center gap-2 transition-colors shrink-0"
               >
                 <Search className="w-4 h-4" />
                 <span>Search</span>
@@ -93,9 +94,9 @@ export const Hero: React.FC = () => {
               <a
                 key={filter.id}
                 href="#categories"
-                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white border border-slate-200 hover:border-blue-300 text-slate-700 hover:text-blue-700 text-xs font-semibold transition-colors shadow-2xs"
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white border border-slate-200 hover:border-blue-300 text-slate-700 hover:text-blue-600 text-xs font-semibold transition-colors shadow-2xs"
               >
-                <Icon name={filter.iconName} className="w-3.5 h-3.5 text-blue-700" />
+                <Icon name={filter.iconName} className="w-3.5 h-3.5 text-blue-600" />
                 <span>{filter.label}</span>
               </a>
             ))}
@@ -109,7 +110,7 @@ export const Hero: React.FC = () => {
               key={stat.id}
               className="bg-white p-4 rounded-xl border border-slate-200 flex items-start gap-3"
             >
-              <div className="p-2.5 rounded-lg bg-blue-50 text-blue-700 shrink-0">
+              <div className="p-2.5 rounded-lg bg-blue-50 text-blue-600 shrink-0">
                 <Icon name={stat.iconName} className="w-5 h-5" />
               </div>
               <div>

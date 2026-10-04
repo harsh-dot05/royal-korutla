@@ -9,19 +9,19 @@ import { Zap, Droplets, Wind, Tv, Hammer, Sparkles, Car, Truck, Scissors, Monito
 export const QuickServicesSection: React.FC = () => {
   const getIcon = (iconName: string) => {
     switch (iconName) {
-      case 'Zap': return <Zap className="w-6 h-6 text-blue-700" />;
-      case 'Droplets': return <Droplets className="w-6 h-6 text-blue-700" />;
-      case 'Wind': return <Wind className="w-6 h-6 text-blue-700" />;
-      case 'Tv': return <Tv className="w-6 h-6 text-blue-700" />;
-      case 'Hammer': return <Hammer className="w-6 h-6 text-blue-700" />;
-      case 'Sparkles': return <Sparkles className="w-6 h-6 text-blue-700" />;
-      case 'Car': return <Car className="w-6 h-6 text-blue-700" />;
-      case 'Truck': return <Truck className="w-6 h-6 text-blue-700" />;
-      case 'Scissors': return <Scissors className="w-6 h-6 text-blue-700" />;
-      case 'Monitor': return <Monitor className="w-6 h-6 text-blue-700" />;
-      case 'Camera': return <Camera className="w-6 h-6 text-blue-700" />;
-      case 'Home': return <Home className="w-6 h-6 text-blue-700" />;
-      default: return <Wrench className="w-6 h-6 text-blue-700" />;
+      case 'Zap': return <Zap className="w-6 h-6 text-blue-600" />;
+      case 'Droplets': return <Droplets className="w-6 h-6 text-blue-600" />;
+      case 'Wind': return <Wind className="w-6 h-6 text-blue-600" />;
+      case 'Tv': return <Tv className="w-6 h-6 text-blue-600" />;
+      case 'Hammer': return <Hammer className="w-6 h-6 text-blue-600" />;
+      case 'Sparkles': return <Sparkles className="w-6 h-6 text-blue-600" />;
+      case 'Car': return <Car className="w-6 h-6 text-blue-600" />;
+      case 'Truck': return <Truck className="w-6 h-6 text-blue-600" />;
+      case 'Scissors': return <Scissors className="w-6 h-6 text-blue-600" />;
+      case 'Monitor': return <Monitor className="w-6 h-6 text-blue-600" />;
+      case 'Camera': return <Camera className="w-6 h-6 text-blue-600" />;
+      case 'Home': return <Home className="w-6 h-6 text-blue-600" />;
+      default: return <Wrench className="w-6 h-6 text-blue-600" />;
     }
   };
 
@@ -42,14 +42,14 @@ export const QuickServicesSection: React.FC = () => {
             href={`/services?category=${encodeURIComponent(cat.slug)}`}
             className="pastel-card pastel-card-hover rounded-2xl p-4 flex flex-col items-center text-center gap-3 border border-slate-200 hover:border-blue-300 group bg-white shadow-xs"
           >
-            <div className="p-3 rounded-2xl bg-blue-50 border border-blue-100 group-hover:scale-110 transition-transform">
+            <div className="p-3 rounded-2xl bg-blue-50 border border-blue-100">
               {getIcon(cat.iconName)}
             </div>
             <div>
-              <h4 className="text-xs font-bold text-slate-900 group-hover:text-blue-700 transition-colors">
+              <h4 className="text-xs font-bold text-slate-900 group-hover:text-blue-600 transition-colors">
                 {cat.label}
               </h4>
-              <span className="text-[10px] text-slate-500 font-semibold flex items-center justify-center gap-0.5 mt-0.5 group-hover:text-blue-700">
+              <span className="text-[10px] text-slate-500 font-semibold flex items-center justify-center gap-0.5 mt-0.5 group-hover:text-blue-600">
                 <span>Book Now</span>
                 <ArrowRight className="w-2.5 h-2.5" />
               </span>

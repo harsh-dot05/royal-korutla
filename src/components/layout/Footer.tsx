@@ -29,11 +29,11 @@ export const Footer: React.FC = () => {
           {/* Col 1: Brand info */}
           <div className="md:col-span-1 space-y-3">
             <div className="flex items-center gap-3">
-              <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-blue-700 text-white shadow-xs">
+              <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-blue-600 text-white shadow-xs">
                 <Crown className="w-5 h-5 stroke-[2.5]" />
               </div>
               <span className="font-extrabold text-xl text-slate-900 tracking-tight">
-                Royal <span className="text-blue-700">Korutla</span>
+                Royal <span className="text-blue-600">Korutla</span>
               </span>
             </div>
 
@@ -42,7 +42,7 @@ export const Footer: React.FC = () => {
             </p>
 
             <div className="flex items-center gap-2 text-xs text-slate-600 font-semibold">
-              <MapPin className="w-4 h-4 text-blue-700" />
+              <MapPin className="w-4 h-4 text-blue-600" />
               <span>Korutla, Jagtial Dist, Telangana - 505326</span>
             </div>
           </div>
@@ -55,7 +55,7 @@ export const Footer: React.FC = () => {
             <ul className="space-y-2 text-xs font-medium">
               {CATEGORIES.slice(0, 5).map((cat) => (
                 <li key={cat.id}>
-                  <Link href={getCategoryHref(cat.slug)} className="hover:text-blue-700 transition-colors">
+                  <Link href={getCategoryHref(cat.slug)} className="hover:text-blue-600 transition-colors">
                     {cat.name}
                   </Link>
                 </li>
@@ -71,7 +71,7 @@ export const Footer: React.FC = () => {
             <ul className="space-y-2 text-xs font-medium">
               {CATEGORIES.slice(5).map((cat) => (
                 <li key={cat.id}>
-                  <Link href={getCategoryHref(cat.slug)} className="hover:text-blue-700 transition-colors">
+                  <Link href={getCategoryHref(cat.slug)} className="hover:text-blue-600 transition-colors">
                     {cat.name}
                   </Link>
                 </li>
@@ -86,7 +86,7 @@ export const Footer: React.FC = () => {
             </h4>
             <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-700 space-y-2">
               <div className="flex items-center gap-2 text-slate-900 font-bold">
-                <Shield className="w-4 h-4 text-blue-700" />
+                <Shield className="w-4 h-4 text-blue-600" />
                 <span>Verified Local Listings</span>
               </div>
               <p className="text-[11px] leading-normal font-medium text-slate-600">
@@ -101,7 +101,7 @@ export const Footer: React.FC = () => {
           <p>© {new Date().getFullYear()} Royal Korutla Directory Portal. All rights reserved.</p>
           <p className="flex items-center gap-1">
             <span>Built for Korutla with</span>
-            <Heart className="w-3.5 h-3.5 text-blue-700 fill-blue-700" />
+            <Heart className="w-3.5 h-3.5 text-blue-600 fill-blue-600" />
           </p>
         </div>
       </div>

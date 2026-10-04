@@ -11,15 +11,15 @@ export const TodayInKorutla: React.FC = () => {
   const getTypeIcon = (type: string) => {
     switch (type) {
       case 'OFFER':
-        return <Tag className="w-3.5 h-3.5 text-blue-700" />;
+        return <Tag className="w-3.5 h-3.5 text-blue-600" />;
       case 'EVENT':
-        return <Briefcase className="w-3.5 h-3.5 text-blue-700" />;
+        return <Briefcase className="w-3.5 h-3.5 text-blue-600" />;
       case 'ANNOUNCEMENT':
-        return <HeartPulse className="w-3.5 h-3.5 text-blue-700" />;
+        return <HeartPulse className="w-3.5 h-3.5 text-blue-600" />;
       case 'NEW_BUSINESS':
-        return <Store className="w-3.5 h-3.5 text-blue-700" />;
+        return <Store className="w-3.5 h-3.5 text-blue-600" />;
       default:
-        return <Info className="w-3.5 h-3.5 text-blue-700" />;
+        return <Info className="w-3.5 h-3.5 text-blue-600" />;
     }
   };
 
@@ -61,7 +61,7 @@ export const TodayInKorutla: React.FC = () => {
 
               {/* Body */}
               <div className="p-4">
-                <span className="text-[11px] font-bold text-blue-700 block mb-1">
+                <span className="text-[11px] font-bold text-blue-600 block mb-1">
                   {item.businessName}
                 </span>
                 <h3 className="text-sm font-bold text-slate-900 leading-snug line-clamp-2">
@@ -77,7 +77,7 @@ export const TodayInKorutla: React.FC = () => {
             <div className="p-4 pt-0">
               <Link
                 href={item.linkHref || '/'}
-                className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-blue-50 hover:bg-blue-100 text-xs font-bold text-blue-700 border border-blue-200 transition-colors"
+                className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-blue-50 hover:bg-blue-100 text-xs font-bold text-blue-600 border border-blue-200 transition-colors"
               >
                 <span>{item.linkText || 'View Details'}</span>
                 <ArrowRight className="w-3.5 h-3.5" />
