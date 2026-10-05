@@ -99,10 +99,20 @@ export const Footer: React.FC = () => {
         {/* Bottom bar */}
         <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 font-medium">
           <p>© {new Date().getFullYear()} Royal Korutla Directory Portal. All rights reserved.</p>
-          <p className="flex items-center gap-1">
-            <span>Built for Korutla with</span>
-            <Heart className="w-3.5 h-3.5 text-blue-600 fill-blue-600" />
-          </p>
+          <div className="flex items-center gap-4">
+            <p className="flex items-center gap-1">
+              <span>Built for Korutla with</span>
+              <Heart className="w-3.5 h-3.5 text-blue-600 fill-blue-600" />
+            </p>
+            <Link
+              href="/admin/login"
+              className="flex items-center gap-1 text-[10px] text-slate-400 hover:text-slate-600 transition-colors font-medium opacity-60 hover:opacity-100"
+              title="Admin Access"
+            >
+              <Shield className="w-3 h-3" />
+              <span>Owner Login</span>
+            </Link>
+          </div>
         </div>
       </div>
     </footer>

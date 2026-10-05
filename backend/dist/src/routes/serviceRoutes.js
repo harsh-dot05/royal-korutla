@@ -1,0 +1,13 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const serviceController_1 = require("../controllers/serviceController");
+const auth_1 = require("../middleware/auth");
+const router = (0, express_1.Router)();
+router.get('/services', serviceController_1.getServiceProviders);
+router.post('/services/request', serviceController_1.createServiceRequest);
+router.post('/admin/services', auth_1.requireAdmin, serviceController_1.createServiceProvider);
+router.put('/admin/services/:id', auth_1.requireAdmin, serviceController_1.updateServiceProvider);
+router.delete('/admin/services/:id', auth_1.requireAdmin, serviceController_1.deleteServiceProvider);
+router.get('/admin/service-requests', auth_1.requireAdmin, serviceController_1.getServiceRequests);
+exports.default = router;

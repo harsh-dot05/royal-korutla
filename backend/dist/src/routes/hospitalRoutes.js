@@ -1,0 +1,13 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const hospitalController_1 = require("../controllers/hospitalController");
+const auth_1 = require("../middleware/auth");
+const router = (0, express_1.Router)();
+router.get('/hospitals', hospitalController_1.getHospitals);
+router.get('/doctors', hospitalController_1.getDoctors);
+router.post('/admin/hospitals', auth_1.requireAdmin, hospitalController_1.createHospital);
+router.post('/admin/doctors', auth_1.requireAdmin, hospitalController_1.createDoctor);
+router.delete('/admin/hospitals/:id', auth_1.requireAdmin, hospitalController_1.deleteHospital);
+router.delete('/admin/doctors/:id', auth_1.requireAdmin, hospitalController_1.deleteDoctor);
+exports.default = router;
