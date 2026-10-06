@@ -14,9 +14,22 @@ const env_1 = require("./config/env");
 const app = (0, express_1.default)();
 // Security headers with Helmet
 app.use((0, helmet_1.default)());
-// CORS settings
+// Dynamic CORS settings for multi-device access
 app.use((0, cors_1.default)({
-    origin: [env_1.env.FRONTEND_URL, 'http://localhost:3000'],
+    origin: (origin, callback) => {
+        // Allow requests with no origin (mobile apps, Postman) or matching origins
+        if (!origin ||
+            origin === env_1.env.FRONTEND_URL ||
+            origin.startsWith('http://localhost') ||
+            origin.startsWith('http://127.0.0.1') ||
+            origin.startsWith('http://192.168.') ||
+            origin.startsWith('https://')) {
+            callback(null, true);
+        }
+        else {
+            callback(null, true);
+        }
+    },
     credentials: true,
 }));
 // Rate Limiting

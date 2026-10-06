@@ -32,6 +32,12 @@ export default function AdminLoginPage() {
         return;
       }
 
+      if (data.token) {
+        try {
+          localStorage.setItem('rk_session_token', data.token);
+        } catch (e) {}
+      }
+
       // Successful login -> Redirect to /admin
       router.replace('/admin');
       router.refresh();
@@ -87,7 +93,7 @@ export default function AdminLoginPage() {
                 placeholder="admin@royalkorutla.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-3 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-700 font-medium"
+                className="w-full bg-white border border-slate-300 rounded-lg px-3.5 py-3 text-xs text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 shadow-2xs"
               />
             </div>
 
@@ -103,7 +109,7 @@ export default function AdminLoginPage() {
                 placeholder="••••••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-3 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-700 font-medium"
+                className="w-full bg-white border border-slate-300 rounded-lg px-3.5 py-3 text-xs text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 shadow-2xs"
               />
             </div>
 

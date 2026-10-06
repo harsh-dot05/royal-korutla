@@ -46,6 +46,36 @@
     padding-bottom: 4.5rem;
   }
 
+  /* Universal high-contrast input styles so typed text is always dark and clearly visible */
+  input,
+  select,
+  textarea {
+    color: #0f172a !important;
+    caret-color: #2563eb !important;
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: #94a3b8 !important;
+    opacity: 1 !important;
+  }
+
+  /* Chrome/Edge/Safari autofill override to prevent white or unreadable text */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover, 
+  input:-webkit-autofill:focus,
+  textarea:-webkit-autofill,
+  textarea:-webkit-autofill:hover,
+  textarea:-webkit-autofill:focus,
+  select:-webkit-autofill,
+  select:-webkit-autofill:hover,
+  select:-webkit-autofill:focus {
+    -webkit-text-fill-color: #0f172a !important;
+    -webkit-box-shadow: 0 0 0px 1000px #ffffff inset !important;
+    box-shadow: 0 0 0px 1000px #ffffff inset !important;
+    transition: background-color 5000s ease-in-out 0s;
+  }
+
   @media (min-width: 768px) {
     body {
       padding-bottom: 0;

@@ -75,7 +75,53 @@ import {
   Star,
   Zap,
   Sliders,
+  Palette,
+  X,
+  Search,
+  Filter,
 } from 'lucide-react';
+
+const JOB_CATEGORIES = [
+  'Sales & Retail',
+  'Billing / Cashier',
+  'Hotel & Kitchen',
+  'Technical Services',
+  'Drivers & Delivery',
+  'Tuition & School Staff',
+  'Beauty & Salon',
+  'Office & Admin',
+  'General Jobs',
+];
+
+const JOB_COLOR_THEMES = [
+  { id: 'blue', label: 'Royal Blue', border: 'border-blue-300 hover:border-blue-500', bg: 'bg-blue-600', text: 'text-blue-700', badgeBg: 'bg-blue-600', lightBg: 'bg-blue-50', ring: 'ring-blue-500' },
+  { id: 'emerald', label: 'Emerald Green', border: 'border-emerald-300 hover:border-emerald-500', bg: 'bg-emerald-600', text: 'text-emerald-700', badgeBg: 'bg-emerald-600', lightBg: 'bg-emerald-50', ring: 'ring-emerald-500' },
+  { id: 'purple', label: 'Royal Purple', border: 'border-purple-300 hover:border-purple-500', bg: 'bg-purple-600', text: 'text-purple-700', badgeBg: 'bg-purple-600', lightBg: 'bg-purple-50', ring: 'ring-purple-500' },
+  { id: 'amber', label: 'Amber Gold', border: 'border-amber-300 hover:border-amber-500', bg: 'bg-amber-600', text: 'text-amber-700', badgeBg: 'bg-amber-600', lightBg: 'bg-amber-50', ring: 'ring-amber-500' },
+  { id: 'rose', label: 'Ruby Rose', border: 'border-rose-300 hover:border-rose-500', bg: 'bg-rose-600', text: 'text-rose-700', badgeBg: 'bg-rose-600', lightBg: 'bg-rose-50', ring: 'ring-rose-500' },
+  { id: 'indigo', label: 'Electric Indigo', border: 'border-indigo-300 hover:border-indigo-500', bg: 'bg-indigo-600', text: 'text-indigo-700', badgeBg: 'bg-indigo-600', lightBg: 'bg-indigo-50', ring: 'ring-indigo-500' },
+  { id: 'teal', label: 'Ocean Teal', border: 'border-teal-300 hover:border-teal-500', bg: 'bg-teal-600', text: 'text-teal-700', badgeBg: 'bg-teal-600', lightBg: 'bg-teal-50', ring: 'ring-teal-500' },
+  { id: 'slate', label: 'Midnight Slate', border: 'border-slate-300 hover:border-slate-500', bg: 'bg-slate-800', text: 'text-slate-800', badgeBg: 'bg-slate-800', lightBg: 'bg-slate-100', ring: 'ring-slate-500' },
+];
+
+const JOB_BADGE_PRESETS = [
+  '🔥 URGENT HIRING',
+  '⭐ FEATURED VACANCY',
+  '💰 HIGH SALARY',
+  '⚡ IMMEDIATE JOINING',
+  '🎓 FRESHERS WELCOME',
+  '👩 WOMEN PREFERRED',
+  '🕒 FLEXIBLE SHIFTS',
+];
+
+const JOB_BADGE_COLORS = [
+  { id: 'rose', label: 'Rose Red', bg: 'bg-rose-600', text: 'text-white' },
+  { id: 'emerald', label: 'Emerald Green', bg: 'bg-emerald-600', text: 'text-white' },
+  { id: 'amber', label: 'Amber Gold', bg: 'bg-amber-500', text: 'text-slate-950' },
+  { id: 'blue', label: 'Royal Blue', bg: 'bg-blue-600', text: 'text-white' },
+  { id: 'purple', label: 'Royal Purple', bg: 'bg-purple-600', text: 'text-white' },
+  { id: 'indigo', label: 'Deep Indigo', bg: 'bg-indigo-600', text: 'text-white' },
+];
 
 type AdminTab =
   | 'dashboard'
@@ -186,8 +232,33 @@ export default function AdminDashboardPage() {
   // Food Menu Items State
   const [foodItems, setFoodItems] = useState<FoodMenuItem[]>(FOOD_MENU_ITEMS);
 
-  // Jobs State
+  // Jobs State & Management
   const [jobs, setJobs] = useState<JobListing[]>(LOCAL_JOBS);
+  const [loadingJobs, setLoadingJobs] = useState(false);
+  const [editingJob, setEditingJob] = useState<JobListing | null>(null);
+  const [isJobModalOpen, setIsJobModalOpen] = useState(false);
+
+  // Job Form Inputs
+  const [jobTitle, setJobTitle] = useState('');
+  const [jobShopName, setJobShopName] = useState('');
+  const [jobCategory, setJobCategory] = useState('Sales & Retail');
+  const [jobSalary, setJobSalary] = useState('₹12,000 - ₹18,000 / month');
+  const [jobType, setJobType] = useState<'Full-time' | 'Part-time' | 'Shift' | 'Contract'>('Full-time');
+  const [jobExperience, setJobExperience] = useState('Freshers / Experienced');
+  const [jobLocation, setJobLocation] = useState('Korutla Town');
+  const [jobPhone, setJobPhone] = useState('+91 98480 12345');
+  const [jobWhatsapp, setJobWhatsapp] = useState('+91 98480 12345');
+  const [jobDescription, setJobDescription] = useState('Immediate vacancy available for energetic staff in Korutla.');
+  const [jobRequirements, setJobRequirements] = useState('Punctual, Hardworking, Basic Telugu/Hindi');
+  const [jobVerified, setJobVerified] = useState(true);
+  const [jobFeatured, setJobFeatured] = useState(false);
+  const [jobBadgeLabel, setJobBadgeLabel] = useState('🔥 URGENT HIRING');
+  const [jobBadgeColor, setJobBadgeColor] = useState('rose');
+  const [jobCardColorTheme, setJobCardColorTheme] = useState('blue');
+
+  // Job Search / Category Filter in Admin
+  const [jobAdminSearch, setJobAdminSearch] = useState('');
+  const [jobAdminCategoryFilter, setJobAdminCategoryFilter] = useState('All');
 
   // Users State
   const [usersList, setUsersList] = useState([
@@ -238,18 +309,45 @@ export default function AdminDashboardPage() {
     }
   };
 
+  // Fetch Jobs from API
+  const fetchJobs = async () => {
+    setLoadingJobs(true);
+    try {
+      const storedToken = typeof window !== 'undefined' ? localStorage.getItem('rk_session_token') : null;
+      const headers: Record<string, string> = {};
+      if (storedToken) headers['Authorization'] = `Bearer ${storedToken}`;
+      const res = await fetch('/api/admin/jobs', { headers });
+      const data = await res.json();
+      if (data.success && Array.isArray(data.data)) {
+        setJobs(data.data);
+      }
+    } catch (e) {
+      console.error('Failed to fetch admin jobs', e);
+    } finally {
+      setLoadingJobs(false);
+    }
+  };
+
   const [checkingAuth, setCheckingAuth] = useState(true);
 
   useEffect(() => {
     async function checkAdminSession() {
       try {
-        const res = await fetch('/api/admin/me');
+        const storedToken = typeof window !== 'undefined' ? localStorage.getItem('rk_session_token') : null;
+        const headers: Record<string, string> = {};
+        if (storedToken) {
+          headers['Authorization'] = `Bearer ${storedToken}`;
+        }
+
+        const res = await fetch('/api/admin/me', { headers });
         const data = await res.json();
         if (!res.ok || !data.success || data.user?.role !== 'ADMIN') {
+          if (typeof window !== 'undefined') localStorage.removeItem('rk_session_token');
           router.replace('/admin/login');
           return;
         }
       } catch (err) {
+        if (typeof window !== 'undefined') localStorage.removeItem('rk_session_token');
         router.replace('/admin/login');
         return;
       } finally {
@@ -259,6 +357,7 @@ export default function AdminDashboardPage() {
     checkAdminSession();
     fetchPromotions();
     fetchPhotography();
+    fetchJobs();
   }, [router]);
 
   const showToast = (message: string, type: 'success' | 'error' = 'success') => {
@@ -271,6 +370,9 @@ export default function AdminDashboardPage() {
       await fetch('/api/admin/logout', { method: 'POST' });
     } catch (e) {
       // ignore error
+    }
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('rk_session_token');
     }
     router.replace('/admin/login');
     router.refresh();
@@ -535,6 +637,200 @@ export default function AdminDashboardPage() {
     showToast('Featured business order updated');
   };
 
+  // Jobs Action Handlers
+  const resetJobForm = () => {
+    setEditingJob(null);
+    setJobTitle('');
+    setJobShopName('');
+    setJobCategory('Sales & Retail');
+    setJobSalary('₹12,000 - ₹18,000 / month');
+    setJobType('Full-time');
+    setJobExperience('Freshers / Experienced');
+    setJobLocation('Korutla Town');
+    setJobPhone('+91 98480 12345');
+    setJobWhatsapp('+91 98480 12345');
+    setJobDescription('Immediate vacancy available for energetic staff in Korutla.');
+    setJobRequirements('Punctual, Hardworking, Basic Telugu/Hindi');
+    setJobVerified(true);
+    setJobFeatured(false);
+    setJobBadgeLabel('🔥 URGENT HIRING');
+    setJobBadgeColor('rose');
+    setJobCardColorTheme('blue');
+  };
+
+  const handleOpenAddJobModal = () => {
+    resetJobForm();
+    setIsJobModalOpen(true);
+  };
+
+  const handleStartEditJob = (job: JobListing) => {
+    setEditingJob(job);
+    setJobTitle(job.title);
+    setJobShopName(job.shopName);
+    setJobCategory(job.category);
+    setJobSalary(job.salary);
+    setJobType(job.type);
+    setJobExperience(job.experience || 'Freshers / Experienced');
+    setJobLocation(job.location);
+    setJobPhone(job.phone);
+    setJobWhatsapp(job.whatsapp || job.phone);
+    setJobDescription(job.description);
+    setJobRequirements(job.requirements?.join(', ') || '');
+    setJobVerified(job.isVerified);
+    setJobFeatured(!!job.isFeatured);
+    setJobBadgeLabel(job.badgeLabel || '🔥 URGENT HIRING');
+    setJobBadgeColor(job.badgeColor || 'rose');
+    setJobCardColorTheme(job.cardColorTheme || 'blue');
+    setIsJobModalOpen(true);
+  };
+
+  const handleSaveJob = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!jobTitle.trim() || !jobShopName.trim()) {
+      showToast('Please enter both Job Title and Shop / Business Name.', 'error');
+      return;
+    }
+
+    const storedToken = typeof window !== 'undefined' ? localStorage.getItem('rk_session_token') : null;
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    if (storedToken) headers['Authorization'] = `Bearer ${storedToken}`;
+
+    const isEdit = !!editingJob;
+    const url = '/api/admin/jobs';
+    const method = isEdit ? 'PUT' : 'POST';
+
+    const reqs = jobRequirements
+      .split(',')
+      .map((r) => r.trim())
+      .filter(Boolean);
+
+    const payload = {
+      ...(isEdit ? { id: editingJob.id } : {}),
+      title: jobTitle.trim(),
+      shopName: jobShopName.trim(),
+      category: jobCategory,
+      salary: jobSalary.trim() || 'Negotiable',
+      type: jobType,
+      experience: jobExperience.trim(),
+      location: jobLocation.trim() || 'Korutla Town',
+      phone: jobPhone.trim() || '+91 98480 12345',
+      whatsapp: jobWhatsapp.trim() || jobPhone.trim() || '+91 98480 12345',
+      description: jobDescription.trim() || 'Immediate job vacancy available in Korutla.',
+      requirements: reqs.length > 0 ? reqs : ['Punctual & Hardworking'],
+      isVerified: jobVerified,
+      isFeatured: jobFeatured,
+      badgeLabel: jobBadgeLabel.trim(),
+      badgeColor: jobBadgeColor,
+      cardColorTheme: jobCardColorTheme,
+    };
+
+    try {
+      const res = await fetch(url, {
+        method,
+        headers,
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        showToast(
+          isEdit
+            ? `Job vacancy "${jobTitle}" updated with new style & colors! 🎨`
+            : `Job vacancy "${jobTitle}" published to Korutla live site! 👑`
+        );
+        setIsJobModalOpen(false);
+        resetJobForm();
+        fetchJobs();
+      } else {
+        showToast(data.message || 'Failed to save job vacancy', 'error');
+      }
+    } catch (err) {
+      showToast('Error saving job vacancy', 'error');
+    }
+  };
+
+  const handleDeleteJob = async (id: string) => {
+    if (!confirm('Are you sure you want to permanently delete this job listing?')) return;
+    try {
+      const storedToken = typeof window !== 'undefined' ? localStorage.getItem('rk_session_token') : null;
+      const headers: Record<string, string> = {};
+      if (storedToken) headers['Authorization'] = `Bearer ${storedToken}`;
+
+      const res = await fetch(`/api/admin/jobs?id=${id}`, { method: 'DELETE', headers });
+      const data = await res.json();
+      if (data.success) {
+        showToast('Job listing removed successfully.');
+        fetchJobs();
+      } else {
+        showToast(data.message || 'Failed to delete job', 'error');
+      }
+    } catch (err) {
+      showToast('Error deleting job listing', 'error');
+    }
+  };
+
+  const handleQuickColorTheme = async (jobId: string, colorTheme: string) => {
+    try {
+      const storedToken = typeof window !== 'undefined' ? localStorage.getItem('rk_session_token') : null;
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (storedToken) headers['Authorization'] = `Bearer ${storedToken}`;
+
+      const res = await fetch('/api/admin/jobs', {
+        method: 'PUT',
+        headers,
+        body: JSON.stringify({ id: jobId, cardColorTheme: colorTheme }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        showToast(`Card style updated to ${colorTheme}! 🎨`);
+        setJobs(jobs.map((j) => (j.id === jobId ? { ...j, cardColorTheme: colorTheme } : j)));
+      }
+    } catch (err) {
+      showToast('Failed to update card theme', 'error');
+    }
+  };
+
+  const handleToggleJobVerified = async (job: JobListing) => {
+    try {
+      const storedToken = typeof window !== 'undefined' ? localStorage.getItem('rk_session_token') : null;
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (storedToken) headers['Authorization'] = `Bearer ${storedToken}`;
+
+      const res = await fetch('/api/admin/jobs', {
+        method: 'PUT',
+        headers,
+        body: JSON.stringify({ id: job.id, isVerified: !job.isVerified }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        showToast(job.isVerified ? 'Verification removed.' : 'Job marked as Verified! 🛡️');
+        setJobs(jobs.map((j) => (j.id === job.id ? { ...j, isVerified: !j.isVerified } : j)));
+      }
+    } catch (err) {
+      showToast('Failed to toggle verification', 'error');
+    }
+  };
+
+  const handleToggleJobFeatured = async (job: JobListing) => {
+    try {
+      const storedToken = typeof window !== 'undefined' ? localStorage.getItem('rk_session_token') : null;
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (storedToken) headers['Authorization'] = `Bearer ${storedToken}`;
+
+      const res = await fetch('/api/admin/jobs', {
+        method: 'PUT',
+        headers,
+        body: JSON.stringify({ id: job.id, isFeatured: !job.isFeatured }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        showToast(job.isFeatured ? 'Removed from featured.' : 'Pinned as Featured Vacancy! ⭐');
+        setJobs(jobs.map((j) => (j.id === job.id ? { ...j, isFeatured: !j.isFeatured } : j)));
+      }
+    } catch (err) {
+      showToast('Failed to toggle featured status', 'error');
+    }
+  };
+
   // Tab definitions
   const tabsList: { id: AdminTab; label: string; icon: any; badge?: string }[] = [
     { id: 'dashboard', label: 'Dashboard', icon: Layout },
@@ -550,7 +846,7 @@ export default function AdminDashboardPage() {
     { id: 'food', label: 'Food & Menus', icon: Utensils },
     { id: 'grocery', label: 'Grocery Stock', icon: ShoppingBag },
     { id: 'services', label: 'Services', icon: Wrench },
-    { id: 'jobs', label: 'Jobs', icon: Briefcase },
+    { id: 'jobs', label: 'Jobs', icon: Briefcase, badge: `${jobs.length}` },
     { id: 'real-estate', label: 'Real Estate', icon: Home },
     { id: 'hospitals', label: 'Hospitals', icon: HeartPulse },
     { id: 'doctors', label: 'Doctors', icon: Stethoscope },
@@ -799,7 +1095,7 @@ export default function AdminDashboardPage() {
                         placeholder="e.g. Royal Digital Photography Studio"
                         value={photoName}
                         onChange={(e) => setPhotoName(e.target.value)}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                        className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 shadow-2xs"
                       />
                     </div>
 
@@ -812,7 +1108,7 @@ export default function AdminDashboardPage() {
                           placeholder="+91 98480 12345"
                           value={photoPhone}
                           onChange={(e) => setPhotoPhone(e.target.value)}
-                          className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                          className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 shadow-2xs"
                         />
                       </div>
                       <div>
@@ -822,7 +1118,7 @@ export default function AdminDashboardPage() {
                           placeholder="+91 98480 12345"
                           value={photoWhatsapp}
                           onChange={(e) => setPhotoWhatsapp(e.target.value)}
-                          className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                          className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 shadow-2xs"
                         />
                       </div>
                     </div>
@@ -835,7 +1131,7 @@ export default function AdminDashboardPage() {
                           placeholder="https://images.unsplash.com/..."
                           value={photoProfile}
                           onChange={(e) => setPhotoProfile(e.target.value)}
-                          className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                          className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 shadow-2xs"
                         />
                       </div>
                       <div>
@@ -845,7 +1141,7 @@ export default function AdminDashboardPage() {
                           placeholder="https://images.unsplash.com/..."
                           value={photoCover}
                           onChange={(e) => setPhotoCover(e.target.value)}
-                          className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                          className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 shadow-2xs"
                         />
                       </div>
                     </div>
@@ -858,7 +1154,7 @@ export default function AdminDashboardPage() {
                           placeholder="e.g. Main Road, Korutla"
                           value={photoLocation}
                           onChange={(e) => setPhotoLocation(e.target.value)}
-                          className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                          className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 shadow-2xs"
                         />
                       </div>
                       <div>
@@ -868,7 +1164,7 @@ export default function AdminDashboardPage() {
                           placeholder="e.g. ₹15,000 / day"
                           value={photoPrice}
                           onChange={(e) => setPhotoPrice(e.target.value)}
-                          className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                          className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 shadow-2xs"
                         />
                       </div>
                     </div>
@@ -880,7 +1176,7 @@ export default function AdminDashboardPage() {
                         placeholder="e.g. @royal_korutla_studios"
                         value={photoInstagram}
                         onChange={(e) => setPhotoInstagram(e.target.value)}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                        className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 shadow-2xs"
                       />
                     </div>
 
@@ -891,7 +1187,7 @@ export default function AdminDashboardPage() {
                         placeholder="Specialist in cinematic wedding photography, candid video shoots, drone coverage in Korutla."
                         value={photoDesc}
                         onChange={(e) => setPhotoDesc(e.target.value)}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                        className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 shadow-2xs"
                       />
                     </div>
 
@@ -1057,7 +1353,7 @@ export default function AdminDashboardPage() {
                         placeholder="e.g. Royal Paradise Biryani"
                         value={promBizName}
                         onChange={(e) => setPromBizName(e.target.value)}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-600"
+                        className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 shadow-2xs"
                       />
                     </div>
 
@@ -1069,7 +1365,7 @@ export default function AdminDashboardPage() {
                         placeholder="https://images.unsplash.com/..."
                         value={promImage}
                         onChange={(e) => setPromImage(e.target.value)}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-600"
+                        className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 shadow-2xs"
                       />
                     </div>
 
@@ -1080,7 +1376,7 @@ export default function AdminDashboardPage() {
                         placeholder="e.g. Grand Festival Offer 2026"
                         value={promTitle}
                         onChange={(e) => setPromTitle(e.target.value)}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-600"
+                        className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 shadow-2xs"
                       />
                     </div>
 
@@ -1091,7 +1387,7 @@ export default function AdminDashboardPage() {
                         placeholder="e.g. Flat 20% OFF on all items"
                         value={promOfferText}
                         onChange={(e) => setPromOfferText(e.target.value)}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-600"
+                        className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 shadow-2xs"
                       />
                     </div>
 
@@ -1101,7 +1397,7 @@ export default function AdminDashboardPage() {
                         <select
                           value={promType}
                           onChange={(e) => setPromType(e.target.value as PromotionType)}
-                          className="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-2 text-white focus:outline-none focus:border-blue-600"
+                          className="w-full bg-white border border-slate-300 rounded-xl px-2.5 py-2 text-slate-900 font-semibold focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 shadow-2xs"
                         >
                           <option value="HOMEPAGE_FEATURED">Homepage Featured</option>
                           <option value="FEATURED_BUSINESS">Featured Business Ticker</option>
@@ -1117,7 +1413,7 @@ export default function AdminDashboardPage() {
                         <select
                           value={promPlacement}
                           onChange={(e) => setPromPlacement(e.target.value)}
-                          className="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-2 text-white focus:outline-none focus:border-blue-600"
+                          className="w-full bg-white border border-slate-300 rounded-xl px-2.5 py-2 text-slate-900 font-semibold focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 shadow-2xs"
                         >
                           <option value="Homepage Top Banner">Homepage Top Banner</option>
                           <option value="Photography Header">Photography Header</option>
@@ -1135,7 +1431,7 @@ export default function AdminDashboardPage() {
                           type="date"
                           value={promStartDate}
                           onChange={(e) => setPromStartDate(e.target.value)}
-                          className="w-full bg-slate-50 border border-slate-200 rounded-xl px-2 py-1.5 text-white focus:outline-none focus:border-blue-600"
+                          className="w-full bg-white border border-slate-300 rounded-xl px-2 py-1.5 text-slate-900 font-semibold focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 shadow-2xs"
                         />
                       </div>
                       <div>
@@ -1144,7 +1440,7 @@ export default function AdminDashboardPage() {
                           type="date"
                           value={promEndDate}
                           onChange={(e) => setPromEndDate(e.target.value)}
-                          className="w-full bg-slate-50 border border-slate-200 rounded-xl px-2 py-1.5 text-white focus:outline-none focus:border-blue-600"
+                          className="w-full bg-white border border-slate-300 rounded-xl px-2 py-1.5 text-slate-900 font-semibold focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 shadow-2xs"
                         />
                       </div>
                     </div>
@@ -1247,10 +1543,10 @@ export default function AdminDashboardPage() {
                       <th className="p-3 text-right">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-800 text-slate-700">
+                  <tbody className="divide-y divide-slate-100 text-slate-700">
                     {businesses.map((b) => (
                       <tr key={b.id} className="hover:bg-slate-50">
-                        <td className="p-3 font-bold text-white flex items-center gap-2">
+                        <td className="p-3 font-bold text-slate-900 flex items-center gap-2">
                           <img src={b.image} alt={b.name} className="w-8 h-8 rounded-lg object-cover" />
                           <span>{b.name}</span>
                         </td>
@@ -1319,7 +1615,7 @@ export default function AdminDashboardPage() {
                     placeholder="e.g. Royal Sweets & Bakery"
                     value={newBizName}
                     onChange={(e) => setNewBizName(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-white focus:border-blue-500 focus:outline-none"
+                    className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-semibold placeholder-slate-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:outline-none transition-all shadow-2xs"
                   />
                 </div>
 
@@ -1329,7 +1625,7 @@ export default function AdminDashboardPage() {
                     <select
                       value={newBizCategory}
                       onChange={(e) => setNewBizCategory(e.target.value)}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-white focus:border-blue-500 focus:outline-none"
+                      className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-semibold focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:outline-none transition-all shadow-2xs"
                     >
                       <option value="food">Food &amp; Dining</option>
                       <option value="groceries">Groceries &amp; Marts</option>
@@ -1348,7 +1644,7 @@ export default function AdminDashboardPage() {
                       placeholder="e.g. Bakery & Confectionery"
                       value={newBizSubCategory}
                       onChange={(e) => setNewBizSubCategory(e.target.value)}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-white focus:border-blue-500 focus:outline-none"
+                      className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-semibold placeholder-slate-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:outline-none transition-all shadow-2xs"
                     />
                   </div>
                 </div>
@@ -1361,7 +1657,7 @@ export default function AdminDashboardPage() {
                       placeholder="+91 98480 12345"
                       value={newBizPhone}
                       onChange={(e) => setNewBizPhone(e.target.value)}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-white focus:border-blue-500 focus:outline-none"
+                      className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-semibold placeholder-slate-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:outline-none transition-all shadow-2xs"
                     />
                   </div>
                   <div>
@@ -1370,7 +1666,7 @@ export default function AdminDashboardPage() {
                       type="text"
                       value={newBizTiming}
                       onChange={(e) => setNewBizTiming(e.target.value)}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-white focus:border-blue-500 focus:outline-none"
+                      className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-semibold placeholder-slate-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:outline-none transition-all shadow-2xs"
                     />
                   </div>
                 </div>
@@ -1382,7 +1678,7 @@ export default function AdminDashboardPage() {
                     placeholder="e.g. Main Road, Korutla"
                     value={newBizAddress}
                     onChange={(e) => setNewBizAddress(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-white focus:border-blue-500 focus:outline-none"
+                    className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-semibold placeholder-slate-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:outline-none transition-all shadow-2xs"
                   />
                 </div>
 
@@ -1392,7 +1688,7 @@ export default function AdminDashboardPage() {
                     type="url"
                     value={newBizImage}
                     onChange={(e) => setNewBizImage(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-white focus:border-blue-500 focus:outline-none"
+                    className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-semibold placeholder-slate-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:outline-none transition-all shadow-2xs"
                   />
                 </div>
 
@@ -1402,16 +1698,16 @@ export default function AdminDashboardPage() {
                     id="v-check"
                     checked={newBizVerified}
                     onChange={(e) => setNewBizVerified(e.target.checked)}
-                    className="rounded text-blue-700"
+                    className="w-4 h-4 rounded text-blue-700 focus:ring-blue-500"
                   />
-                  <label htmlFor="v-check" className="text-slate-700 font-bold">
+                  <label htmlFor="v-check" className="text-slate-800 font-bold">
                     Grant Royal Korutla Verified Badge
                   </label>
                 </div>
 
                 <button
                   type="submit"
-                  className="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs shadow-lg"
+                  className="w-full py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs shadow-lg hover:shadow-blue-500/25 transition-all"
                 >
                   Save Business Listing
                 </button>
@@ -1435,7 +1731,7 @@ export default function AdminDashboardPage() {
                       required
                       value={newBizName}
                       onChange={(e) => setNewBizName(e.target.value)}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-white focus:border-blue-500 focus:outline-none"
+                      className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-semibold placeholder-slate-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:outline-none transition-all shadow-2xs"
                     />
                   </div>
 
@@ -1445,7 +1741,7 @@ export default function AdminDashboardPage() {
                       <select
                         value={newBizCategory}
                         onChange={(e) => setNewBizCategory(e.target.value)}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-white focus:border-blue-500 focus:outline-none"
+                        className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-semibold focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:outline-none transition-all shadow-2xs"
                       >
                         <option value="food">Food &amp; Dining</option>
                         <option value="groceries">Groceries &amp; Marts</option>
@@ -1463,7 +1759,7 @@ export default function AdminDashboardPage() {
                         type="text"
                         value={newBizSubCategory}
                         onChange={(e) => setNewBizSubCategory(e.target.value)}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-white focus:border-blue-500 focus:outline-none"
+                        className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-semibold placeholder-slate-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:outline-none transition-all shadow-2xs"
                       />
                     </div>
                   </div>
@@ -1475,7 +1771,7 @@ export default function AdminDashboardPage() {
                         type="text"
                         value={newBizPhone}
                         onChange={(e) => setNewBizPhone(e.target.value)}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-white focus:border-blue-500 focus:outline-none"
+                        className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-semibold placeholder-slate-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:outline-none transition-all shadow-2xs"
                       />
                     </div>
                     <div>
@@ -1484,7 +1780,7 @@ export default function AdminDashboardPage() {
                         type="text"
                         value={newBizTiming}
                         onChange={(e) => setNewBizTiming(e.target.value)}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-white focus:border-blue-500 focus:outline-none"
+                        className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-semibold placeholder-slate-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:outline-none transition-all shadow-2xs"
                       />
                     </div>
                   </div>
@@ -1495,7 +1791,7 @@ export default function AdminDashboardPage() {
                       type="text"
                       value={newBizAddress}
                       onChange={(e) => setNewBizAddress(e.target.value)}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-white focus:border-blue-500 focus:outline-none"
+                      className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-semibold placeholder-slate-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:outline-none transition-all shadow-2xs"
                     />
                   </div>
 
@@ -1505,7 +1801,7 @@ export default function AdminDashboardPage() {
                       type="url"
                       value={newBizImage}
                       onChange={(e) => setNewBizImage(e.target.value)}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-white focus:border-blue-500 focus:outline-none"
+                      className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-semibold placeholder-slate-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:outline-none transition-all shadow-2xs"
                     />
                   </div>
 
@@ -1515,9 +1811,9 @@ export default function AdminDashboardPage() {
                       id="ve-check"
                       checked={newBizVerified}
                       onChange={(e) => setNewBizVerified(e.target.checked)}
-                      className="rounded text-blue-700"
+                      className="w-4 h-4 rounded text-blue-700 focus:ring-blue-500"
                     />
-                    <label htmlFor="ve-check" className="text-slate-700 font-bold">
+                    <label htmlFor="ve-check" className="text-slate-800 font-bold">
                       Royal Korutla Verified Badge Active
                     </label>
                   </div>
@@ -1525,14 +1821,14 @@ export default function AdminDashboardPage() {
                   <div className="flex gap-2">
                     <button
                       type="submit"
-                      className="flex-1 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs"
+                      className="flex-1 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs shadow-lg hover:shadow-blue-500/25 transition-all"
                     >
                       Update Changes
                     </button>
                     <button
                       type="button"
                       onClick={() => setActiveTab('businesses')}
-                      className="px-4 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold"
+                      className="px-4 py-3.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-all"
                     >
                       Cancel
                     </button>
@@ -1575,14 +1871,14 @@ export default function AdminDashboardPage() {
                       placeholder="Slide Main Title (e.g. Festival Season Sale)"
                       value={newSlideTitle}
                       onChange={(e) => setNewSlideTitle(e.target.value)}
-                      className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-white focus:outline-none"
+                      className="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 shadow-2xs"
                     />
                     <input
                       type="text"
                       placeholder="Subtitle (e.g. Up to 40% discount across stores)"
                       value={newSlideSubtitle}
                       onChange={(e) => setNewSlideSubtitle(e.target.value)}
-                      className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-white focus:outline-none"
+                      className="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 shadow-2xs"
                     />
                     <div className="grid grid-cols-2 gap-2">
                       <input
@@ -1590,14 +1886,14 @@ export default function AdminDashboardPage() {
                         placeholder="Button Text"
                         value={newSlideCtaText}
                         onChange={(e) => setNewSlideCtaText(e.target.value)}
-                        className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-white focus:outline-none"
+                        className="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 shadow-2xs"
                       />
                       <input
                         type="text"
                         placeholder="Button Link (e.g. /offers)"
                         value={newSlideCtaLink}
                         onChange={(e) => setNewSlideCtaLink(e.target.value)}
-                        className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-white focus:outline-none"
+                        className="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 shadow-2xs"
                       />
                     </div>
                     <input
@@ -1605,7 +1901,7 @@ export default function AdminDashboardPage() {
                       placeholder="Background Image URL"
                       value={newSlideBg}
                       onChange={(e) => setNewSlideBg(e.target.value)}
-                      className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-white focus:outline-none"
+                      className="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 shadow-2xs"
                     />
                     <button type="submit" className="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white font-extrabold rounded-lg">
                       Add Hero Slide
@@ -1616,7 +1912,7 @@ export default function AdminDashboardPage() {
                     {heroSlides.map((slide) => (
                       <div key={slide.id} className="p-3 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-between text-xs">
                         <div>
-                          <p className="font-bold text-white">{slide.title}</p>
+                          <p className="font-bold text-slate-900">{slide.title}</p>
                           <p className="text-[11px] text-slate-500">{slide.subtitle}</p>
                         </div>
                         <button
@@ -1645,7 +1941,7 @@ export default function AdminDashboardPage() {
                           <span className="w-5 h-5 rounded bg-slate-100 flex items-center justify-center font-bold text-[10px] text-slate-500">
                             #{idx + 1}
                           </span>
-                          <span className="font-bold text-white">{biz.name}</span>
+                          <span className="font-bold text-slate-900">{biz.name}</span>
                         </div>
                         <div className="flex items-center gap-1">
                           <button
@@ -1753,26 +2049,666 @@ export default function AdminDashboardPage() {
             </div>
           )}
 
-          {/* TAB 12: JOBS */}
+          {/* TAB 12: JOBS MANAGEMENT & STYLE CUSTOMIZER */}
           {activeTab === 'jobs' && (
-            <div className="space-y-4">
-              <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                <Briefcase className="w-5 h-5 text-blue-600" />
-                <span>Korutla Local Job Listings ({jobs.length})</span>
-              </h3>
-              <div className="space-y-3">
-                {jobs.map((job) => (
-                  <div key={job.id} className="p-4 rounded-2xl bg-white border border-slate-200 flex items-center justify-between">
-                    <div>
-                      <h4 className="text-sm font-bold text-slate-900">{job.title}</h4>
-                      <p className="text-xs text-slate-500">{job.shopName} • {job.salary}</p>
-                    </div>
-                    <span className="px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 text-[10px] font-bold border border-slate-200">
-                      {job.type}
-                    </span>
+            <div className="space-y-6">
+              {/* Header Banner */}
+              <div className="p-6 rounded-2xl bg-white border border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-xs">
+                <div>
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-xs font-bold mb-2">
+                    <Briefcase className="w-3.5 h-3.5" />
+                    <span>Jobs Module &amp; Visual Customizer</span>
                   </div>
-                ))}
+                  <h2 className="text-xl font-bold text-slate-900">Korutla Local Jobs &amp; Vacancies ({jobs.length})</h2>
+                  <p className="text-xs text-slate-500 max-w-2xl mt-1">
+                    Add new job openings, edit existing postings, and customize card colors, borders, and urgency badges with live real-time preview.
+                  </p>
+                </div>
+                <div className="flex items-center gap-2.5 shrink-0">
+                  <button
+                    onClick={fetchJobs}
+                    disabled={loadingJobs}
+                    className="px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-bold flex items-center gap-1.5 transition-all"
+                  >
+                    <RefreshCw className={`w-3.5 h-3.5 ${loadingJobs ? 'animate-spin' : ''}`} />
+                    <span>Refresh</span>
+                  </button>
+                  <button
+                    onClick={handleOpenAddJobModal}
+                    className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-extrabold flex items-center gap-2 shadow-md hover:shadow-blue-500/20 transition-all"
+                  >
+                    <Plus className="w-4 h-4" />
+                    <span>Add New Job Vacancy</span>
+                  </button>
+                </div>
               </div>
+
+              {/* Quick Insight Stats */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+                <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-xs">
+                  <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Total Vacancies</p>
+                  <p className="text-2xl font-black text-slate-900 mt-1">{jobs.length}</p>
+                  <span className="text-[10px] text-blue-600 font-semibold mt-1 inline-block">Active in Korutla</span>
+                </div>
+                <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-xs">
+                  <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Urgent Badges</p>
+                  <p className="text-2xl font-black text-rose-600 mt-1">{jobs.filter(j => !!j.badgeLabel).length}</p>
+                  <span className="text-[10px] text-rose-500 font-semibold mt-1 inline-block">High Attention</span>
+                </div>
+                <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-xs">
+                  <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Verified Badges</p>
+                  <p className="text-2xl font-black text-emerald-600 mt-1">{jobs.filter(j => j.isVerified).length}</p>
+                  <span className="text-[10px] text-emerald-600 font-semibold mt-1 inline-block">Royal Verified</span>
+                </div>
+                <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-xs">
+                  <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Featured Jobs</p>
+                  <p className="text-2xl font-black text-amber-600 mt-1">{jobs.filter(j => j.isFeatured).length}</p>
+                  <span className="text-[10px] text-amber-600 font-semibold mt-1 inline-block">Pinned Spotlight</span>
+                </div>
+              </div>
+
+              {/* Filters & Search Toolbar */}
+              <div className="p-4 rounded-2xl bg-white border border-slate-200 flex flex-col md:flex-row items-center justify-between gap-3 shadow-xs">
+                <div className="relative w-full md:max-w-xs">
+                  <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                  <input
+                    type="text"
+                    placeholder="Search by title, shop, location..."
+                    value={jobAdminSearch}
+                    onChange={(e) => setJobAdminSearch(e.target.value)}
+                    className="w-full bg-white border border-slate-300 rounded-xl pl-9 pr-4 py-2 text-xs text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
+                  />
+                </div>
+
+                <div className="flex items-center gap-1.5 overflow-x-auto w-full md:w-auto pb-1 md:pb-0 scrollbar-none">
+                  <button
+                    onClick={() => setJobAdminCategoryFilter('All')}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition-all ${
+                      jobAdminCategoryFilter === 'All'
+                        ? 'bg-blue-600 text-white shadow-xs'
+                        : 'bg-slate-100 text-slate-600 hover:text-slate-900 hover:bg-slate-200'
+                    }`}
+                  >
+                    All Categories ({jobs.length})
+                  </button>
+                  {JOB_CATEGORIES.map((cat) => {
+                    const count = jobs.filter((j) => j.category === cat).length;
+                    return (
+                      <button
+                        key={cat}
+                        onClick={() => setJobAdminCategoryFilter(cat)}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition-all ${
+                          jobAdminCategoryFilter === cat
+                            ? 'bg-blue-600 text-white shadow-xs'
+                            : 'bg-slate-100 text-slate-600 hover:text-slate-900 hover:bg-slate-200'
+                        }`}
+                      >
+                        {cat} {count > 0 && `(${count})`}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Job Listings Grid */}
+              {loadingJobs ? (
+                <div className="p-12 text-center bg-white rounded-2xl border border-slate-200 text-xs text-slate-500 font-bold">
+                  <RefreshCw className="w-5 h-5 mx-auto mb-2 animate-spin text-blue-600" />
+                  Loading local jobs...
+                </div>
+              ) : jobs.filter((j) => {
+                  const matchesCat = jobAdminCategoryFilter === 'All' || j.category === jobAdminCategoryFilter;
+                  const matchesQuery =
+                    j.title.toLowerCase().includes(jobAdminSearch.toLowerCase()) ||
+                    j.shopName.toLowerCase().includes(jobAdminSearch.toLowerCase()) ||
+                    j.location.toLowerCase().includes(jobAdminSearch.toLowerCase());
+                  return matchesCat && matchesQuery;
+                }).length === 0 ? (
+                <div className="p-12 text-center bg-white rounded-2xl border border-slate-200 space-y-3">
+                  <Briefcase className="w-8 h-8 text-slate-300 mx-auto" />
+                  <p className="text-sm font-bold text-slate-800">No job openings found matching your criteria.</p>
+                  <button
+                    onClick={() => { setJobAdminSearch(''); setJobAdminCategoryFilter('All'); }}
+                    className="px-4 py-2 rounded-xl bg-blue-600 text-white font-bold text-xs hover:bg-blue-700"
+                  >
+                    Clear Filters
+                  </button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {jobs
+                    .filter((j) => {
+                      const matchesCat = jobAdminCategoryFilter === 'All' || j.category === jobAdminCategoryFilter;
+                      const matchesQuery =
+                        j.title.toLowerCase().includes(jobAdminSearch.toLowerCase()) ||
+                        j.shopName.toLowerCase().includes(jobAdminSearch.toLowerCase()) ||
+                        j.location.toLowerCase().includes(jobAdminSearch.toLowerCase());
+                      return matchesCat && matchesQuery;
+                    })
+                    .map((job) => {
+                      const theme = JOB_COLOR_THEMES.find((t) => t.id === job.cardColorTheme) || JOB_COLOR_THEMES[0];
+                      const badgeTheme = JOB_BADGE_COLORS.find((b) => b.id === job.badgeColor) || JOB_BADGE_COLORS[0];
+
+                      return (
+                        <div
+                          key={job.id}
+                          className={`p-5 rounded-2xl bg-white border-2 transition-all duration-200 shadow-xs hover:shadow-md flex flex-col justify-between ${theme.border}`}
+                        >
+                          <div className="space-y-3">
+                            {/* Badges & Status Line */}
+                            <div className="flex flex-wrap items-center justify-between gap-2">
+                              <div className="flex items-center gap-1.5 flex-wrap">
+                                <span className={`px-2.5 py-0.5 rounded-md text-[10px] font-extrabold uppercase ${theme.lightBg} ${theme.text}`}>
+                                  {job.category}
+                                </span>
+                                {job.badgeLabel && (
+                                  <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold shadow-xs ${badgeTheme.bg} ${badgeTheme.text}`}>
+                                    {job.badgeLabel}
+                                  </span>
+                                )}
+                              </div>
+
+                              <div className="flex items-center gap-1.5 shrink-0">
+                                {job.isFeatured && (
+                                  <span className="px-2 py-0.5 rounded-md bg-amber-50 border border-amber-200 text-amber-800 text-[10px] font-bold flex items-center gap-1">
+                                    <Sparkles className="w-3 h-3 text-amber-600" />
+                                    <span>Featured</span>
+                                  </span>
+                                )}
+                                {job.isVerified && (
+                                  <span className="px-2 py-0.5 rounded-md bg-emerald-50 border border-emerald-200 text-emerald-800 text-[10px] font-bold flex items-center gap-1">
+                                    <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                                    <span>Verified</span>
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+
+                            {/* Job Title & Shop */}
+                            <div>
+                              <h4 className={`text-base font-bold text-slate-900 transition-colors ${theme.text}`}>
+                                {job.title}
+                              </h4>
+                              <p className="text-xs font-semibold text-slate-700 flex items-center gap-1 mt-0.5">
+                                <Building2 className={`w-3.5 h-3.5 ${theme.text}`} />
+                                <span>{job.shopName}</span>
+                                <span className="text-slate-300">•</span>
+                                <span className="text-slate-500 font-normal">{job.location}</span>
+                              </p>
+                            </div>
+
+                            {/* Salary & Details Box */}
+                            <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5 text-xs">
+                              <div className="flex items-center justify-between">
+                                <span className="text-slate-600 font-medium">Salary Offer:</span>
+                                <span className={`font-black text-sm ${theme.text}`}>{job.salary}</span>
+                              </div>
+                              <div className="flex items-center justify-between text-slate-500 text-[11px] pt-1 border-t border-slate-200">
+                                <span>Type: <strong className="text-slate-700">{job.type}</strong></span>
+                                <span>Exp: <strong className="text-slate-700">{job.experience}</strong></span>
+                              </div>
+                            </div>
+
+                            <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed">
+                              {job.description}
+                            </p>
+
+                            {/* Requirements Pills */}
+                            {job.requirements && job.requirements.length > 0 && (
+                              <div className="flex flex-wrap gap-1">
+                                {job.requirements.map((req, idx) => (
+                                  <span key={idx} className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 text-[10px] font-semibold">
+                                    • {req}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+
+                            {/* Quick Color Theme Switcher on Card */}
+                            <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
+                              <span className="text-[10px] font-bold text-slate-500 flex items-center gap-1">
+                                <Palette className="w-3 h-3 text-slate-400" /> Quick Theme:
+                              </span>
+                              <div className="flex items-center gap-1">
+                                {JOB_COLOR_THEMES.map((clr) => (
+                                  <button
+                                    key={clr.id}
+                                    title={clr.label}
+                                    onClick={() => handleQuickColorTheme(job.id, clr.id)}
+                                    className={`w-4 h-4 rounded-full ${clr.bg} transition-transform hover:scale-125 ${
+                                      job.cardColorTheme === clr.id ? 'ring-2 ring-offset-1 ring-slate-900 scale-110' : 'opacity-70 hover:opacity-100'
+                                    }`}
+                                  />
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Actions Footer */}
+                          <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+                            <div className="flex items-center gap-1.5">
+                              <button
+                                onClick={() => handleToggleJobVerified(job)}
+                                title={job.isVerified ? 'Remove verification' : 'Grant verification'}
+                                className={`p-2 rounded-xl text-xs font-bold transition-all ${
+                                  job.isVerified
+                                    ? 'bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100'
+                                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                                }`}
+                              >
+                                <CheckCircle2 className="w-3.5 h-3.5" />
+                              </button>
+                              <button
+                                onClick={() => handleToggleJobFeatured(job)}
+                                title={job.isFeatured ? 'Unpin from featured' : 'Pin as featured'}
+                                className={`p-2 rounded-xl text-xs font-bold transition-all ${
+                                  job.isFeatured
+                                    ? 'bg-amber-50 text-amber-800 border border-amber-200 hover:bg-amber-100'
+                                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                                }`}
+                              >
+                                <Sparkles className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+
+                            <div className="flex items-center gap-2">
+                              <button
+                                onClick={() => handleStartEditJob(job)}
+                                className="px-3 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold flex items-center gap-1 transition-all border border-blue-200"
+                              >
+                                <Edit3 className="w-3.5 h-3.5" />
+                                <span>Edit &amp; Style</span>
+                              </button>
+                              <button
+                                onClick={() => handleDeleteJob(job.id)}
+                                className="p-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold transition-all border border-rose-200"
+                                title="Delete job vacancy"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                </div>
+              )}
+
+              {/* ADD / EDIT JOB MODAL */}
+              {isJobModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 overflow-y-auto">
+                  <div className="relative w-full max-w-4xl bg-white border border-slate-200 rounded-3xl p-6 shadow-2xl my-8 space-y-6">
+                    {/* Modal Header */}
+                    <div className="flex items-center justify-between pb-4 border-b border-slate-200">
+                      <div>
+                        <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 text-xs font-bold mb-1">
+                          <Palette className="w-3.5 h-3.5" />
+                          <span>Interactive Module Customizer</span>
+                        </div>
+                        <h3 className="text-xl font-bold text-slate-900">
+                          {editingJob ? `Edit Job Vacancy & Style: ${jobTitle || 'Listing'}` : 'Add New Job Vacancy & Custom Style'}
+                        </h3>
+                        <p className="text-xs text-slate-500">
+                          Fill vacancy details and personalize the card style, colors, and badge with live preview.
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => { setIsJobModalOpen(false); resetJobForm(); }}
+                        className="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-all"
+                      >
+                        <X className="w-5 h-5" />
+                      </button>
+                    </div>
+
+                    <form onSubmit={handleSaveJob} className="space-y-6">
+                      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                        {/* Left Column: Job Details */}
+                        <div className="lg:col-span-7 space-y-4 text-xs">
+                          <div className="space-y-1">
+                            <label className="font-bold text-slate-700">Job Title / Role *</label>
+                            <input
+                              type="text"
+                              required
+                              placeholder="e.g. Sales Executive, Cashier, Head Cook"
+                              value={jobTitle}
+                              onChange={(e) => setJobTitle(e.target.value)}
+                              className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
+                            />
+                          </div>
+
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div className="space-y-1">
+                              <label className="font-bold text-slate-700">Shop / Business Name *</label>
+                              <input
+                                type="text"
+                                required
+                                placeholder="e.g. Royal Supermarket"
+                                value={jobShopName}
+                                onChange={(e) => setJobShopName(e.target.value)}
+                                className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
+                              />
+                            </div>
+                            <div className="space-y-1">
+                              <label className="font-bold text-slate-700">Category</label>
+                              <select
+                                value={jobCategory}
+                                onChange={(e) => setJobCategory(e.target.value)}
+                                className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-semibold focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
+                              >
+                                {JOB_CATEGORIES.map((cat) => (
+                                  <option key={cat} value={cat}>{cat}</option>
+                                ))}
+                              </select>
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div className="space-y-1">
+                              <label className="font-bold text-slate-700">Salary Offer</label>
+                              <input
+                                type="text"
+                                placeholder="e.g. ₹15,000 - ₹20,000 / month"
+                                value={jobSalary}
+                                onChange={(e) => setJobSalary(e.target.value)}
+                                className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
+                              />
+                            </div>
+                            <div className="space-y-1">
+                              <label className="font-bold text-slate-700">Job Type</label>
+                              <select
+                                value={jobType}
+                                onChange={(e) => setJobType(e.target.value as any)}
+                                className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-semibold focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
+                              >
+                                <option value="Full-time">Full-time</option>
+                                <option value="Part-time">Part-time</option>
+                                <option value="Shift">Shift</option>
+                                <option value="Contract">Contract</option>
+                              </select>
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div className="space-y-1">
+                              <label className="font-bold text-slate-700">Experience Required</label>
+                              <input
+                                type="text"
+                                placeholder="e.g. Freshers Welcome or 1+ Years"
+                                value={jobExperience}
+                                onChange={(e) => setJobExperience(e.target.value)}
+                                className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
+                              />
+                            </div>
+                            <div className="space-y-1">
+                              <label className="font-bold text-slate-700">Location in Korutla</label>
+                              <input
+                                type="text"
+                                placeholder="e.g. Gandhi Road, Korutla"
+                                value={jobLocation}
+                                onChange={(e) => setJobLocation(e.target.value)}
+                                className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
+                              />
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div className="space-y-1">
+                              <label className="font-bold text-slate-700">Employer Phone Number *</label>
+                              <input
+                                type="tel"
+                                required
+                                placeholder="e.g. +91 98480 12345"
+                                value={jobPhone}
+                                onChange={(e) => setJobPhone(e.target.value)}
+                                className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
+                              />
+                            </div>
+                            <div className="space-y-1">
+                              <label className="font-bold text-slate-700">Employer WhatsApp Number</label>
+                              <input
+                                type="tel"
+                                placeholder="e.g. +91 98480 12345"
+                                value={jobWhatsapp}
+                                onChange={(e) => setJobWhatsapp(e.target.value)}
+                                className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
+                              />
+                            </div>
+                          </div>
+
+                          <div className="space-y-1">
+                            <label className="font-bold text-slate-700">Job Description</label>
+                            <textarea
+                              rows={2}
+                              placeholder="Brief description of responsibilities and work timings..."
+                              value={jobDescription}
+                              onChange={(e) => setJobDescription(e.target.value)}
+                              className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
+                            />
+                          </div>
+
+                          <div className="space-y-1">
+                            <label className="font-bold text-slate-700">Requirements / Skills (comma separated)</label>
+                            <input
+                              type="text"
+                              placeholder="e.g. Punctual, Basic Math, Telugu & Hindi speaking"
+                              value={jobRequirements}
+                              onChange={(e) => setJobRequirements(e.target.value)}
+                              className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
+                            />
+                          </div>
+
+                          <div className="flex items-center gap-6 pt-2">
+                            <label className="flex items-center gap-2 cursor-pointer font-bold text-slate-700">
+                              <input
+                                type="checkbox"
+                                checked={jobVerified}
+                                onChange={(e) => setJobVerified(e.target.checked)}
+                                className="w-4 h-4 rounded text-blue-600"
+                              />
+                              <span>Royal Verified Listing</span>
+                            </label>
+                            <label className="flex items-center gap-2 cursor-pointer font-bold text-slate-700">
+                              <input
+                                type="checkbox"
+                                checked={jobFeatured}
+                                onChange={(e) => setJobFeatured(e.target.checked)}
+                                className="w-4 h-4 rounded text-amber-500"
+                              />
+                              <span>Pin as Featured Job ⭐</span>
+                            </label>
+                          </div>
+                        </div>
+
+                        {/* Right Column: Style & Color Customizer + Live Preview */}
+                        <div className="lg:col-span-5 space-y-4">
+                          <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3.5 text-xs">
+                            <div className="flex items-center justify-between pb-2 border-b border-slate-200">
+                              <span className="font-extrabold text-slate-900 flex items-center gap-1.5">
+                                <Palette className="w-4 h-4 text-blue-600" /> Card Theme &amp; Colors
+                              </span>
+                              <span className="text-[10px] uppercase font-bold text-blue-600 bg-blue-100 px-2 py-0.5 rounded">
+                                {jobCardColorTheme}
+                              </span>
+                            </div>
+
+                            {/* Theme Swatches */}
+                            <div>
+                              <label className="block text-[11px] font-bold text-slate-600 mb-1.5">Select Card Color Theme:</label>
+                              <div className="grid grid-cols-4 gap-2">
+                                {JOB_COLOR_THEMES.map((theme) => (
+                                  <button
+                                    key={theme.id}
+                                    type="button"
+                                    onClick={() => setJobCardColorTheme(theme.id)}
+                                    className={`p-2 rounded-xl border flex flex-col items-center gap-1 transition-all ${
+                                      jobCardColorTheme === theme.id
+                                        ? 'border-slate-900 bg-white shadow-sm ring-2 ring-slate-900'
+                                        : 'border-slate-200 bg-white hover:border-slate-300'
+                                    }`}
+                                  >
+                                    <span className={`w-5 h-5 rounded-full ${theme.bg} shadow-xs flex items-center justify-center text-white`}>
+                                      {jobCardColorTheme === theme.id && <Check className="w-3 h-3 stroke-[3]" />}
+                                    </span>
+                                    <span className="text-[10px] font-bold text-slate-700 text-center leading-tight">
+                                      {theme.label.split(' ')[0]}
+                                    </span>
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+
+                            {/* Urgency Badge Presets */}
+                            <div>
+                              <label className="block text-[11px] font-bold text-slate-600 mb-1.5">Highlight &amp; Urgency Badge:</label>
+                              <div className="flex flex-wrap gap-1.5 mb-2">
+                                {JOB_BADGE_PRESETS.map((preset) => (
+                                  <button
+                                    key={preset}
+                                    type="button"
+                                    onClick={() => setJobBadgeLabel(preset)}
+                                    className={`px-2 py-1 rounded-lg text-[10px] font-bold transition-all ${
+                                      jobBadgeLabel === preset
+                                        ? 'bg-slate-900 text-white shadow-xs'
+                                        : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-100'
+                                    }`}
+                                  >
+                                    {preset}
+                                  </button>
+                                ))}
+                                <button
+                                  type="button"
+                                  onClick={() => setJobBadgeLabel('')}
+                                  className="px-2 py-1 rounded-lg text-[10px] font-bold bg-white border border-rose-200 text-rose-600 hover:bg-rose-50"
+                                >
+                                  None (Clear)
+                                </button>
+                              </div>
+                              <input
+                                type="text"
+                                placeholder="Or enter custom badge text..."
+                                value={jobBadgeLabel}
+                                onChange={(e) => setJobBadgeLabel(e.target.value)}
+                                className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
+                              />
+                            </div>
+
+                            {/* Badge Color Selector */}
+                            <div>
+                              <label className="block text-[11px] font-bold text-slate-600 mb-1.5">Badge Accent Color:</label>
+                              <div className="flex items-center gap-2">
+                                {JOB_BADGE_COLORS.map((clr) => (
+                                  <button
+                                    key={clr.id}
+                                    type="button"
+                                    onClick={() => setJobBadgeColor(clr.id)}
+                                    className={`px-2.5 py-1 rounded-lg text-[10px] font-extrabold flex items-center gap-1 transition-all ${clr.bg} ${clr.text} ${
+                                      jobBadgeColor === clr.id ? 'ring-2 ring-slate-900 ring-offset-1 scale-105' : 'opacity-80 hover:opacity-100'
+                                    }`}
+                                  >
+                                    {jobBadgeColor === clr.id && <Check className="w-2.5 h-2.5 stroke-[3]" />}
+                                    <span>{clr.label.split(' ')[0]}</span>
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* LIVE PREVIEW CARD */}
+                          <div>
+                            <div className="flex items-center justify-between mb-1.5">
+                              <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1">
+                                <Eye className="w-3.5 h-3.5 text-blue-600" /> Live Website Card Preview:
+                              </span>
+                              <span className="text-[10px] text-emerald-600 font-bold">Real-time sync</span>
+                            </div>
+
+                            {(() => {
+                              const previewTheme = JOB_COLOR_THEMES.find((t) => t.id === jobCardColorTheme) || JOB_COLOR_THEMES[0];
+                              const previewBadge = JOB_BADGE_COLORS.find((b) => b.id === jobBadgeColor) || JOB_BADGE_COLORS[0];
+
+                              return (
+                                <div className={`p-4 rounded-2xl bg-white border-2 shadow-sm space-y-2.5 transition-all ${previewTheme.border}`}>
+                                  <div className="flex items-center justify-between gap-2">
+                                    <div className="flex items-center gap-1.5">
+                                      <span className={`px-2 py-0.5 rounded text-[9px] font-extrabold uppercase ${previewTheme.lightBg} ${previewTheme.text}`}>
+                                        {jobCategory}
+                                      </span>
+                                      {jobBadgeLabel && (
+                                        <span className={`px-2 py-0.5 rounded-full text-[9px] font-extrabold shadow-xs ${previewBadge.bg} ${previewBadge.text}`}>
+                                          {jobBadgeLabel}
+                                        </span>
+                                      )}
+                                    </div>
+
+                                    <div className="flex items-center gap-1 shrink-0">
+                                      {jobFeatured && (
+                                        <span className="px-1.5 py-0.5 rounded bg-amber-50 border border-amber-200 text-amber-800 text-[9px] font-bold flex items-center gap-0.5">
+                                          <Sparkles className="w-2.5 h-2.5 text-amber-600" />
+                                          <span>Featured</span>
+                                        </span>
+                                      )}
+                                      {jobVerified && (
+                                        <span className="px-1.5 py-0.5 rounded bg-emerald-50 border border-emerald-200 text-emerald-800 text-[9px] font-bold flex items-center gap-0.5">
+                                          <CheckCircle2 className="w-2.5 h-2.5 text-emerald-600" />
+                                          <span>Verified</span>
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
+
+                                  <div>
+                                    <h5 className={`text-sm font-bold text-slate-900 ${previewTheme.text}`}>
+                                      {jobTitle || 'Your Job Title Appears Here'}
+                                    </h5>
+                                    <p className="text-[11px] font-medium text-slate-600 flex items-center gap-1 mt-0.5">
+                                      <Building2 className={`w-3 h-3 ${previewTheme.text}`} />
+                                      <span>{jobShopName || 'Shop / Business Name'}</span>
+                                      <span className="text-slate-300">•</span>
+                                      <span>{jobLocation || 'Korutla Town'}</span>
+                                    </p>
+                                  </div>
+
+                                  <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between text-xs">
+                                    <span className="text-[11px] text-slate-600 font-medium">Salary:</span>
+                                    <span className={`font-black ${previewTheme.text}`}>{jobSalary || '₹12,000 - ₹18,000'}</span>
+                                  </div>
+
+                                  <div className="flex items-center gap-2 pt-1">
+                                    <div className="flex-1 py-1.5 rounded-lg bg-slate-100 text-slate-700 text-[10px] font-bold text-center border border-slate-200 flex items-center justify-center gap-1">
+                                      <Phone className="w-3 h-3" /> Call
+                                    </div>
+                                    <div className={`flex-1 py-1.5 rounded-lg text-white text-[10px] font-bold text-center flex items-center justify-center gap-1 shadow-xs ${previewTheme.bg}`}>
+                                      <MessageSquare className="w-3 h-3" /> WhatsApp
+                                    </div>
+                                  </div>
+                                </div>
+                              );
+                            })()}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Modal Action Buttons */}
+                      <div className="pt-4 border-t border-slate-200 flex items-center justify-end gap-3">
+                        <button
+                          type="button"
+                          onClick={() => { setIsJobModalOpen(false); resetJobForm(); }}
+                          className="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-all"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="submit"
+                          className="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-extrabold flex items-center gap-2 shadow-lg transition-all"
+                        >
+                          <Sparkles className="w-4 h-4" />
+                          <span>{editingJob ? 'Save & Update Vacancy' : 'Publish Job Vacancy'}</span>
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
@@ -1793,10 +2729,10 @@ export default function AdminDashboardPage() {
                       <th className="p-3">Status</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-800">
+                  <tbody className="divide-y divide-slate-100">
                     {usersList.map((u) => (
                       <tr key={u.id} className="hover:bg-slate-50">
-                        <td className="p-3 font-bold text-white">{u.name}</td>
+                        <td className="p-3 font-bold text-slate-900">{u.name}</td>
                         <td className="p-3 text-slate-700">{u.email}</td>
                         <td className="p-3">
                           <span className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold ${
@@ -1828,7 +2764,7 @@ export default function AdminDashboardPage() {
                     type="text"
                     value={siteName}
                     onChange={(e) => setSiteName(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-white focus:outline-none"
+                    className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 shadow-2xs"
                   />
                 </div>
 
@@ -1838,7 +2774,7 @@ export default function AdminDashboardPage() {
                     type="text"
                     value={supportPhone}
                     onChange={(e) => setSupportPhone(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-white focus:outline-none"
+                    className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 shadow-2xs"
                   />
                 </div>
 
@@ -1848,19 +2784,19 @@ export default function AdminDashboardPage() {
                     type="email"
                     value={supportEmail}
                     onChange={(e) => setSupportEmail(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-white focus:outline-none"
+                    className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 shadow-2xs"
                   />
                 </div>
 
                 <div className="pt-2 border-t border-slate-200 flex items-center justify-between">
                   <div>
-                    <p className="font-bold text-white">Maintenance Mode</p>
+                    <p className="font-bold text-slate-900">Maintenance Mode</p>
                     <p className="text-[10px] text-slate-500">Temporarily restrict public access to Korutla app</p>
                   </div>
                   <button
                     onClick={() => setMaintenanceMode(!maintenanceMode)}
                     className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                      maintenanceMode ? 'bg-rose-600 text-white' : 'bg-slate-100 text-slate-500'
+                      maintenanceMode ? 'bg-rose-600 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                     }`}
                   >
                     {maintenanceMode ? 'ENABLED' : 'DISABLED'}
@@ -1869,7 +2805,7 @@ export default function AdminDashboardPage() {
 
                 <button
                   onClick={() => showToast('Platform settings saved successfully.')}
-                  className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold"
+                  className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold shadow-md transition-all"
                 >
                   Save Settings
                 </button>
@@ -1880,10 +2816,10 @@ export default function AdminDashboardPage() {
           {/* FALLBACK FOR OTHER TABS */}
           {!['dashboard', 'photography', 'promotions', 'businesses', 'add-business', 'edit-business', 'verify-business', 'homepage-content', 'offers', 'food', 'jobs', 'users', 'settings'].includes(activeTab) && (
             <div className="p-8 text-center space-y-3 bg-white rounded-2xl border border-slate-200">
-              <div className="w-12 h-12 rounded-2xl bg-blue-50 border border-blue-200 flex items-center justify-center mx-auto text-white">
+              <div className="w-12 h-12 rounded-2xl bg-blue-50 border border-blue-200 flex items-center justify-center mx-auto text-blue-600">
                 <Crown className="w-6 h-6" />
               </div>
-              <h3 className="text-base font-bold text-white capitalize">{activeTab.replace('-', ' ')} Module</h3>
+              <h3 className="text-base font-bold text-slate-900 capitalize">{activeTab.replace('-', ' ')} Module</h3>
               <p className="text-xs text-slate-500 max-w-sm mx-auto">
                 Module active &amp; connected to Royal Korutla database. Real-time updates active.
               </p>

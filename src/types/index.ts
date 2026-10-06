@@ -177,6 +177,9 @@ export interface JobListing {
   requirements: string[];
   isVerified: boolean;
   isFeatured?: boolean;
+  badgeLabel?: string;
+  badgeColor?: string;
+  cardColorTheme?: string;
 }
 
 export interface RealEstateProperty {

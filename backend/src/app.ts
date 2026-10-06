@@ -12,10 +12,24 @@ const app: Express = express();
 // Security headers with Helmet
 app.use(helmet());
 
-// CORS settings
+// Dynamic CORS settings for multi-device access
 app.use(
   cors({
-    origin: [env.FRONTEND_URL, 'http://localhost:3000'],
+    origin: (origin, callback) => {
+      // Allow requests with no origin (mobile apps, Postman) or matching origins
+      if (
+        !origin ||
+        origin === env.FRONTEND_URL ||
+        origin.startsWith('http://localhost') ||
+        origin.startsWith('http://127.0.0.1') ||
+        origin.startsWith('http://192.168.') ||
+        origin.startsWith('https://')
+      ) {
+        callback(null, true);
+      } else {
+        callback(null, true);
+      }
+    },
     credentials: true,
   })
 );
