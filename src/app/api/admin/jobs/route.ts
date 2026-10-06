@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { JobListing } from '@/types';
-import { requireAdminApi } from '@/lib/auth';
+import { requireAdminApi } from '@/lib/authServer';
 import { getAllJobs, addJob, updateJob, deleteJob } from '@/lib/jobsStore';
 
 export async function GET(request: Request) {

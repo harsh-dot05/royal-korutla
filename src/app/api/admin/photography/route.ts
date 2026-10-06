@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { PhotographyBusiness } from '@/types';
-import { requireAdminApi } from '@/lib/auth';
+import { requireAdminApi } from '@/lib/authServer';
 import {
   getAllPhotographyBusinesses,
   addPhotographyBusiness,

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Home, X, ChevronRight, MapPin, Utensils, Briefcase, Building2, Store, Wrench, Shirt, GraduationCap, TreePine, PhoneCall, Tag, Camera } from 'lucide-react';
+import { Home, X, ChevronRight, MapPin, Utensils, Briefcase, Building2, Store, Wrench, Shirt, GraduationCap, TreePine, PhoneCall, Tag, Camera, Award } from 'lucide-react';
 import { CATEGORIES } from '../../data/mockData';
 
 interface MobileNavProps {
@@ -26,6 +26,7 @@ export const MobileNav: React.FC<MobileNavProps> = ({ isOpen, onClose }) => {
       case 'jobs': return '/jobs';
       case 'real-estate': return '/real-estate';
       case 'offers': return '/offers';
+      case 'rewards': return '/rewards';
       default: return `/${slug}`;
     }
   };
@@ -68,6 +69,14 @@ export const MobileNav: React.FC<MobileNavProps> = ({ isOpen, onClose }) => {
             >
               <Home className="w-4 h-4 text-blue-600" />
               <span>Home</span>
+            </Link>
+            <Link
+              href="/rewards"
+              onClick={onClose}
+              className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-50 text-slate-700 hover:text-blue-600 font-medium text-sm transition-colors"
+            >
+              <Award className="w-4 h-4 text-blue-600" />
+              <span>Royal Points Rewards</span>
             </Link>
             <Link
               href="/food"

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { requireAdminApi, getSessionFromRequest } from '@/lib/auth';
+import { requireAdminApi, getSessionFromRequest } from '@/lib/authServer';
 
 export async function GET(request: Request) {
   const authError = requireAdminApi(request);

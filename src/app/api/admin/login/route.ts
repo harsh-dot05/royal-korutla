@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
-import { authenticateAdminCredentials, createSessionToken, SESSION_COOKIE_NAME } from '@/lib/auth';
+import { createSessionToken, SESSION_COOKIE_NAME } from '@/lib/auth';
+import { authenticateAdminCredentials } from '@/lib/authServer';
 
 export async function POST(request: Request) {
   try {
@@ -10,8 +11,8 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           success: false,
-          error: 'UNAUTHORIZED',
-          message: 'Invalid admin credentials.',
+          error: 'INVALID_CREDENTIALS',
+          message: 'Invalid credentials.',
         },
         { status: 401 }
       );
@@ -39,22 +40,27 @@ export async function POST(request: Request) {
       }
     }
 
-    if (!adminUser) {
-      adminUser = authenticateAdminCredentials(email, password);
-    }
+    let token: string;
 
-    if (!adminUser) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: 'UNAUTHORIZED',
-          message: 'Invalid admin credentials.',
-        },
-        { status: 401 }
-      );
-    }
+    if (adminUser) {
+      token = backendToken || createSessionToken(adminUser);
+    } else {
+      const authResult = authenticateAdminCredentials(email, password);
 
-    const token = backendToken || createSessionToken(adminUser);
+      if (!authResult.success || !authResult.user) {
+        const statusCode = authResult.error === 'ACCOUNT_INACTIVE' ? 403 : 401;
+        return NextResponse.json(
+          {
+            success: false,
+            error: authResult.error || 'INVALID_CREDENTIALS',
+            message: authResult.message || 'Invalid credentials.',
+          },
+          { status: statusCode }
+        );
+      }
+      adminUser = authResult.user;
+      token = createSessionToken(adminUser);
+    }
 
     const response = NextResponse.json({
       success: true,

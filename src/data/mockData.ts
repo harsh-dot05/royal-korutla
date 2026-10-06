@@ -843,18 +843,32 @@ export const REWARD_VOUCHERS: RewardVoucher[] = [
 
 export const INITIAL_ROYAL_POINTS_TRANSACTIONS: RoyalPointTransaction[] = [
   {
-    id: 'rpt-1',
-    amount: 100,
+    id: 'rpt-welcome-1000',
+    amount: 1000,
     type: 'EARNED',
-    reason: 'Welcome Bonus for joining Royal Korutla 👑',
+    reason: 'Welcome bonus for joining Royal Korutla',
     timestamp: 'Today',
   },
   {
-    id: 'rpt-2',
+    id: 'rpt-order-250',
+    amount: 250,
+    type: 'EARNED',
+    reason: 'Order reward — Royal Paradise Restaurant',
+    timestamp: '2 days ago',
+  },
+  {
+    id: 'rpt-review-50',
     amount: 50,
     type: 'EARNED',
-    reason: 'Verified review posted for Royal Paradise Biryani',
-    timestamp: 'Yesterday',
+    reason: 'Verified business review posted',
+    timestamp: '3 days ago',
+  },
+  {
+    id: 'rpt-redeem-500',
+    amount: 500,
+    type: 'REDEEMED',
+    reason: 'Reward redemption — Discount Voucher #RKROYAL100',
+    timestamp: '1 week ago',
   },
 ];
 

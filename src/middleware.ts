@@ -10,7 +10,7 @@ export function middleware(request: NextRequest) {
     const sessionToken = request.cookies.get(SESSION_COOKIE_NAME)?.value;
     const session = verifySessionToken(sessionToken);
 
-    if (!session || session.role !== 'ADMIN') {
+    if (!session || (session.role !== 'ADMIN' && session.role !== 'SUPER_ADMIN')) {
       const loginUrl = new URL('/admin/login', request.url);
       loginUrl.searchParams.set('redirect', pathname);
       const redirectResponse = NextResponse.redirect(loginUrl);
@@ -25,12 +25,12 @@ export function middleware(request: NextRequest) {
     return response;
   }
 
-  // If already logged in as ADMIN and visiting /admin/login, redirect to /admin
+  // If already logged in as ADMIN or SUPER_ADMIN and visiting /admin/login, redirect to /admin
   if (pathname === '/admin/login') {
     const sessionToken = request.cookies.get(SESSION_COOKIE_NAME)?.value;
     const session = verifySessionToken(sessionToken);
 
-    if (session && session.role === 'ADMIN') {
+    if (session && (session.role === 'ADMIN' || session.role === 'SUPER_ADMIN')) {
       return NextResponse.redirect(new URL('/admin', request.url));
     }
   }

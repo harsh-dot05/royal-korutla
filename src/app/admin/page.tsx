@@ -32,7 +32,11 @@ import {
   PhotographyBusiness,
   PhotographyType,
   HomepageSlide,
+  RoyalPointTransaction,
+  RewardVoucher,
+  UserSession,
 } from '@/types';
+import { SafeAdminUser } from '@/lib/adminStore';
 import {
   Shield,
   Sparkles,
@@ -79,6 +83,8 @@ import {
   X,
   Search,
   Filter,
+  Gift,
+  History as HistoryIcon,
 } from 'lucide-react';
 
 const JOB_CATEGORIES = [
@@ -149,6 +155,7 @@ type AdminTab =
   | 'payments'
   | 'subscriptions'
   | 'homepage-content'
+  | 'admin-management'
   | 'settings';
 
 const ALL_PHOTO_TYPES: PhotographyType[] = [
@@ -328,6 +335,289 @@ export default function AdminDashboardPage() {
     }
   };
 
+  // Royal Points Admin State
+  const [rewardsAdminData, setRewardsAdminData] = useState<{
+    summary: { balance: number; earned: number; spent: number; equivalentRupees: string };
+    transactions: RoyalPointTransaction[];
+    vouchers: RewardVoucher[];
+  }>({
+    summary: { balance: 800, earned: 1300, spent: 500, equivalentRupees: '8.00' },
+    transactions: [],
+    vouchers: [],
+  });
+
+  const [adjAmount, setAdjAmount] = useState('');
+  const [adjType, setAdjType] = useState<'EARNED' | 'REDEEMED'>('EARNED');
+  const [adjReason, setAdjReason] = useState('');
+
+  const [vTitle, setVTitle] = useState('');
+  const [vBusiness, setVBusiness] = useState('');
+  const [vCost, setVCost] = useState('');
+  const [vDiscount, setVDiscount] = useState('');
+  const [vCode, setVCode] = useState('');
+  const [vExpiry, setVExpiry] = useState('30 Days from Claim');
+  const [vImage, setVImage] = useState('https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=600&auto=format&fit=crop&q=80');
+
+  const fetchRewardsAdminData = async () => {
+    try {
+      const res = await fetch('/api/admin/rewards');
+      const data = await res.json();
+      if (data.success) {
+        setRewardsAdminData({
+          summary: data.summary,
+          transactions: data.transactions || [],
+          vouchers: data.vouchers || [],
+        });
+      }
+    } catch (err) {
+      console.error('Failed to fetch rewards admin data', err);
+    }
+  };
+
+  const handleAdjustPoints = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!adjAmount || !adjReason) {
+      showToast('Please specify points amount and reason', 'error');
+      return;
+    }
+    try {
+      const res = await fetch('/api/admin/rewards', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'adjust_points',
+          amount: Number(adjAmount),
+          type: adjType,
+          reason: adjReason,
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast(data.message);
+        setAdjAmount('');
+        setAdjReason('');
+        fetchRewardsAdminData();
+      } else {
+        showToast(data.message || 'Error adjusting points', 'error');
+      }
+    } catch (err) {
+      showToast('Failed to adjust points', 'error');
+    }
+  };
+
+  const handleAddRewardVoucher = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!vTitle || !vBusiness || !vCost || !vDiscount || !vCode) {
+      showToast('Please fill out all required voucher fields', 'error');
+      return;
+    }
+    try {
+      const res = await fetch('/api/admin/rewards', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'add_voucher',
+          title: vTitle,
+          businessName: vBusiness,
+          pointsCost: Number(vCost),
+          valueDiscount: vDiscount,
+          code: vCode,
+          expiry: vExpiry,
+          image: vImage,
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast(data.message);
+        setVTitle('');
+        setVBusiness('');
+        setVCost('');
+        setVDiscount('');
+        setVCode('');
+        fetchRewardsAdminData();
+      } else {
+        showToast(data.message || 'Error adding voucher', 'error');
+      }
+    } catch (err) {
+      showToast('Failed to add reward voucher', 'error');
+    }
+  };
+
+  const handleDeleteVoucher = async (id: string) => {
+    try {
+      const res = await fetch(`/api/admin/rewards?id=${id}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (data.success) {
+        showToast('Voucher removed successfully.');
+        fetchRewardsAdminData();
+      }
+    } catch (err) {
+      showToast('Error removing voucher', 'error');
+    }
+  };
+
+  // Multi-Admin Management State
+  const [currentUser, setCurrentUser] = useState<UserSession | null>(null);
+  const [adminAccountsList, setAdminAccountsList] = useState<SafeAdminUser[]>([]);
+  const [loadingAdmins, setLoadingAdmins] = useState(false);
+
+  // Add Admin Form State
+  const [newAdminName, setNewAdminName] = useState('');
+  const [newAdminEmail, setNewAdminEmail] = useState('');
+  const [newAdminPassword, setNewAdminPassword] = useState('');
+  const [newAdminRole, setNewAdminRole] = useState<'SUPER_ADMIN' | 'ADMIN'>('ADMIN');
+
+  // Edit Admin State
+  const [editingAdmin, setEditingAdmin] = useState<SafeAdminUser | null>(null);
+  const [editName, setEditName] = useState('');
+  const [editEmail, setEditEmail] = useState('');
+  const [editRole, setEditRole] = useState<'SUPER_ADMIN' | 'ADMIN'>('ADMIN');
+
+  // Reset Password State
+  const [resetAdminUser, setResetAdminUser] = useState<SafeAdminUser | null>(null);
+  const [resetPasswordInput, setResetPasswordInput] = useState('');
+
+  const fetchAdminAccounts = async () => {
+    setLoadingAdmins(true);
+    try {
+      const res = await fetch('/api/admin/users');
+      const data = await res.json();
+      if (data.success && data.users) {
+        setAdminAccountsList(data.users);
+      }
+    } catch (err) {
+      console.error('Failed to fetch admin accounts', err);
+    } finally {
+      setLoadingAdmins(false);
+    }
+  };
+
+  const handleCreateAdmin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newAdminName || !newAdminEmail || !newAdminPassword) {
+      showToast('Name, email, and password are required', 'error');
+      return;
+    }
+    try {
+      const res = await fetch('/api/admin/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: newAdminName,
+          email: newAdminEmail,
+          password: newAdminPassword,
+          role: newAdminRole,
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast(data.message || 'Admin account created successfully.');
+        setNewAdminName('');
+        setNewAdminEmail('');
+        setNewAdminPassword('');
+        fetchAdminAccounts();
+      } else {
+        showToast(data.message || 'Failed to create admin', 'error');
+      }
+    } catch (err) {
+      showToast('Failed to create admin account', 'error');
+    }
+  };
+
+  const handleUpdateAdmin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingAdmin) return;
+    try {
+      const res = await fetch('/api/admin/users', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'update',
+          id: editingAdmin.id,
+          name: editName,
+          email: editEmail,
+          role: editRole,
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast(data.message || 'Admin updated successfully.');
+        setEditingAdmin(null);
+        fetchAdminAccounts();
+      } else {
+        showToast(data.message || 'Failed to update admin', 'error');
+      }
+    } catch (err) {
+      showToast('Failed to update admin', 'error');
+    }
+  };
+
+  const handleToggleAdminStatus = async (user: SafeAdminUser) => {
+    try {
+      const res = await fetch('/api/admin/users', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'update',
+          id: user.id,
+          is_active: !user.is_active,
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast(user.is_active ? `Deactivated ${user.name}` : `Activated ${user.name}`);
+        fetchAdminAccounts();
+      } else {
+        showToast(data.message || 'Failed to change admin status', 'error');
+      }
+    } catch (err) {
+      showToast('Failed to change admin status', 'error');
+    }
+  };
+
+  const handleResetAdminPasswordSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!resetAdminUser || !resetPasswordInput) return;
+    try {
+      const res = await fetch('/api/admin/users', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'reset_password',
+          id: resetAdminUser.id,
+          newPassword: resetPasswordInput,
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast(`Password reset for ${resetAdminUser.name}.`);
+        setResetAdminUser(null);
+        setResetPasswordInput('');
+        fetchAdminAccounts();
+      } else {
+        showToast(data.message || 'Failed to reset password', 'error');
+      }
+    } catch (err) {
+      showToast('Failed to reset password', 'error');
+    }
+  };
+
+  const handleDeleteAdmin = async (id: string, name: string) => {
+    if (!confirm(`Are you sure you want to remove admin account "${name}"?`)) return;
+    try {
+      const res = await fetch(`/api/admin/users?id=${id}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (data.success) {
+        showToast(`Admin account "${name}" removed.`);
+        fetchAdminAccounts();
+      } else {
+        showToast(data.message || 'Failed to remove admin', 'error');
+      }
+    } catch (err) {
+      showToast('Failed to remove admin account', 'error');
+    }
+  };
+
   const [checkingAuth, setCheckingAuth] = useState(true);
 
   useEffect(() => {
@@ -341,10 +631,14 @@ export default function AdminDashboardPage() {
 
         const res = await fetch('/api/admin/me', { headers });
         const data = await res.json();
-        if (!res.ok || !data.success || data.user?.role !== 'ADMIN') {
+        if (!res.ok || !data.success || (data.user?.role !== 'ADMIN' && data.user?.role !== 'SUPER_ADMIN')) {
           if (typeof window !== 'undefined') localStorage.removeItem('rk_session_token');
           router.replace('/admin/login');
           return;
+        }
+        setCurrentUser(data.user);
+        if (data.user?.role === 'SUPER_ADMIN') {
+          fetchAdminAccounts();
         }
       } catch (err) {
         if (typeof window !== 'undefined') localStorage.removeItem('rk_session_token');
@@ -358,6 +652,7 @@ export default function AdminDashboardPage() {
     fetchPromotions();
     fetchPhotography();
     fetchJobs();
+    fetchRewardsAdminData();
   }, [router]);
 
   const showToast = (message: string, type: 'success' | 'error' = 'success') => {
@@ -832,7 +1127,7 @@ export default function AdminDashboardPage() {
   };
 
   // Tab definitions
-  const tabsList: { id: AdminTab; label: string; icon: any; badge?: string }[] = [
+  const baseTabs: { id: AdminTab; label: string; icon: any; badge?: string }[] = [
     { id: 'dashboard', label: 'Dashboard', icon: Layout },
     { id: 'businesses', label: 'Businesses', icon: Building2, badge: `${businesses.length}` },
     { id: 'add-business', label: 'Add Business', icon: Plus },
@@ -857,8 +1152,15 @@ export default function AdminDashboardPage() {
     { id: 'stories', label: 'Stories & Reels', icon: Video },
     { id: 'payments', label: 'Payments', icon: CreditCard },
     { id: 'subscriptions', label: 'Subscriptions', icon: Zap },
-    { id: 'settings', label: 'Settings', icon: SettingsIcon },
   ];
+
+  if (currentUser?.role === 'SUPER_ADMIN') {
+    baseTabs.push({ id: 'admin-management', label: 'Admin Accounts', icon: Shield, badge: 'SUPER' });
+  }
+
+  baseTabs.push({ id: 'settings', label: 'Settings', icon: SettingsIcon });
+
+  const tabsList = baseTabs;
 
   if (checkingAuth) {
     return (
@@ -895,12 +1197,16 @@ export default function AdminDashboardPage() {
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="text-base font-extrabold text-slate-900 tracking-tight">Royal Korutla Admin</h1>
-                <span className="text-[10px] font-black px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-200 uppercase tracking-wide">
-                  Owner Admin
+                <span className={`text-[10px] font-black px-2 py-0.5 rounded-md border uppercase tracking-wide ${
+                  currentUser?.role === 'SUPER_ADMIN'
+                    ? 'bg-blue-50 text-blue-700 border-blue-200'
+                    : 'bg-slate-100 text-slate-700 border-slate-200'
+                }`}>
+                  {currentUser?.role === 'SUPER_ADMIN' ? 'Super Admin' : 'Admin'}
                 </span>
               </div>
               <p className="text-[11px] text-slate-500 flex items-center gap-1">
-                <Lock className="w-3 h-3 text-emerald-700 inline" /> Session: <strong className="text-slate-800 font-medium">admin@royalkorutla.com</strong>
+                <Lock className="w-3 h-3 text-emerald-700 inline" /> Session: <strong className="text-slate-800 font-medium">{currentUser?.email || 'admin'}</strong>
               </p>
             </div>
           </div>
@@ -2813,8 +3119,561 @@ export default function AdminDashboardPage() {
             </div>
           )}
 
+          {/* TAB 26: ROYAL POINTS MANAGEMENT */}
+          {activeTab === 'royal-points' && (
+            <div className="space-y-6">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div>
+                  <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                    <Award className="w-5 h-5 text-blue-600" />
+                    <span>Royal Points &amp; Rewards Management</span>
+                  </h3>
+                  <p className="text-xs text-slate-500 font-medium">
+                    View customer point balances, issue manual adjustments, and manage active store discount vouchers.
+                  </p>
+                </div>
+                <button
+                  onClick={fetchRewardsAdminData}
+                  className="px-3.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-700 flex items-center gap-1.5 transition-colors"
+                >
+                  <RefreshCw className="w-3.5 h-3.5" />
+                  <span>Refresh Data</span>
+                </button>
+              </div>
+
+              {/* Metric Cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                <div className="p-4 bg-white rounded-2xl border border-slate-200 space-y-1">
+                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Current Ledger Balance</span>
+                  <p className="text-2xl font-black text-blue-600">{rewardsAdminData.summary.balance.toLocaleString()} Pts</p>
+                  <span className="text-[10px] font-semibold text-slate-500">≈ ₹{rewardsAdminData.summary.equivalentRupees} value</span>
+                </div>
+
+                <div className="p-4 bg-white rounded-2xl border border-slate-200 space-y-1">
+                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Total Points Issued</span>
+                  <p className="text-2xl font-black text-emerald-600">+{rewardsAdminData.summary.earned.toLocaleString()} Pts</p>
+                  <span className="text-[10px] font-semibold text-slate-500">≈ ₹{(rewardsAdminData.summary.earned / 100).toFixed(2)} value</span>
+                </div>
+
+                <div className="p-4 bg-white rounded-2xl border border-slate-200 space-y-1">
+                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Total Points Redeemed</span>
+                  <p className="text-2xl font-black text-rose-600">-{rewardsAdminData.summary.spent.toLocaleString()} Pts</p>
+                  <span className="text-[10px] font-semibold text-slate-500">≈ ₹{(rewardsAdminData.summary.spent / 100).toFixed(2)} value</span>
+                </div>
+
+                <div className="p-4 bg-white rounded-2xl border border-slate-200 space-y-1">
+                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Active Vouchers</span>
+                  <p className="text-2xl font-black text-slate-900">{rewardsAdminData.vouchers.length}</p>
+                  <span className="text-[10px] font-semibold text-slate-500">Store Coupons</span>
+                </div>
+              </div>
+
+              {/* Management Panels */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Left Column: Manual Adjustment & Transactions */}
+                <div className="space-y-6">
+                  {/* Manual Adjustment Form */}
+                  <div className="p-5 bg-white rounded-2xl border border-slate-200 space-y-4">
+                    <h4 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                      <Plus className="w-4 h-4 text-blue-600" />
+                      <span>Manual Points Adjustment</span>
+                    </h4>
+                    <form onSubmit={handleAdjustPoints} className="space-y-3 text-xs">
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-slate-700 font-bold mb-1">Adjustment Type</label>
+                          <select
+                            value={adjType}
+                            onChange={(e) => setAdjType(e.target.value as any)}
+                            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 font-medium focus:outline-none"
+                          >
+                            <option value="EARNED">Add Points (+EARNED)</option>
+                            <option value="REDEEMED">Deduct Points (-REDEEMED)</option>
+                          </select>
+                        </div>
+
+                        <div>
+                          <label className="block text-slate-700 font-bold mb-1">Points Amount</label>
+                          <input
+                            type="number"
+                            placeholder="e.g. 500"
+                            value={adjAmount}
+                            onChange={(e) => setAdjAmount(e.target.value)}
+                            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 font-medium focus:outline-none"
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-slate-700 font-bold mb-1">Reason / Account</label>
+                        <input
+                          type="text"
+                          placeholder="e.g. Manual credit for Srinivas (+91 94401 88776)"
+                          value={adjReason}
+                          onChange={(e) => setAdjReason(e.target.value)}
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 font-medium focus:outline-none"
+                        />
+                      </div>
+
+                      <button
+                        type="submit"
+                        className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold transition-colors shadow-xs"
+                      >
+                        Submit Points Adjustment
+                      </button>
+                    </form>
+                  </div>
+
+                  {/* Transactions History */}
+                  <div className="p-5 bg-white rounded-2xl border border-slate-200 space-y-3">
+                    <h4 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                      <HistoryIcon className="w-4 h-4 text-blue-600" />
+                      <span>Point Transactions History</span>
+                    </h4>
+
+                    <div className="space-y-2 max-h-96 overflow-y-auto pr-1">
+                      {rewardsAdminData.transactions.map((tx) => (
+                        <div key={tx.id} className="p-3 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between text-xs">
+                          <div>
+                            <p className="font-bold text-slate-900">{tx.reason}</p>
+                            <span className="text-[10px] text-slate-500 font-medium">{tx.timestamp}</span>
+                          </div>
+                          <div className="text-right">
+                            <span className={`font-mono font-bold text-xs ${tx.type === 'EARNED' ? 'text-emerald-600' : 'text-rose-600'}`}>
+                              {tx.type === 'EARNED' ? '+' : '-'}{tx.amount} Pts
+                            </span>
+                            <span className="text-[10px] text-slate-400 block font-medium">≈ ₹{(tx.amount / 100).toFixed(2)}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right Column: Manage Reward Vouchers */}
+                <div className="space-y-6">
+                  {/* Add Voucher Form */}
+                  <div className="p-5 bg-white rounded-2xl border border-slate-200 space-y-4">
+                    <h4 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                      <Gift className="w-4 h-4 text-blue-600" />
+                      <span>Add Store Discount Voucher</span>
+                    </h4>
+                    <form onSubmit={handleAddRewardVoucher} className="space-y-3 text-xs">
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-slate-700 font-bold mb-1">Voucher Title</label>
+                          <input
+                            type="text"
+                            placeholder="e.g. ₹100 Biryani Discount"
+                            value={vTitle}
+                            onChange={(e) => setVTitle(e.target.value)}
+                            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 font-medium focus:outline-none"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-slate-700 font-bold mb-1">Business Name</label>
+                          <input
+                            type="text"
+                            placeholder="e.g. Royal Paradise Restaurant"
+                            value={vBusiness}
+                            onChange={(e) => setVBusiness(e.target.value)}
+                            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 font-medium focus:outline-none"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-3 gap-3">
+                        <div>
+                          <label className="block text-slate-700 font-bold mb-1">Points Cost</label>
+                          <input
+                            type="number"
+                            placeholder="200"
+                            value={vCost}
+                            onChange={(e) => setVCost(e.target.value)}
+                            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 font-medium focus:outline-none"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-slate-700 font-bold mb-1">Discount Label</label>
+                          <input
+                            type="text"
+                            placeholder="₹100 OFF"
+                            value={vDiscount}
+                            onChange={(e) => setVDiscount(e.target.value)}
+                            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 font-medium focus:outline-none"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-slate-700 font-bold mb-1">Voucher Code</label>
+                          <input
+                            type="text"
+                            placeholder="RKROYAL100"
+                            value={vCode}
+                            onChange={(e) => setVCode(e.target.value)}
+                            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 font-mono font-bold focus:outline-none"
+                          />
+                        </div>
+                      </div>
+
+                      <button
+                        type="submit"
+                        className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold transition-colors shadow-xs"
+                      >
+                        Add Reward Voucher
+                      </button>
+                    </form>
+                  </div>
+
+                  {/* Existing Vouchers List */}
+                  <div className="p-5 bg-white rounded-2xl border border-slate-200 space-y-3">
+                    <h4 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                      <Gift className="w-4 h-4 text-blue-600" />
+                      <span>Active Reward Vouchers ({rewardsAdminData.vouchers.length})</span>
+                    </h4>
+
+                    <div className="space-y-3">
+                      {rewardsAdminData.vouchers.map((voucher) => (
+                        <div key={voucher.id} className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between text-xs">
+                          <div className="space-y-0.5">
+                            <span className="text-[10px] font-bold text-blue-600 uppercase tracking-wider block">{voucher.businessName}</span>
+                            <h5 className="font-bold text-slate-900">{voucher.title}</h5>
+                            <p className="text-[10px] text-slate-500 font-medium">Cost: {voucher.pointsCost} Pts • Code: <code className="font-mono font-bold">{voucher.code}</code></p>
+                          </div>
+                          <button
+                            onClick={() => handleDeleteVoucher(voucher.id)}
+                            className="p-2 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 font-bold transition-colors"
+                            title="Delete Voucher"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 27: ADMIN ACCOUNTS MANAGEMENT (SUPER_ADMIN ONLY) */}
+          {activeTab === 'admin-management' && (
+            currentUser?.role !== 'SUPER_ADMIN' ? (
+              <div className="p-8 text-center bg-white rounded-2xl border border-slate-200 space-y-3">
+                <Shield className="w-8 h-8 text-rose-500 mx-auto" />
+                <h3 className="text-base font-bold text-slate-900">Access Denied</h3>
+                <p className="text-xs text-slate-500">Only Super Admin accounts can manage admin users.</p>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                  <div>
+                    <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                      <Shield className="w-5 h-5 text-blue-600" />
+                      <span>Admin User Accounts &amp; Permissions</span>
+                    </h3>
+                    <p className="text-xs text-slate-500 font-medium">
+                      Super Admin Control Panel: Manage authorized administrators, roles, active status, and password resets.
+                    </p>
+                  </div>
+                  <button
+                    onClick={fetchAdminAccounts}
+                    className="px-3.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-700 flex items-center gap-1.5 transition-colors"
+                  >
+                    <RefreshCw className="w-3.5 h-3.5" />
+                    <span>Refresh List</span>
+                  </button>
+                </div>
+
+                {/* Overview Cards */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="p-4 bg-white rounded-2xl border border-slate-200 space-y-1">
+                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Total Admin Users</span>
+                    <p className="text-2xl font-black text-slate-900">{adminAccountsList.length}</p>
+                  </div>
+                  <div className="p-4 bg-white rounded-2xl border border-slate-200 space-y-1">
+                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Super Admins</span>
+                    <p className="text-2xl font-black text-blue-600">{adminAccountsList.filter(u => u.role === 'SUPER_ADMIN').length}</p>
+                  </div>
+                  <div className="p-4 bg-white rounded-2xl border border-slate-200 space-y-1">
+                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Active Admins</span>
+                    <p className="text-2xl font-black text-emerald-600">{adminAccountsList.filter(u => u.is_active).length}</p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                  {/* Left Column: Create Admin Form */}
+                  <div className="lg:col-span-1 p-5 bg-white rounded-2xl border border-slate-200 space-y-4">
+                    <h4 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                      <Plus className="w-4 h-4 text-blue-600" />
+                      <span>Create Authorized Admin</span>
+                    </h4>
+
+                    <form onSubmit={handleCreateAdmin} className="space-y-3 text-xs">
+                      <div>
+                        <label className="block text-slate-700 font-bold mb-1">Full Name</label>
+                        <input
+                          type="text"
+                          required
+                          placeholder="e.g. Ramesh Kumar"
+                          value={newAdminName}
+                          onChange={(e) => setNewAdminName(e.target.value)}
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 font-medium focus:outline-none"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-slate-700 font-bold mb-1">Email Address</label>
+                        <input
+                          type="email"
+                          required
+                          placeholder="e.g. ramesh.admin@royalkorutla.com"
+                          value={newAdminEmail}
+                          onChange={(e) => setNewAdminEmail(e.target.value)}
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 font-medium focus:outline-none"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-slate-700 font-bold mb-1">Initial Password</label>
+                        <input
+                          type="password"
+                          required
+                          placeholder="••••••••••••"
+                          value={newAdminPassword}
+                          onChange={(e) => setNewAdminPassword(e.target.value)}
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 font-medium focus:outline-none"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-slate-700 font-bold mb-1">Admin Role</label>
+                        <select
+                          value={newAdminRole}
+                          onChange={(e) => setNewAdminRole(e.target.value as any)}
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 font-medium focus:outline-none"
+                        >
+                          <option value="ADMIN">ADMIN (Normal Panel Access)</option>
+                          <option value="SUPER_ADMIN">SUPER_ADMIN (Full Access)</option>
+                        </select>
+                      </div>
+
+                      <button
+                        type="submit"
+                        className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold transition-colors shadow-xs"
+                      >
+                        Add Authorized Admin
+                      </button>
+                    </form>
+                  </div>
+
+                  {/* Right Column: Admin Accounts List */}
+                  <div className="lg:col-span-2 p-5 bg-white rounded-2xl border border-slate-200 space-y-4">
+                    <h4 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                      <Users className="w-4 h-4 text-blue-600" />
+                      <span>Authorized Admin Accounts List ({adminAccountsList.length})</span>
+                    </h4>
+
+                    {loadingAdmins ? (
+                      <p className="text-xs text-slate-500 py-4 text-center">Loading admin accounts...</p>
+                    ) : (
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-left text-xs">
+                          <thead>
+                            <tr className="border-b border-slate-200 text-slate-500 font-bold uppercase tracking-wider text-[10px]">
+                              <th className="pb-3">Admin</th>
+                              <th className="pb-3">Role</th>
+                              <th className="pb-3">Status</th>
+                              <th className="pb-3 text-right">Actions</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-slate-100 font-medium">
+                            {adminAccountsList.map((user) => {
+                              const isSelf = user.id === currentUser?.id;
+                              const isSuper = user.role === 'SUPER_ADMIN';
+
+                              return (
+                                <tr key={user.id} className="hover:bg-slate-50/80">
+                                  <td className="py-3">
+                                    <div className="font-bold text-slate-900 flex items-center gap-1.5">
+                                      <span>{user.name}</span>
+                                      {isSelf && (
+                                        <span className="text-[9px] px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 font-extrabold border border-blue-200">
+                                          You
+                                        </span>
+                                      )}
+                                    </div>
+                                    <span className="text-[11px] text-slate-500">{user.email}</span>
+                                  </td>
+                                  <td className="py-3">
+                                    <span className={`px-2 py-0.5 rounded text-[10px] font-extrabold border uppercase ${
+                                      isSuper
+                                        ? 'bg-blue-50 text-blue-700 border-blue-200'
+                                        : 'bg-slate-100 text-slate-700 border-slate-200'
+                                    }`}>
+                                      {user.role}
+                                    </span>
+                                  </td>
+                                  <td className="py-3">
+                                    <button
+                                      onClick={() => handleToggleAdminStatus(user)}
+                                      disabled={isSelf}
+                                      className={`px-2.5 py-1 rounded-full text-[10px] font-extrabold border transition-colors ${
+                                        user.is_active
+                                          ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'
+                                          : 'bg-rose-50 text-rose-700 border-rose-200 hover:bg-rose-100'
+                                      }`}
+                                    >
+                                      {user.is_active ? 'ACTIVE' : 'INACTIVE'}
+                                    </button>
+                                  </td>
+                                  <td className="py-3 text-right space-x-1.5">
+                                    <button
+                                      onClick={() => {
+                                        setResetAdminUser(user);
+                                        setResetPasswordInput('');
+                                      }}
+                                      className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-bold border border-slate-200 transition-colors"
+                                    >
+                                      Reset Password
+                                    </button>
+
+                                    <button
+                                      onClick={() => {
+                                        setEditingAdmin(user);
+                                        setEditName(user.name);
+                                        setEditEmail(user.email);
+                                        setEditRole(user.role);
+                                      }}
+                                      className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition-colors"
+                                      title="Edit Admin"
+                                    >
+                                      <Edit3 className="w-3.5 h-3.5" />
+                                    </button>
+
+                                    {!isSelf && (
+                                      <button
+                                        onClick={() => handleDeleteAdmin(user.id, user.name)}
+                                        className="p-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 transition-colors"
+                                        title="Delete Admin Account"
+                                      >
+                                        <Trash2 className="w-3.5 h-3.5" />
+                                      </button>
+                                    )}
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )
+          )}
+
+          {/* Edit Admin Modal */}
+          {editingAdmin && (
+            <div className="fixed inset-0 z-50 bg-slate-900/50 flex items-center justify-center p-4">
+              <div className="bg-white rounded-2xl p-6 border border-slate-200 max-w-md w-full space-y-4 shadow-2xl">
+                <h4 className="text-base font-bold text-slate-900">Edit Admin: {editingAdmin.name}</h4>
+                <form onSubmit={handleUpdateAdmin} className="space-y-3 text-xs">
+                  <div>
+                    <label className="block text-slate-700 font-bold mb-1">Full Name</label>
+                    <input
+                      type="text"
+                      value={editName}
+                      onChange={(e) => setEditName(e.target.value)}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 font-medium focus:outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-slate-700 font-bold mb-1">Email Address</label>
+                    <input
+                      type="email"
+                      value={editEmail}
+                      onChange={(e) => setEditEmail(e.target.value)}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 font-medium focus:outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-slate-700 font-bold mb-1">Role</label>
+                    <select
+                      value={editRole}
+                      onChange={(e) => setEditRole(e.target.value as any)}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 font-medium focus:outline-none"
+                    >
+                      <option value="ADMIN">ADMIN</option>
+                      <option value="SUPER_ADMIN">SUPER_ADMIN</option>
+                    </select>
+                  </div>
+
+                  <div className="flex items-center justify-end gap-2 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => setEditingAdmin(null)}
+                      className="px-4 py-2 rounded-xl bg-slate-100 text-slate-700 font-bold hover:bg-slate-200"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-4 py-2 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700"
+                    >
+                      Save Changes
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
+
+          {/* Reset Password Modal */}
+          {resetAdminUser && (
+            <div className="fixed inset-0 z-50 bg-slate-900/50 flex items-center justify-center p-4">
+              <div className="bg-white rounded-2xl p-6 border border-slate-200 max-w-md w-full space-y-4 shadow-2xl">
+                <h4 className="text-base font-bold text-slate-900">Reset Password: {resetAdminUser.name}</h4>
+                <form onSubmit={handleResetAdminPasswordSubmit} className="space-y-3 text-xs">
+                  <div>
+                    <label className="block text-slate-700 font-bold mb-1">New Password</label>
+                    <input
+                      type="password"
+                      required
+                      placeholder="Min 6 chars"
+                      value={resetPasswordInput}
+                      onChange={(e) => setResetPasswordInput(e.target.value)}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 font-medium focus:outline-none"
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-end gap-2 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => setResetAdminUser(null)}
+                      className="px-4 py-2 rounded-xl bg-slate-100 text-slate-700 font-bold hover:bg-slate-200"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-4 py-2 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700"
+                    >
+                      Reset Password
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
+
           {/* FALLBACK FOR OTHER TABS */}
-          {!['dashboard', 'photography', 'promotions', 'businesses', 'add-business', 'edit-business', 'verify-business', 'homepage-content', 'offers', 'food', 'jobs', 'users', 'settings'].includes(activeTab) && (
+          {!['dashboard', 'photography', 'promotions', 'businesses', 'add-business', 'edit-business', 'verify-business', 'homepage-content', 'offers', 'food', 'jobs', 'users', 'royal-points', 'admin-management', 'settings'].includes(activeTab) && (
             <div className="p-8 text-center space-y-3 bg-white rounded-2xl border border-slate-200">
               <div className="w-12 h-12 rounded-2xl bg-blue-50 border border-blue-200 flex items-center justify-center mx-auto text-blue-600">
                 <Crown className="w-6 h-6" />

@@ -312,7 +312,7 @@ export interface StoryReel {
   linkUrl?: string;
 }
 
-export type UserRole = 'CUSTOMER' | 'BUSINESS_OWNER' | 'ADMIN';
+export type UserRole = 'CUSTOMER' | 'BUSINESS_OWNER' | 'ADMIN' | 'SUPER_ADMIN';
 
 export interface UserSession {
   id: string;

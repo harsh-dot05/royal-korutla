@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { Promotion } from '@/types';
-import { requireAdminApi } from '@/lib/auth';
+import { requireAdminApi } from '@/lib/authServer';
 import { getAllPromotions, addPromotion, deletePromotion } from '@/lib/promotionsStore';
 
 export async function GET(request: Request) {

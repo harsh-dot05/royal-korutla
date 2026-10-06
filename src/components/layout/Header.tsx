@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Crown, MapPin, Search, Menu, X, PhoneCall, Utensils, Briefcase, Home, Wrench, Store, ShoppingBag, Tag, Camera } from 'lucide-react';
+import { Crown, MapPin, Search, Menu, X, PhoneCall, Utensils, Briefcase, Home, Wrench, Store, ShoppingBag, Tag, Camera, Award } from 'lucide-react';
 import { MobileNav } from './MobileNav';
 
 export const Header: React.FC = () => {
@@ -35,43 +35,47 @@ export const Header: React.FC = () => {
             </Link>
 
             {/* Desktop Navigation */}
-            <nav className="hidden lg:flex items-center gap-4">
-              <Link href="/" className="text-sm font-semibold text-blue-600 transition-colors">
+            <nav className="hidden lg:flex items-center gap-3 xl:gap-4">
+              <Link href="/" className="text-xs xl:text-sm font-semibold text-blue-600 transition-colors">
                 Home
               </Link>
-              <Link href="/food" className="text-sm font-medium text-slate-700 hover:text-blue-600 transition-colors flex items-center gap-1.5">
+              <Link href="/food" className="text-xs xl:text-sm font-medium text-slate-700 hover:text-blue-600 transition-colors flex items-center gap-1.5">
                 <Utensils className="w-4 h-4 text-blue-600" />
                 <span>Food</span>
               </Link>
-              <Link href="/grocery" className="text-sm font-medium text-slate-700 hover:text-blue-600 transition-colors flex items-center gap-1.5">
+              <Link href="/grocery" className="text-xs xl:text-sm font-medium text-slate-700 hover:text-blue-600 transition-colors flex items-center gap-1.5">
                 <Store className="w-4 h-4 text-blue-600" />
                 <span>Groceries</span>
               </Link>
-              <Link href="/photography" className="text-sm font-medium text-slate-700 hover:text-blue-600 transition-colors flex items-center gap-1.5">
+              <Link href="/photography" className="text-xs xl:text-sm font-medium text-slate-700 hover:text-blue-600 transition-colors flex items-center gap-1.5">
                 <Camera className="w-4 h-4 text-blue-600" />
                 <span>Photography</span>
               </Link>
-              <Link href="/shopping" className="text-sm font-medium text-slate-700 hover:text-blue-600 transition-colors flex items-center gap-1.5">
+              <Link href="/shopping" className="text-xs xl:text-sm font-medium text-slate-700 hover:text-blue-600 transition-colors flex items-center gap-1.5">
                 <ShoppingBag className="w-4 h-4 text-blue-600" />
                 <span>Shopping</span>
               </Link>
-              <Link href="/offers" className="text-sm font-medium text-slate-700 hover:text-blue-600 transition-colors flex items-center gap-1.5">
+              <Link href="/offers" className="text-xs xl:text-sm font-medium text-slate-700 hover:text-blue-600 transition-colors flex items-center gap-1.5">
                 <Tag className="w-4 h-4 text-blue-600" />
                 <span>Offers</span>
               </Link>
-              <Link href="/services" className="text-sm font-medium text-slate-700 hover:text-blue-600 transition-colors flex items-center gap-1.5">
+              <Link href="/rewards" className="text-xs xl:text-sm font-medium text-slate-700 hover:text-blue-600 transition-colors flex items-center gap-1.5">
+                <Award className="w-4 h-4 text-blue-600" />
+                <span>Royal Points</span>
+              </Link>
+              <Link href="/services" className="text-xs xl:text-sm font-medium text-slate-700 hover:text-blue-600 transition-colors flex items-center gap-1.5">
                 <Wrench className="w-4 h-4 text-blue-600" />
                 <span>Services</span>
               </Link>
-              <Link href="/jobs" className="text-sm font-medium text-slate-700 hover:text-blue-600 transition-colors flex items-center gap-1.5">
+              <Link href="/jobs" className="text-xs xl:text-sm font-medium text-slate-700 hover:text-blue-600 transition-colors flex items-center gap-1.5">
                 <Briefcase className="w-4 h-4 text-blue-600" />
                 <span>Jobs</span>
               </Link>
-              <Link href="/real-estate" className="text-sm font-medium text-slate-700 hover:text-blue-600 transition-colors flex items-center gap-1.5">
+              <Link href="/real-estate" className="text-xs xl:text-sm font-medium text-slate-700 hover:text-blue-600 transition-colors flex items-center gap-1.5">
                 <Home className="w-4 h-4 text-blue-600" />
                 <span>Real Estate</span>
               </Link>
-              <Link href="/hospitals" className="text-sm font-medium text-slate-700 hover:text-blue-600 transition-colors flex items-center gap-1.5">
+              <Link href="/hospitals" className="text-xs xl:text-sm font-medium text-slate-700 hover:text-blue-600 transition-colors flex items-center gap-1.5">
                 <PhoneCall className="w-4 h-4 text-blue-600" />
                 <span>Hospitals</span>
               </Link>
@@ -84,7 +88,7 @@ export const Header: React.FC = () => {
                   const searchEl = document.getElementById('hero-search');
                   if (searchEl) searchEl.focus();
                 }}
-                className="hidden sm:flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200/80 text-xs font-medium text-slate-700 border border-slate-200 transition-all"
+                className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200/80 text-xs font-medium text-slate-700 border border-slate-200 transition-all"
               >
                 <Search className="w-3.5 h-3.5 text-blue-600" />
                 <span>Search...</span>
@@ -94,10 +98,11 @@ export const Header: React.FC = () => {
               </button>
 
               <Link
-                href="/food"
-                className="hidden sm:inline-flex items-center justify-center px-4 py-2 text-xs font-bold rounded-xl bg-blue-600 hover:bg-blue-700 text-white transition-colors shadow-xs"
+                href="/rewards"
+                className="hidden sm:inline-flex items-center justify-center gap-1.5 px-3.5 py-2 text-xs font-bold rounded-xl bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 transition-colors"
               >
-                Order Food
+                <Crown className="w-3.5 h-3.5 text-blue-600" />
+                <span>Royal Points</span>
               </Link>
 
               {/* Mobile Menu Button */}
