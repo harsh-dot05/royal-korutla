@@ -11,6 +11,7 @@ import hospitalRoutes from './hospitalRoutes';
 import serviceRoutes from './serviceRoutes';
 import offerRoutes from './offerRoutes';
 import emergencyRoutes from './emergencyRoutes';
+import reelRequestRoutes from './reelRequestRoutes';
 
 const router = Router();
 
@@ -26,5 +27,6 @@ router.use('/api', hospitalRoutes);
 router.use('/api', serviceRoutes);
 router.use('/api', offerRoutes);
 router.use('/api', emergencyRoutes);
+router.use('/api', reelRequestRoutes);
 
 export default router;

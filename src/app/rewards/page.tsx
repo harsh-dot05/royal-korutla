@@ -38,7 +38,29 @@ export default function RewardsPage() {
   };
 
   useEffect(() => {
-    fetchRewardsData();
+    let isMounted = true;
+    const initData = async () => {
+      try {
+        const res = await fetch('/api/rewards');
+        const data = await res.json();
+        if (isMounted && data.success && data.summary) {
+          setBalance(data.summary.balance);
+          setEarnedTotal(data.summary.earned);
+          setSpentTotal(data.summary.spent);
+          setEquivalentRupees(data.summary.equivalentRupees);
+          setTransactions(data.transactions || []);
+          setVouchers(data.vouchers || []);
+        }
+      } catch (err) {
+        console.error('Error loading rewards data:', err);
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    };
+    initData();
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const handleClaimVoucher = async (voucherId: string, cost: number) => {

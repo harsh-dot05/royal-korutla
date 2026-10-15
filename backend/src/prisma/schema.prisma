@@ -459,5 +459,30 @@ model EmergencyContact {
   phone         String
   address       String
   available24x7 Boolean  @default(true)
+  isVerified    Boolean  @default(true)
+  notes         String?
+  timing        String?
   createdAt     DateTime @default(now())
+  updatedAt     DateTime @default(now()) @updatedAt
+
+  @@index([category])
 }
+
+model ReelRequest {
+  id                     String   @id @default(uuid())
+  businessName           String
+  contactPhone           String
+  businessCategory       String
+  reelPurpose            String   @default("product_promotion")
+  preferredLanguage      String   @default("Telugu")
+  additionalRequirements String?
+  status                 String   @default("PENDING")
+  adminNotes             String?
+  followUpDate           String?
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @default(now()) @updatedAt
+
+  @@index([status])
+  @@index([contactPhone])
+}
+

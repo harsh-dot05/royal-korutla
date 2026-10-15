@@ -2,9 +2,13 @@ import React from 'react';
 import { Header } from '@/components/layout/Header';
 import { Hero } from '@/components/hero/Hero';
 import { HeroSlider } from '@/components/hero/HeroSlider';
+import { StatisticsSection } from '@/components/home/StatisticsSection';
+import { InstantReelSection } from '@/components/home/InstantReelSection';
+import { RepresentativesSpotlight } from '@/components/home/RepresentativesSpotlight';
 import { TodayInKorutla } from '@/components/home/TodayInKorutla';
 import { FeaturedSection } from '@/components/featured/FeaturedSection';
 import { PromotionsSection } from '@/components/home/PromotionsSection';
+import { EmergencySection } from '@/components/home/EmergencySection';
 import { QuickServicesSection } from '@/components/home/QuickServicesSection';
 import { FoodSpotlight } from '@/components/home/FoodSpotlight';
 import { GrocerySpotlight } from '@/components/home/GrocerySpotlight';
@@ -15,7 +19,7 @@ import { Footer } from '@/components/layout/Footer';
 
 export default function Home() {
   return (
-    <div className="min-h-screen flex flex-col bg-white">
+    <div className="min-h-screen flex flex-col bg-[#FAF7F2]">
       {/* 1. Header */}
       <Header />
 
@@ -26,7 +30,16 @@ export default function Home() {
         {/* 3. Hero Slider Carousel */}
         <HeroSlider />
 
-        {/* 4. Today in Korutla */}
+        {/* 4. Statistics Cards */}
+        <StatisticsSection />
+
+        {/* 5. Featured Instant Reel Service for Local Businesses */}
+        <InstantReelSection />
+
+        {/* 6. Public Representatives Spotlight Preview */}
+        <RepresentativesSpotlight />
+
+        {/* 6. Today in Korutla */}
         <TodayInKorutla />
 
         {/* 5. Featured Businesses ⭐ */}
@@ -35,7 +48,10 @@ export default function Home() {
         {/* 6. Paid Promotions Section 🏷️ */}
         <PromotionsSection />
 
-        {/* 7. Quick Services / "What do you need?" */}
+        {/* 7. Prominent Emergency & Ambulance Services */}
+        <EmergencySection />
+
+        {/* 8. Quick Services / "What do you need?" */}
         <QuickServicesSection />
 
         {/* 8. Food Spotlight */}

@@ -2,7 +2,26 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Home, X, ChevronRight, MapPin, Utensils, Briefcase, Building2, Store, Wrench, Shirt, GraduationCap, TreePine, PhoneCall, Tag, Camera, Award } from 'lucide-react';
+import {
+  Home,
+  X,
+  ChevronRight,
+  MapPin,
+  Utensils,
+  Briefcase,
+  Store,
+  Wrench,
+  Shirt,
+  GraduationCap,
+  TreePine,
+  PhoneCall,
+  Tag,
+  Camera,
+  Award,
+  AlertCircle,
+  Building2,
+  Users,
+} from 'lucide-react';
 import { CATEGORIES } from '../../data/mockData';
 
 interface MobileNavProps {
@@ -15,19 +34,36 @@ export const MobileNav: React.FC<MobileNavProps> = ({ isOpen, onClose }) => {
 
   const getCategoryHref = (slug: string) => {
     switch (slug) {
-      case 'food': return '/food';
-      case 'groceries': case 'grocery': return '/grocery';
-      case 'photography': case 'photography-studios': return '/photography';
-      case 'shopping': return '/shopping';
-      case 'services': return '/services';
-      case 'hospitals': return '/hospitals';
-      case 'education': return '/education';
-      case 'public-places': return '/public-places';
-      case 'jobs': return '/jobs';
-      case 'real-estate': return '/real-estate';
-      case 'offers': return '/offers';
-      case 'rewards': return '/rewards';
-      default: return `/${slug}`;
+      case 'food':
+        return '/food';
+      case 'groceries':
+      case 'grocery':
+        return '/groceries';
+      case 'clothing':
+        return '/clothing';
+      case 'photography':
+      case 'photography-studios':
+        return '/photography';
+      case 'shopping':
+        return '/shopping';
+      case 'services':
+        return '/services';
+      case 'hospitals':
+        return '/hospitals';
+      case 'education':
+        return '/education';
+      case 'public-places':
+        return '/public-places';
+      case 'jobs':
+        return '/jobs';
+      case 'real-estate':
+        return '/real-estate';
+      case 'offers':
+        return '/offers';
+      case 'rewards':
+        return '/rewards';
+      default:
+        return `/${slug}`;
     }
   };
 
@@ -35,143 +71,158 @@ export const MobileNav: React.FC<MobileNavProps> = ({ isOpen, onClose }) => {
     <div className="fixed inset-0 z-50 lg:hidden flex justify-end">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-slate-900/40 transition-opacity"
+        className="fixed inset-0 bg-[#26352D]/50 transition-opacity"
         onClick={onClose}
+        aria-hidden="true"
       />
 
       {/* Drawer */}
-      <div className="relative w-full max-w-xs bg-white border-l border-slate-200 h-full p-6 overflow-y-auto flex flex-col justify-between shadow-2xl z-10">
+      <div className="relative w-full max-w-xs bg-white border-l border-[#E8E5DF] h-full p-5 overflow-y-auto flex flex-col justify-between shadow-2xl z-10">
         <div>
           {/* Header */}
-          <div className="flex items-center justify-between pb-5 border-b border-slate-200">
+          <div className="flex items-center justify-between pb-4 border-b border-[#E8E5DF]">
             <div>
-              <span className="font-extrabold text-lg text-slate-900">
-                Royal <span className="text-blue-600">Korutla</span>
+              <span className="font-extrabold text-lg text-[#26352D]">
+                Royal <span className="text-[#E66A32]">Korutla</span>
               </span>
-              <p className="text-xs text-slate-500 flex items-center gap-1 mt-0.5 font-medium">
-                <MapPin className="w-3.5 h-3.5 text-blue-600" /> Korutla Directory
+              <p className="text-xs text-[#647067] flex items-center gap-1 mt-0.5 font-medium">
+                <MapPin className="w-3.5 h-3.5 text-[#E66A32]" />
+                <span>Korutla Shopping &amp; Services</span>
               </p>
             </div>
             <button
               onClick={onClose}
-              className="p-2 rounded-lg bg-slate-100 text-slate-500 hover:text-slate-900 hover:bg-slate-200"
+              className="p-1.5 rounded-lg bg-[#FAF7F2] text-[#647067] hover:text-[#26352D] hover:bg-[#F4EFE7] border border-[#E8E5DF]"
+              aria-label="Close menu"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
 
           {/* Quick Links */}
-          <div className="py-5 space-y-1.5">
+          <div className="py-4 space-y-1">
             <Link
               href="/"
               onClick={onClose}
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-blue-50 text-blue-600 font-bold text-sm border border-blue-100"
+              className="flex items-center gap-2.5 px-3 py-2 rounded-lg bg-[#FFF6F0] text-[#E66A32] font-bold text-xs border border-[#F8CFBE]"
             >
-              <Home className="w-4 h-4 text-blue-600" />
+              <Home className="w-4 h-4 text-[#E66A32]" />
               <span>Home</span>
             </Link>
+
             <Link
               href="/rewards"
               onClick={onClose}
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-50 text-slate-700 hover:text-blue-600 font-medium text-sm transition-colors"
+              className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#FAF7F2] text-[#26352D] hover:text-[#E66A32] font-semibold text-xs transition-colors"
             >
-              <Award className="w-4 h-4 text-blue-600" />
-              <span>Royal Points Rewards</span>
+              <Award className="w-4 h-4 text-[#E66A32]" />
+              <span>Royal Points &amp; Rewards</span>
             </Link>
+
+            <Link
+              href="/emergency"
+              onClick={onClose}
+              className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#FFF1F2] text-[#BE123C] font-bold text-xs transition-colors"
+            >
+              <AlertCircle className="w-4 h-4 text-[#BE123C]" />
+              <span>Emergency 24/7</span>
+            </Link>
+
+            <Link
+              href="/clothing"
+              onClick={onClose}
+              className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#FAF7F2] text-[#26352D] hover:text-[#E66A32] font-medium text-xs transition-colors"
+            >
+              <Shirt className="w-4 h-4 text-[#E66A32]" />
+              <span>Clothing Stores</span>
+            </Link>
+
             <Link
               href="/food"
               onClick={onClose}
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-50 text-slate-700 hover:text-blue-600 font-medium text-sm transition-colors"
+              className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#FAF7F2] text-[#26352D] hover:text-[#E66A32] font-medium text-xs transition-colors"
             >
-              <Utensils className="w-4 h-4 text-blue-600" />
+              <Utensils className="w-4 h-4 text-[#E66A32]" />
               <span>Food &amp; Dining</span>
             </Link>
+
             <Link
-              href="/grocery"
+              href="/groceries"
               onClick={onClose}
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-50 text-slate-700 hover:text-blue-600 font-medium text-sm transition-colors"
+              className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#FAF7F2] text-[#26352D] hover:text-[#E66A32] font-medium text-xs transition-colors"
             >
-              <Store className="w-4 h-4 text-blue-600" />
+              <Store className="w-4 h-4 text-[#E66A32]" />
               <span>Groceries &amp; Marts</span>
             </Link>
-            <Link
-              href="/photography"
-              onClick={onClose}
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-50 text-slate-700 hover:text-blue-600 font-medium text-sm transition-colors"
-            >
-              <Camera className="w-4 h-4 text-blue-600" />
-              <span>Photography &amp; Studios</span>
-            </Link>
-            <Link
-              href="/shopping"
-              onClick={onClose}
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-50 text-slate-700 hover:text-blue-600 font-medium text-sm transition-colors"
-            >
-              <Shirt className="w-4 h-4 text-blue-600" />
-              <span>Shopping &amp; Apparel</span>
-            </Link>
-            <Link
-              href="/offers"
-              onClick={onClose}
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-50 text-slate-700 hover:text-blue-600 font-medium text-sm transition-colors"
-            >
-              <Tag className="w-4 h-4 text-blue-600" />
-              <span>Offers &amp; Promotions</span>
-            </Link>
+
             <Link
               href="/services"
               onClick={onClose}
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-50 text-slate-700 hover:text-blue-600 font-medium text-sm transition-colors"
+              className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#FAF7F2] text-[#26352D] hover:text-[#E66A32] font-medium text-xs transition-colors"
             >
-              <Wrench className="w-4 h-4 text-blue-600" />
+              <Wrench className="w-4 h-4 text-[#E66A32]" />
               <span>Services &amp; Repair</span>
             </Link>
-            <Link
-              href="/jobs"
-              onClick={onClose}
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-50 text-slate-700 hover:text-blue-600 font-medium text-sm transition-colors"
-            >
-              <Briefcase className="w-4 h-4 text-blue-600" />
-              <span>Local Jobs</span>
-            </Link>
-            <Link
-              href="/real-estate"
-              onClick={onClose}
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-50 text-slate-700 hover:text-blue-600 font-medium text-sm transition-colors"
-            >
-              <Building2 className="w-4 h-4 text-blue-600" />
-              <span>Real Estate &amp; Rentals</span>
-            </Link>
+
             <Link
               href="/hospitals"
               onClick={onClose}
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-50 text-slate-700 hover:text-blue-600 font-medium text-sm transition-colors"
+              className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#FAF7F2] text-[#26352D] hover:text-[#E66A32] font-medium text-xs transition-colors"
             >
-              <PhoneCall className="w-4 h-4 text-blue-600" />
+              <PhoneCall className="w-4 h-4 text-[#E66A32]" />
               <span>Hospitals &amp; Doctors</span>
             </Link>
+
             <Link
-              href="/education"
+              href="/jobs"
               onClick={onClose}
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-50 text-slate-700 hover:text-blue-600 font-medium text-sm transition-colors"
+              className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#FAF7F2] text-[#26352D] hover:text-[#E66A32] font-medium text-xs transition-colors"
             >
-              <GraduationCap className="w-4 h-4 text-blue-600" />
-              <span>Education &amp; Tuition</span>
+              <Briefcase className="w-4 h-4 text-[#E66A32]" />
+              <span>Local Jobs</span>
             </Link>
+
             <Link
-              href="/public-places"
+              href="/real-estate"
               onClick={onClose}
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-50 text-slate-700 hover:text-blue-600 font-medium text-sm transition-colors"
+              className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#FAF7F2] text-[#26352D] hover:text-[#E66A32] font-medium text-xs transition-colors"
             >
-              <TreePine className="w-4 h-4 text-blue-600" />
-              <span>Public Places &amp; Parks</span>
+              <Building2 className="w-4 h-4 text-[#E66A32]" />
+              <span>Real Estate</span>
+            </Link>
+
+            <Link
+              href="/photography"
+              onClick={onClose}
+              className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#FAF7F2] text-[#26352D] hover:text-[#E66A32] font-medium text-xs transition-colors"
+            >
+              <Camera className="w-4 h-4 text-[#E66A32]" />
+              <span>Photography &amp; Studios</span>
+            </Link>
+
+            <Link
+              href="/offers"
+              onClick={onClose}
+              className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#FAF7F2] text-[#26352D] hover:text-[#E66A32] font-medium text-xs transition-colors"
+            >
+              <Tag className="w-4 h-4 text-[#E66A32]" />
+              <span>Offers &amp; Promotions</span>
+            </Link>
+
+            <Link
+              href="/representatives"
+              onClick={onClose}
+              className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#FAF7F2] text-[#26352D] hover:text-[#E66A32] font-medium text-xs transition-colors"
+            >
+              <Users className="w-4 h-4 text-[#E66A32]" />
+              <span>Public Representatives</span>
             </Link>
           </div>
 
           {/* Categories List */}
-          <div className="pt-4 border-t border-slate-200">
-            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-3">
-              Categories
+          <div className="pt-3 border-t border-[#E8E5DF]">
+            <span className="text-[11px] font-bold text-[#647067] uppercase tracking-wider block mb-2">
+              Browse Sectors
             </span>
             <div className="space-y-1">
               {CATEGORIES.map((cat) => (
@@ -179,10 +230,10 @@ export const MobileNav: React.FC<MobileNavProps> = ({ isOpen, onClose }) => {
                   key={cat.id}
                   href={getCategoryHref(cat.slug)}
                   onClick={onClose}
-                  className="flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100 hover:text-blue-600"
+                  className="flex items-center justify-between px-3 py-1.5 rounded-lg text-xs font-medium text-[#26352D] hover:bg-[#FAF7F2] hover:text-[#E66A32] transition-colors"
                 >
                   <span>{cat.name}</span>
-                  <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
+                  <ChevronRight className="w-3.5 h-3.5 text-[#8A968D]" />
                 </Link>
               ))}
             </div>
@@ -190,9 +241,9 @@ export const MobileNav: React.FC<MobileNavProps> = ({ isOpen, onClose }) => {
         </div>
 
         {/* Footer info inside Drawer */}
-        <div className="pt-4 border-t border-slate-200 text-center text-xs text-slate-500 font-medium">
-          <p className="font-bold text-slate-900">Royal Korutla</p>
-          <p className="text-[11px] mt-0.5">Local Business &amp; Community Directory</p>
+        <div className="pt-3 border-t border-[#E8E5DF] text-center text-xs text-[#647067] font-medium">
+          <p className="font-bold text-[#26352D]">Royal Korutla</p>
+          <p className="text-[10px] mt-0.5">Town Shopping &amp; Discovery Platform</p>
         </div>
       </div>
     </div>

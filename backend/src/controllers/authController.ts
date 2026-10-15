@@ -89,12 +89,12 @@ export const loginAdmin = async (req: Request, res: Response) => {
 
       try {
         const createdUser = await prisma.user.upsert({
-          where: { email: matchedAdmin.email },
+          where: { email: cleanEmail },
           update: { passwordHash, role: 'ADMIN' },
           create: {
             id: 'admin-owner-001',
             name: 'Royal Korutla Owner (Admin)',
-            email: matchedAdmin.email,
+            email: cleanEmail,
             passwordHash,
             role: 'ADMIN',
             phone: '+91 98480 12345',

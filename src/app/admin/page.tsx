@@ -35,6 +35,8 @@ import {
   RoyalPointTransaction,
   RewardVoucher,
   UserSession,
+  ReelRequest,
+  EmergencyContact,
 } from '@/types';
 import { SafeAdminUser } from '@/lib/adminStore';
 import {
@@ -47,6 +49,7 @@ import {
   LogOut,
   Lock,
   Edit3,
+  ExternalLink,
   Trash2,
   Tag,
   Utensils,
@@ -68,6 +71,7 @@ import {
   Settings as SettingsIcon,
   Eye,
   AlertCircle,
+  AlertTriangle,
   RefreshCw,
   Camera,
   ArrowUp,
@@ -138,6 +142,7 @@ type AdminTab =
   | 'featured-businesses'
   | 'photography'
   | 'promotions'
+  | 'representatives'
   | 'offers'
   | 'food'
   | 'grocery'
@@ -156,6 +161,7 @@ type AdminTab =
   | 'subscriptions'
   | 'homepage-content'
   | 'admin-management'
+  | 'emergency'
   | 'settings';
 
 const ALL_PHOTO_TYPES: PhotographyType[] = [
@@ -277,6 +283,42 @@ export default function AdminDashboardPage() {
 
   // Stories & Reels
   const [storiesList, setStoriesList] = useState<StoryReel[]>(STORIES_REELS);
+  const [reelRequestsList, setReelRequestsList] = useState<ReelRequest[]>([]);
+  const [loadingReels, setLoadingReels] = useState(false);
+
+  const fetchReelRequests = async () => {
+    setLoadingReels(true);
+    try {
+      const res = await fetch('/api/admin/reel-requests');
+      const data = await res.json();
+      if (data.success && data.data) {
+        setReelRequestsList(data.data);
+      }
+    } catch {
+      // ignore
+    } finally {
+      setLoadingReels(false);
+    }
+  };
+
+  // Emergency Contacts State
+  const [emergencyContactsList, setEmergencyContactsList] = useState<EmergencyContact[]>([]);
+  const [loadingEmergency, setLoadingEmergency] = useState(false);
+
+  const fetchEmergencyContacts = async () => {
+    setLoadingEmergency(true);
+    try {
+      const res = await fetch('/api/admin/emergency');
+      const data = await res.json();
+      if (data.success && Array.isArray(data.data)) {
+        setEmergencyContactsList(data.data);
+      }
+    } catch {
+      // ignore
+    } finally {
+      setLoadingEmergency(false);
+    }
+  };
 
   // Settings State
   const [siteName, setSiteName] = useState('Royal Korutla Directory');
@@ -653,6 +695,8 @@ export default function AdminDashboardPage() {
     fetchPhotography();
     fetchJobs();
     fetchRewardsAdminData();
+    fetchReelRequests();
+    fetchEmergencyContacts();
   }, [router]);
 
   const showToast = (message: string, type: 'success' | 'error' = 'success') => {
@@ -1136,6 +1180,7 @@ export default function AdminDashboardPage() {
     { id: 'featured-businesses', label: 'Featured Ticker', icon: Crown },
     { id: 'photography', label: 'Photography & Studios', icon: Camera, badge: `${photographyList.length}` },
     { id: 'promotions', label: 'Promotions (Paid)', icon: Sparkles, badge: `${promotions.length}` },
+    { id: 'representatives', label: 'Public Representatives', icon: Users, badge: '35' },
     { id: 'homepage-content', label: 'Homepage Content', icon: Eye },
     { id: 'offers', label: 'Offers & Deals', icon: Tag },
     { id: 'food', label: 'Food & Menus', icon: Utensils },
@@ -1149,7 +1194,8 @@ export default function AdminDashboardPage() {
     { id: 'reviews', label: 'Reviews', icon: MessageSquare },
     { id: 'orders', label: 'Orders', icon: ShoppingCart },
     { id: 'royal-points', label: 'Royal Points', icon: Award },
-    { id: 'stories', label: 'Stories & Reels', icon: Video },
+    { id: 'stories', label: 'Instant Reels & Requests', icon: Video, badge: `${reelRequestsList.length}` },
+    { id: 'emergency', label: 'Emergency Services', icon: AlertTriangle, badge: `${emergencyContactsList.length}` },
     { id: 'payments', label: 'Payments', icon: CreditCard },
     { id: 'subscriptions', label: 'Subscriptions', icon: Zap },
   ];
@@ -1358,6 +1404,39 @@ export default function AdminDashboardPage() {
                     <p className="font-bold text-white">Homepage Banners</p>
                     <p className="text-[10px] text-slate-500">Hero slides &amp; featured order</p>
                   </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB: PUBLIC REPRESENTATIVES MANAGEMENT */}
+          {activeTab === 'representatives' && (
+            <div className="space-y-6">
+              <div className="p-6 rounded-2xl bg-white border border-slate-200 space-y-3">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FFF6F0] text-[#E66A32] text-xs font-bold border border-[#F8CFBE]">
+                  <Users className="w-3.5 h-3.5" />
+                  <span>Civic Directory &amp; Governance</span>
+                </div>
+                <h2 className="text-xl font-extrabold text-slate-900 tracking-tight">Public Representatives Management</h2>
+                <p className="text-xs text-slate-600 max-w-2xl leading-relaxed">
+                  Manage the official records for the Member of Legislative Assembly (MLA), Municipal Chairperson, and all 33 Municipal Ward Councillors. Profiles pending verification remain marked until validated.
+                </p>
+                <div className="pt-2 flex flex-wrap gap-3">
+                  <Link
+                    href="/admin/representatives"
+                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#26352D] hover:bg-[#1E2B24] text-white text-xs font-bold transition-all shadow-xs"
+                  >
+                    <span>Launch Dedicated Representative Manager</span>
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </Link>
+                  <Link
+                    href="/representatives"
+                    target="_blank"
+                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-xs font-semibold transition-all"
+                  >
+                    <span>View Public Page Live</span>
+                    <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
+                  </Link>
                 </div>
               </div>
             </div>
@@ -3015,6 +3094,282 @@ export default function AdminDashboardPage() {
                   </div>
                 </div>
               )}
+            </div>
+          )}
+
+          {/* TAB: INSTANT REELS & REQUESTS */}
+          {activeTab === 'stories' && (
+            <div className="space-y-6">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-6 rounded-2xl bg-white border border-slate-200 shadow-xs">
+                <div>
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-orange-50 border border-orange-200 text-orange-700 text-[11px] font-bold mb-2">
+                    <Video className="w-3.5 h-3.5 text-orange-600" />
+                    <span>Instant Reel Service Control</span>
+                  </div>
+                  <h2 className="text-xl font-bold text-slate-900">
+                    Business Reel Requests ({reelRequestsList.length})
+                  </h2>
+                  <p className="text-xs text-slate-500 mt-1 max-w-xl">
+                    Review incoming promotional video requests from Korutla shops, manage production follow-ups, and update fulfillment statuses.
+                  </p>
+                </div>
+                <div className="flex items-center gap-2.5">
+                  <Link
+                    href="/admin/reels"
+                    className="px-3.5 py-2 rounded-xl bg-orange-600 hover:bg-orange-700 text-white text-xs font-bold flex items-center gap-1.5 shadow-xs transition-colors"
+                  >
+                    <span>Full Reels Manager →</span>
+                  </Link>
+                  <button
+                    onClick={fetchReelRequests}
+                    disabled={loadingReels}
+                    className="px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-bold flex items-center gap-1.5"
+                  >
+                    <RefreshCw className={`w-3.5 h-3.5 ${loadingReels ? 'animate-spin text-orange-600' : ''}`} />
+                    <span>Refresh</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Reel Requests Table */}
+              <div className="overflow-x-auto rounded-2xl border border-slate-200">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-slate-50 text-slate-500 border-b border-slate-200">
+                    <tr>
+                      <th className="p-3.5">Business Name</th>
+                      <th className="p-3.5">Category</th>
+                      <th className="p-3.5">Purpose &amp; Language</th>
+                      <th className="p-3.5">Contact Number</th>
+                      <th className="p-3.5">Status</th>
+                      <th className="p-3.5">Follow-up / Notes</th>
+                      <th className="p-3.5 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {reelRequestsList.length === 0 ? (
+                      <tr>
+                        <td colSpan={7} className="p-8 text-center text-slate-500 font-medium">
+                          No reel requests submitted yet.
+                        </td>
+                      </tr>
+                    ) : (
+                      reelRequestsList.map((req) => (
+                        <tr key={req.id} className="hover:bg-slate-50">
+                          <td className="p-3.5">
+                            <span className="font-bold text-slate-900 block">{req.businessName}</span>
+                            <span className="text-[10px] text-slate-600 font-mono">#{req.id}</span>
+                          </td>
+                          <td className="p-3.5 text-slate-700 font-medium">{req.businessCategory}</td>
+                          <td className="p-3.5">
+                            <span className="font-semibold text-slate-800 block capitalize">{req.reelPurpose.replace('_', ' ')}</span>
+                            <span className="text-[10px] text-slate-600">{req.preferredLanguage}</span>
+                          </td>
+                          <td className="p-3.5">
+                            <a href={`tel:${req.contactPhone}`} className="font-bold text-orange-600 hover:underline">
+                              {req.contactPhone}
+                            </a>
+                          </td>
+                          <td className="p-3.5">
+                            <select
+                              value={req.status}
+                              onChange={async (e) => {
+                                const newSt = e.target.value;
+                                try {
+                                  const res = await fetch('/api/admin/reel-requests', {
+                                    method: 'PATCH',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ id: req.id, status: newSt }),
+                                  });
+                                  if (res.ok) {
+                                    setReelRequestsList((prev) =>
+                                      prev.map((r) => (r.id === req.id ? { ...r, status: newSt as any } : r))
+                                    );
+                                    showToast(`Status updated to ${newSt}`);
+                                  }
+                                } catch {
+                                  showToast('Failed to update status', 'error');
+                                }
+                              }}
+                              className="px-2 py-1 rounded-lg border border-slate-300 bg-white text-[11px] font-bold text-slate-800 focus:outline-none focus:border-orange-500"
+                            >
+                              <option value="PENDING">PENDING</option>
+                              <option value="CONTACTED">CONTACTED</option>
+                              <option value="SCHEDULED">SCHEDULED</option>
+                              <option value="COMPLETED">COMPLETED</option>
+                              <option value="CANCELLED">CANCELLED</option>
+                            </select>
+                          </td>
+                          <td className="p-3.5 max-w-xs text-[11px] text-slate-600">
+                            {req.followUpDate && <span className="font-bold text-purple-700 block">Shoot: {req.followUpDate}</span>}
+                            <span>{req.adminNotes || req.additionalRequirements || '—'}</span>
+                          </td>
+                          <td className="p-3.5 text-right">
+                            <button
+                              onClick={async () => {
+                                if (!confirm('Delete this request?')) return;
+                                try {
+                                  const res = await fetch(`/api/admin/reel-requests?id=${encodeURIComponent(req.id)}`, { method: 'DELETE' });
+                                  if (res.ok) {
+                                    setReelRequestsList((prev) => prev.filter((r) => r.id !== req.id));
+                                    showToast('Request deleted');
+                                  }
+                                } catch {
+                                  showToast('Failed to delete', 'error');
+                                }
+                              }}
+                              className="p-1 rounded text-slate-400 hover:text-rose-600 transition-colors"
+                              title="Delete"
+                            >
+                              <Trash2 className="w-4 h-4 inline" />
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* TAB: EMERGENCY & AMBULANCE SERVICES */}
+          {activeTab === 'emergency' && (
+            <div className="space-y-6">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-6 rounded-2xl bg-white border border-slate-200 shadow-xs">
+                <div>
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-red-50 border border-red-200 text-red-700 text-[11px] font-bold mb-2">
+                    <AlertTriangle className="w-3.5 h-3.5 text-red-600" />
+                    <span>Emergency Helplines &amp; Ambulance Dispatch</span>
+                  </div>
+                  <h2 className="text-xl font-bold text-slate-900">
+                    Emergency &amp; Ambulance Records ({emergencyContactsList.length})
+                  </h2>
+                  <p className="text-xs text-slate-500 mt-1 max-w-xl">
+                    Verify official town ambulance lines, hospital trauma casualty contacts, police stations, and fire services.
+                  </p>
+                </div>
+                <div className="flex items-center gap-2.5">
+                  <Link
+                    href="/admin/emergency"
+                    className="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-bold flex items-center gap-1.5 shadow-xs transition-colors"
+                  >
+                    <span>Dedicated Emergency Manager →</span>
+                  </Link>
+                  <button
+                    onClick={fetchEmergencyContacts}
+                    disabled={loadingEmergency}
+                    className="px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-bold flex items-center gap-1.5"
+                  >
+                    <RefreshCw className={`w-3.5 h-3.5 ${loadingEmergency ? 'animate-spin text-red-600' : ''}`} />
+                    <span>Refresh</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Emergency Contacts Table */}
+              <div className="overflow-x-auto rounded-2xl border border-slate-200">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-slate-50 text-slate-500 border-b border-slate-200">
+                    <tr>
+                      <th className="p-3.5">Provider Name</th>
+                      <th className="p-3.5">Category</th>
+                      <th className="p-3.5">Direct Helpline</th>
+                      <th className="p-3.5">Availability</th>
+                      <th className="p-3.5">Verification</th>
+                      <th className="p-3.5">Address / Landmark</th>
+                      <th className="p-3.5 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {emergencyContactsList.length === 0 ? (
+                      <tr>
+                        <td colSpan={7} className="p-8 text-center text-slate-500 font-medium">
+                          No emergency contacts configured yet.
+                        </td>
+                      </tr>
+                    ) : (
+                      emergencyContactsList.map((c) => (
+                        <tr key={c.id} className="hover:bg-slate-50">
+                          <td className="p-3.5">
+                            <span className="font-bold text-slate-900 block">{c.name}</span>
+                            <span className="text-[10px] text-slate-600 font-mono">#{c.id}</span>
+                          </td>
+                          <td className="p-3.5">
+                            <span className="px-2 py-0.5 rounded-md bg-slate-800 text-white text-[10px] font-bold uppercase">
+                              {c.category}
+                            </span>
+                          </td>
+                          <td className="p-3.5">
+                            <a href={`tel:${c.phone.replace(/[^0-9]/g, '')}`} className="font-bold text-red-600 hover:underline">
+                              {c.phone}
+                            </a>
+                          </td>
+                          <td className="p-3.5">
+                            <span className={`inline-flex items-center gap-1 font-bold ${
+                              c.available24x7 ? 'text-emerald-700' : 'text-slate-500'
+                            }`}>
+                              <Clock className="w-3 h-3" />
+                              <span>{c.timing || (c.available24x7 ? '24/7' : 'Daytime')}</span>
+                            </span>
+                          </td>
+                          <td className="p-3.5">
+                            <button
+                              onClick={async () => {
+                                const newVerified = !c.isVerified;
+                                try {
+                                  const res = await fetch('/api/admin/emergency', {
+                                    method: 'PUT',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ id: c.id, isVerified: newVerified }),
+                                  });
+                                  if (res.ok) {
+                                    setEmergencyContactsList((prev) =>
+                                      prev.map((item) => (item.id === c.id ? { ...item, isVerified: newVerified } : item))
+                                    );
+                                    showToast(`Verification: ${newVerified ? 'Verified' : 'Unverified'}`);
+                                  }
+                                } catch {
+                                  showToast('Failed to toggle verification', 'error');
+                                }
+                              }}
+                              className={`px-2 py-0.5 rounded text-[10px] font-bold border transition-colors ${
+                                c.isVerified
+                                  ? 'bg-emerald-50 text-emerald-800 border-emerald-200 hover:bg-emerald-100'
+                                  : 'bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200'
+                              }`}
+                            >
+                              {c.isVerified ? 'VERIFIED' : 'UNVERIFIED'}
+                            </button>
+                          </td>
+                          <td className="p-3.5 max-w-xs text-[11px] text-slate-600 truncate">
+                            {c.address}
+                          </td>
+                          <td className="p-3.5 text-right">
+                            <button
+                              onClick={async () => {
+                                if (!confirm('Delete this emergency record?')) return;
+                                try {
+                                  const res = await fetch(`/api/admin/emergency?id=${encodeURIComponent(c.id)}`, { method: 'DELETE' });
+                                  if (res.ok) {
+                                    setEmergencyContactsList((prev) => prev.filter((item) => item.id !== c.id));
+                                    showToast('Record deleted');
+                                  }
+                                } catch {
+                                  showToast('Failed to delete', 'error');
+                                }
+                              }}
+                              className="p-1 rounded text-slate-400 hover:text-rose-600 transition-colors"
+                              title="Delete record"
+                            >
+                              <Trash2 className="w-4 h-4 inline" />
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
           )}
 

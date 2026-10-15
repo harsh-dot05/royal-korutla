@@ -255,6 +255,10 @@ export interface EmergencyContact {
   phone: string;
   address: string;
   available24x7: boolean;
+  isVerified?: boolean;
+  notes?: string;
+  timing?: string;
+  updatedAt?: string;
 }
 
 export interface QuickFilter {
@@ -362,5 +366,53 @@ export interface PhotographyBusiness {
 export type Business = LocalBusiness;
 export type FeaturedBusiness = LocalBusiness;
 export type HomepageSlide = HeroBannerSlide;
+
+export type RepresentativeRole = 'MLA' | 'MUNICIPAL_CHAIRMAN' | 'WARD_COUNCILLOR';
+
+export interface PublicRepresentative {
+  id: string;
+  role: RepresentativeRole;
+  name: string;
+  designation: string;
+  wardNumber?: number;
+  constituency?: string;
+  areaName?: string;
+  photoUrl?: string;
+  phone?: string;
+  email?: string;
+  officeAddress?: string;
+  termPeriod?: string;
+  isVerified: boolean;
+  updatedAt: string;
+}
+
+export type ReelPurpose =
+  | 'product_promotion'
+  | 'offer'
+  | 'shop_introduction'
+  | 'event'
+  | 'other';
+
+export type ReelRequestStatus =
+  | 'PENDING'
+  | 'CONTACTED'
+  | 'SCHEDULED'
+  | 'COMPLETED'
+  | 'CANCELLED';
+
+export interface ReelRequest {
+  id: string;
+  businessName: string;
+  contactPhone: string;
+  businessCategory: string;
+  reelPurpose: ReelPurpose;
+  preferredLanguage: 'Telugu' | 'English';
+  additionalRequirements?: string;
+  status: ReelRequestStatus;
+  adminNotes?: string;
+  followUpDate?: string;
+  createdAt: string;
+  updatedAt: string;
+}
 
 

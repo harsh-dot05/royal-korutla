@@ -16,15 +16,16 @@ export const Button: React.FC<ButtonProps> = ({
   className = '',
   ...props
 }) => {
-  const baseStyles = 'inline-flex items-center justify-center font-semibold transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none rounded-xl';
+  const baseStyles =
+    'inline-flex items-center justify-center font-semibold transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-[#E66A32] focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none rounded-lg';
 
   const variants = {
-    primary: 'bg-blue-600 hover:bg-blue-700 text-white shadow-xs',
-    gold: 'bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-xs',
-    dark: 'bg-slate-900 hover:bg-slate-800 text-white font-bold shadow-xs',
-    secondary: 'bg-slate-100 hover:bg-slate-200 text-slate-900 border border-slate-200',
-    outline: 'bg-white border border-slate-200 hover:bg-slate-50 text-slate-900',
-    ghost: 'bg-transparent hover:bg-slate-100 text-slate-700 hover:text-slate-900',
+    primary: 'bg-[#E66A32] hover:bg-[#D45B25] text-white shadow-xs',
+    gold: 'bg-[#E66A32] hover:bg-[#D45B25] text-white font-bold shadow-xs',
+    dark: 'bg-[#26352D] hover:bg-[#1C2721] text-white font-bold shadow-xs',
+    secondary: 'bg-[#F0F4F1] hover:bg-[#E3EBE5] text-[#26352D] border border-[#D2DDD6]',
+    outline: 'bg-white border border-[#E8E5DF] hover:bg-[#FAF7F2] text-[#26352D]',
+    ghost: 'bg-transparent hover:bg-[#FAF7F2] text-[#26352D]',
   };
 
   const sizes = {

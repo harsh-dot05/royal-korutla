@@ -70,7 +70,7 @@ export default function FoodPage() {
       return;
     }
 
-    const orderId = `RK-FOOD-${Math.floor(1000 + Math.random() * 9000)}`;
+    const orderId = `RK-FOOD-${Date.now().toString().slice(-6)}`;
     let message = `*NEW FOOD ORDER - ROYAL KORUTLA*\n`;
     message += `Order ID: #${orderId}\n`;
     message += `Restaurant: ${restaurant.name}\n\n`;
