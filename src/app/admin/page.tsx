@@ -48,6 +48,7 @@ import {
   Plus,
   LogOut,
   Lock,
+  Clock,
   Edit3,
   ExternalLink,
   Trash2,
