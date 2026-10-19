@@ -92,7 +92,6 @@ import {
   Filter,
   Gift,
   History as HistoryIcon,
-  Clock,
 } from 'lucide-react';
 
 const JOB_CATEGORIES = [
