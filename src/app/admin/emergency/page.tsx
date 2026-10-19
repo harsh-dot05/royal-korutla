@@ -13,7 +13,6 @@ import {
   Phone,
   ShieldCheck,
   Clock,
-  MapPin,
   Trash2,
   Edit2,
   CheckCircle2,

@@ -276,12 +276,59 @@ export interface LocalStat {
   iconName: string;
 }
 
+export type PointTransactionType = 'EARNED' | 'REDEEMED';
+
+export type PointTransactionCategory =
+  | 'SIGNUP'
+  | 'REFERRAL'
+  | 'ACTIVITY'
+  | 'REDEMPTION'
+  | 'ADJUSTMENT'
+  | 'REVERSAL';
+
 export interface RoyalPointTransaction {
   id: string;
+  userId?: string;
+  userEmail?: string;
   amount: number;
-  type: 'EARNED' | 'REDEEMED';
+  type: PointTransactionType;
+  category?: PointTransactionCategory;
   reason: string;
   timestamp: string;
+  referenceId?: string;
+  createdAt?: string;
+}
+
+export type ReferralStatus = 'PENDING_QUALIFYING' | 'QUALIFIED' | 'REWARDED' | 'FLAGGED_ABUSE';
+
+export interface ReferralRecord {
+  id: string;
+  inviterUserId: string;
+  inviterName: string;
+  inviterEmail: string;
+  invitedUserId: string;
+  invitedName: string;
+  invitedEmail: string;
+  invitedPhone?: string;
+  referralCode: string;
+  status: ReferralStatus;
+  pointsAwarded: number;
+  createdAt: string;
+  qualifiedAt?: string;
+  flagReason?: string;
+}
+
+export interface ConfigurableRewardBenefit {
+  id: string;
+  title: string;
+  description: string;
+  pointsCost: number;
+  isActive: boolean;
+  minOrderValue?: number;
+  validityDays: number;
+  eligibilityRules: string[];
+  termsAndConditions: string;
+  updatedAt: string;
 }
 
 export interface RewardVoucher {
@@ -414,5 +461,118 @@ export interface ReelRequest {
   createdAt: string;
   updatedAt: string;
 }
+
+export type SubscriptionTier =
+  | 'FREE'
+  | 'SILVER_MERCHANT'
+  | 'GOLD_VERIFIED'
+  | 'PLATINUM_ROYAL';
+
+export type SubscriptionPaymentStatus = 'PAID' | 'PENDING' | 'OVERDUE';
+
+export interface BusinessSubscription {
+  plan: SubscriptionTier;
+  planName: string;
+  status: 'ACTIVE' | 'EXPIRING_SOON' | 'EXPIRED' | 'TRIAL';
+  renewalDate: string;
+  paymentStatus: SubscriptionPaymentStatus;
+  pricePerMonth: number;
+  features: string[];
+}
+
+export interface BusinessProductService {
+  id: string;
+  businessId: string;
+  name: string;
+  description: string;
+  price: number;
+  priceDisplay?: string;
+  isAvailable: boolean;
+  category: string;
+  image: string;
+  isService?: boolean;
+  isVeg?: boolean;
+  createdAt: string;
+}
+
+export interface BusinessOfferItem {
+  id: string;
+  businessId: string;
+  businessName: string;
+  title: string;
+  discount: string;
+  code?: string;
+  startDate?: string;
+  expiry: string;
+  terms?: string;
+  isActive: boolean;
+  image: string;
+  tag?: string;
+  categorySlug?: CategorySlug;
+  location?: string;
+  createdAt: string;
+}
+
+export type BusinessEnquiryStatus = 'NEW' | 'RESPONDED' | 'CLOSED';
+
+export interface BusinessEnquiry {
+  id: string;
+  businessId: string;
+  businessName?: string;
+  customerName: string;
+  customerPhone: string;
+  customerEmail?: string;
+  subject: string;
+  message: string;
+  status: BusinessEnquiryStatus;
+  responseNotes?: string;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export type BusinessOrderStatus =
+  | 'PENDING'
+  | 'ACCEPTED'
+  | 'DISPATCHED'
+  | 'COMPLETED'
+  | 'CANCELLED';
+
+export interface BusinessOrderItem {
+  itemId: string;
+  name: string;
+  quantity: number;
+  price: number;
+}
+
+export interface BusinessOrder {
+  id: string;
+  businessId: string;
+  businessName: string;
+  customerName: string;
+  customerPhone: string;
+  deliveryAddress: string;
+  landmark?: string;
+  notes?: string;
+  items: BusinessOrderItem[];
+  totalAmount: number;
+  status: BusinessOrderStatus;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface BusinessOwnerAccount {
+  id: string;
+  email: string;
+  phone: string;
+  name: string;
+  password_hash: string;
+  businessId: string;
+  businessName: string;
+  role: 'BUSINESS_OWNER';
+  isActive: boolean;
+  createdAt: string;
+}
+
+export type SafeBusinessOwnerAccount = Omit<BusinessOwnerAccount, 'password_hash'>;
 
 

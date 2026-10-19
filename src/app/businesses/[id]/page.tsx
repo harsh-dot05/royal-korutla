@@ -60,7 +60,7 @@ export default function BusinessDetailPage({ params }: { params: Promise<{ id: s
               sizes="100vw"
               className="object-cover"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/30 to-transparent" />
+            <div className="absolute inset-0 bg-slate-950/60" />
 
             <div className="absolute top-4 left-4 flex gap-2">
               {business.promotionLabel && (

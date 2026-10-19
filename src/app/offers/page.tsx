@@ -7,7 +7,12 @@ import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { FEATURED_OFFERS, PROMOTIONS as FALLBACK_PROMOTIONS, FEATURED_BUSINESSES } from '@/data/mockData';
 import { Offer, Promotion } from '@/types';
-import { Tag, Calendar, MapPin, Phone, MessageSquare, Copy, Check, Search, ArrowRight } from 'lucide-react';
+import { Tag, Calendar, MapPin, Phone, MessageSquare, Copy, Check, Search, ArrowRight, MessageCircle } from 'lucide-react';
+import {
+  getRoyalKorutlaWhatsAppUrl,
+  WHATSAPP_PREFILLED_MESSAGES,
+  ROYAL_KORUTLA_PHONE_DISPLAY,
+} from '@/config/contact';
 
 export default function OffersPage() {
   const [promotions, setPromotions] = useState<Promotion[]>([]);
@@ -323,6 +328,29 @@ export default function OffersPage() {
             )}
           </div>
         )}
+
+        {/* Merchant Promotional Enquiry Card */}
+        <div className="rounded-2xl p-6 bg-slate-50 border border-slate-200 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="space-y-1">
+            <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+              <Tag className="w-4 h-4 text-blue-700" />
+              <span>Want to Publish Deals or Festival Offers for Your Store?</span>
+            </h3>
+            <p className="text-xs text-slate-600">
+              Put your discounts in front of thousands of local residents in Korutla. Contact Royal Korutla advertising team on WhatsApp.
+            </p>
+          </div>
+          <a
+            href={getRoyalKorutlaWhatsAppUrl(WHATSAPP_PREFILLED_MESSAGES.promotionsAdvertising)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="shrink-0 inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#25D366] hover:bg-[#1EBE5D] text-white font-bold text-xs shadow-xs transition-colors"
+            aria-label={`Advertise on Royal Korutla on WhatsApp ${ROYAL_KORUTLA_PHONE_DISPLAY}`}
+          >
+            <MessageCircle className="w-4 h-4 fill-white text-[#25D366]" />
+            <span>Advertise on WhatsApp ({ROYAL_KORUTLA_PHONE_DISPLAY})</span>
+          </a>
+        </div>
       </main>
 
       <Footer />

@@ -7,6 +7,7 @@ import { Footer } from '@/components/layout/Footer';
 import { FEATURED_BUSINESSES, FOOD_MENU_ITEMS } from '@/data/mockData';
 import { FoodMenuItem, CartItem } from '@/types';
 import { Utensils, ShoppingBag, Plus, Minus, Star, MapPin, Clock, MessageSquare, X } from 'lucide-react';
+import { ROYAL_KORUTLA_WHATSAPP_NUMBER } from '@/config/contact';
 
 export default function FoodPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
@@ -91,7 +92,7 @@ export default function FoodPage() {
     message += `\nPlease confirm and prepare my order!`;
 
     const encodedMessage = encodeURIComponent(message);
-    const targetWhatsapp = restaurant.whatsapp ? restaurant.whatsapp.replace(/[^0-9]/g, '') : '919876543210';
+    const targetWhatsapp = restaurant.whatsapp ? restaurant.whatsapp.replace(/[^0-9]/g, '') : ROYAL_KORUTLA_WHATSAPP_NUMBER;
     
     window.open(`https://wa.me/${targetWhatsapp}?text=${encodedMessage}`, '_blank');
   };

@@ -22,9 +22,15 @@ import {
   Award,
   AlertCircle,
   Users,
+  MessageCircle,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { MobileNav } from './MobileNav';
+import {
+  getRoyalKorutlaWhatsAppUrl,
+  WHATSAPP_PREFILLED_MESSAGES,
+  ROYAL_KORUTLA_PHONE_DISPLAY,
+} from '@/config/contact';
 
 export const Header: React.FC = () => {
   const router = useRouter();
@@ -68,7 +74,7 @@ export const Header: React.FC = () => {
                   </span>
                 </div>
                 <div className="text-[10px] sm:text-[11px] text-[#647067] font-medium tracking-tight mt-0.5">
-                  Town Shopping &amp; Services
+                  Everything in Korutla
                 </div>
               </div>
             </Link>
@@ -142,6 +148,19 @@ export const Header: React.FC = () => {
                 <Crown className="w-4 h-4 text-[#E66A32]" />
                 <span className="hidden md:inline">Royal Points</span>
               </Link>
+
+              {/* WhatsApp Support Shortcut */}
+              <a
+                href={getRoyalKorutlaWhatsAppUrl(WHATSAPP_PREFILLED_MESSAGES.defaultSupport)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-[#FAF7F2] hover:bg-[#EAFBF0] border border-[#E8E5DF] hover:border-[#25D366] text-[#26352D] hover:text-[#1EBE5D] text-xs font-bold transition-colors"
+                title={`WhatsApp Support: ${ROYAL_KORUTLA_PHONE_DISPLAY}`}
+                aria-label={`Chat with Royal Korutla on WhatsApp ${ROYAL_KORUTLA_PHONE_DISPLAY}`}
+              >
+                <MessageCircle className="w-4 h-4 text-[#25D366]" />
+                <span className="hidden xl:inline">WhatsApp</span>
+              </a>
 
               {/* Customer Account / Sign In */}
               <Link

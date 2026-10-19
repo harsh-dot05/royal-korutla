@@ -1,7 +1,12 @@
 import React from 'react';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
-import { Shield, Lock, Eye, FileText, CheckCircle } from 'lucide-react';
+import { Shield, Lock, Eye, FileText, CheckCircle, MessageCircle } from 'lucide-react';
+import {
+  getRoyalKorutlaWhatsAppUrl,
+  WHATSAPP_PREFILLED_MESSAGES,
+  ROYAL_KORUTLA_PHONE_DISPLAY,
+} from '@/config/contact';
 
 export const metadata = {
   title: 'Privacy Policy | Royal Korutla Directory Platform',
@@ -78,7 +83,17 @@ export default function PrivacyPolicyPage() {
               4. Contact & Verification Enquiries
             </h2>
             <p>
-              If you wish to update, modify, or remove your business listing or personal account information from Royal Korutla, please contact our support team through our official WhatsApp support or admin portal.
+              If you wish to update, modify, or remove your business listing or personal account information from Royal Korutla, please contact our support team through our official WhatsApp support at{' '}
+              <a
+                href={getRoyalKorutlaWhatsAppUrl(WHATSAPP_PREFILLED_MESSAGES.customerHelp)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 font-bold text-emerald-700 hover:underline"
+              >
+                <MessageCircle className="w-3.5 h-3.5 text-[#25D366]" />
+                <span>{ROYAL_KORUTLA_PHONE_DISPLAY}</span>
+              </a>{' '}
+              or reach out via the admin portal.
             </p>
           </section>
         </div>

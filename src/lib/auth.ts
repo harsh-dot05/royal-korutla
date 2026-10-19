@@ -69,6 +69,7 @@ export function createSessionToken(session: UserSession): string {
       name: session.name,
       email: session.email,
       role: session.role,
+      businessId: session.businessId,
       exp,
       iat,
     })
@@ -94,6 +95,7 @@ export function verifySessionToken(token: string | undefined | null): UserSessio
       name?: string;
       email?: string;
       role?: UserSession['role'];
+      businessId?: string;
       exp?: number;
       iat?: number;
     };
@@ -104,9 +106,14 @@ export function verifySessionToken(token: string | undefined | null): UserSessio
       }
       return {
         id: decoded.id || 'admin-owner-001',
-        name: decoded.name || 'Royal Korutla Owner (Admin)',
+        name:
+          decoded.name ||
+          (decoded.role === 'BUSINESS_OWNER'
+            ? 'Business Owner'
+            : 'Royal Korutla Owner (Admin)'),
         email: decoded.email,
         role: decoded.role,
+        businessId: decoded.businessId,
         createdAt: decoded.iat
           ? new Date(decoded.iat * 1000).toISOString()
           : new Date().toISOString(),

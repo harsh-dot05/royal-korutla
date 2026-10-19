@@ -4,6 +4,8 @@ import React from 'react';
 import { usePathname } from 'next/navigation';
 import { MessageCircle } from 'lucide-react';
 
+import { getRoyalKorutlaWhatsAppUrl, WHATSAPP_PREFILLED_MESSAGES } from '@/config/contact';
+
 export const FloatingWhatsApp: React.FC = () => {
   const pathname = usePathname();
 
@@ -12,14 +14,7 @@ export const FloatingWhatsApp: React.FC = () => {
     return null;
   }
 
-  const rawNumber = process.env.NEXT_PUBLIC_ROYAL_KORUTLA_WHATSAPP || '';
-  const whatsappNumber = rawNumber.replace(/[^0-9]/g, '');
-  const defaultMsg = encodeURIComponent(
-    'Hi Royal Korutla! I am looking for local shops, food, services or information in Korutla.'
-  );
-  const whatsappUrl = whatsappNumber
-    ? `https://wa.me/${whatsappNumber}?text=${defaultMsg}`
-    : `https://wa.me/?text=${defaultMsg}`;
+  const whatsappUrl = getRoyalKorutlaWhatsAppUrl(WHATSAPP_PREFILLED_MESSAGES.defaultSupport);
 
   return (
     <aside aria-label="Floating WhatsApp Contact">

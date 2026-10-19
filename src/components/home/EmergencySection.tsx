@@ -10,7 +10,6 @@ import {
   AlertTriangle,
   ArrowRight,
   Info,
-  CheckCircle2,
 } from 'lucide-react';
 import { EmergencyContact } from '@/types';
 import { INITIAL_EMERGENCY_CONTACTS } from '@/lib/emergencyStore';
@@ -114,68 +113,76 @@ export const EmergencySection: React.FC = () => {
         </div>
 
         {/* Priority Verified Emergency Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {priorityContacts.map((contact) => (
-            <div
-              key={contact.id}
-              className="p-5 rounded-2xl bg-[#FAF7F2] border border-[#E8E5DF] flex flex-col justify-between gap-4 transition-all hover:border-[#26352D]"
-            >
-              <div className="space-y-2">
-                <div className="flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-1.5">
-                    <span className="px-2 py-0.5 rounded-md bg-[#26352D] text-white text-[10px] font-extrabold uppercase tracking-wide">
-                      {contact.category}
-                    </span>
-                    {contact.isVerified && (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-white border border-[#E8E5DF] text-[10px] font-bold text-[#26352D]">
-                        <ShieldCheck className="w-3 h-3 text-emerald-700" />
-                        <span>Verified Public Number</span>
+        {priorityContacts.length === 0 ? (
+          <div className="p-8 text-center bg-[#FAF7F2] rounded-2xl border border-[#E8E5DF] text-xs text-[#647067] space-y-2">
+            <AlertTriangle className="w-6 h-6 text-[#E66A32] mx-auto" />
+            <p className="font-bold text-[#26352D]">No Emergency Records Found</p>
+            <p className="text-[11px]">For immediate life-threatening assistance in Korutla, call toll-free ambulance <a href="tel:108" className="font-bold text-[#E66A32] underline">108</a> or police <a href="tel:100" className="font-bold text-[#26352D] underline">100</a>.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {priorityContacts.map((contact) => (
+              <div
+                key={contact.id}
+                className="p-5 rounded-2xl bg-[#FAF7F2] border border-[#E8E5DF] flex flex-col justify-between gap-4 transition-all hover:border-[#26352D]"
+              >
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-1.5">
+                      <span className="px-2 py-0.5 rounded-md bg-[#26352D] text-white text-[10px] font-extrabold uppercase tracking-wide">
+                        {contact.category}
                       </span>
-                    )}
+                      {contact.isVerified && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-white border border-[#E8E5DF] text-[10px] font-bold text-[#26352D]">
+                          <ShieldCheck className="w-3 h-3 text-emerald-700" />
+                          <span>Verified Public Number</span>
+                        </span>
+                      )}
+                    </div>
+
+                    <span className={`inline-flex items-center gap-1 text-[10px] font-bold ${
+                      contact.available24x7 ? 'text-emerald-800' : 'text-[#647067]'
+                    }`}>
+                      <Clock className="w-3 h-3" />
+                      <span>{contact.timing || (contact.available24x7 ? '24/7 Service' : 'Daytime Hours')}</span>
+                    </span>
                   </div>
 
-                  <span className={`inline-flex items-center gap-1 text-[10px] font-bold ${
-                    contact.available24x7 ? 'text-emerald-800' : 'text-[#647067]'
-                  }`}>
-                    <Clock className="w-3 h-3" />
-                    <span>{contact.timing || (contact.available24x7 ? '24/7 Service' : 'Daytime Hours')}</span>
-                  </span>
-                </div>
+                  <h3 className="text-base font-extrabold text-[#26352D]">
+                    {contact.name}
+                  </h3>
 
-                <h3 className="text-base font-extrabold text-[#26352D]">
-                  {contact.name}
-                </h3>
-
-                <p className="text-xs text-[#647067] flex items-center gap-1">
-                  <MapPin className="w-3.5 h-3.5 text-[#647067] shrink-0" />
-                  <span>{contact.address}</span>
-                </p>
-
-                {contact.notes && (
-                  <p className="text-[11px] text-[#647067] leading-relaxed pt-1">
-                    {contact.notes}
+                  <p className="text-xs text-[#647067] flex items-center gap-1">
+                    <MapPin className="w-3.5 h-3.5 text-[#647067] shrink-0" />
+                    <span>{contact.address}</span>
                   </p>
-                )}
-              </div>
 
-              {/* Call Action Button */}
-              <div className="pt-2 border-t border-[#E8E5DF] flex items-center justify-between gap-3">
-                <div className="text-xs">
-                  <span className="text-[#647067] block text-[10px]">Helpline / Direct Line:</span>
-                  <strong className="text-sm font-black text-[#26352D]">{contact.phone}</strong>
+                  {contact.notes && (
+                    <p className="text-[11px] text-[#647067] leading-relaxed pt-1">
+                      {contact.notes}
+                    </p>
+                  )}
                 </div>
 
-                <a
-                  href={`tel:${contact.phone.replace(/[^0-9]/g, '')}`}
-                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#E66A32] hover:bg-[#D45B25] text-white text-xs font-bold shadow-xs transition-colors shrink-0"
-                >
-                  <Phone className="w-3.5 h-3.5" />
-                  <span>Call Now</span>
-                </a>
+                {/* Call Action Button */}
+                <div className="pt-2 border-t border-[#E8E5DF] flex items-center justify-between gap-3">
+                  <div className="text-xs">
+                    <span className="text-[#647067] block text-[10px]">Helpline / Direct Line:</span>
+                    <strong className="text-sm font-black text-[#26352D]">{contact.phone}</strong>
+                  </div>
+
+                  <a
+                    href={`tel:${contact.phone.replace(/[^0-9]/g, '')}`}
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#E66A32] hover:bg-[#D45B25] text-white text-xs font-bold shadow-xs transition-colors shrink-0"
+                  >
+                    <Phone className="w-3.5 h-3.5" />
+                    <span>Call Now</span>
+                  </a>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
 
         {/* Clear Emergency Guidance Notice */}
         <div className="p-4 rounded-2xl bg-[#FAF7F2] border border-[#E8E5DF] flex items-start gap-3">

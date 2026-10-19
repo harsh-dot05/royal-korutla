@@ -38,18 +38,6 @@ export const INITIAL_EMERGENCY_CONTACTS: EmergencyContact[] = [
     updatedAt: new Date().toISOString(),
   },
   {
-    id: 'em-hosp-lifecare',
-    name: 'Korutla LifeCare Hospital Emergency ICU',
-    category: 'Hospital',
-    phone: '08725-252300',
-    address: 'Metpally Highway Road, Near Govt College, Korutla',
-    available24x7: true,
-    isVerified: true,
-    timing: '24x7 Emergency ICU & Ambulance',
-    notes: 'Emergency critical care, ventilator ICU, trauma support, digital diagnostics, and on-call ambulance.',
-    updatedAt: new Date().toISOString(),
-  },
-  {
     id: 'em-police',
     name: 'Korutla Town Police Station',
     category: 'Police',

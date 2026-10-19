@@ -1,23 +1,29 @@
 import { NextResponse } from 'next/server';
+import { recordOrder } from '@/lib/businessDataStore';
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
 
-    const orderId = `RK-ORD-${Math.floor(100000 + Math.random() * 900000)}`;
+    const newOrder = recordOrder({
+      businessId: body.businessId || 'biz-1',
+      businessName: body.businessName || 'Royal Paradise Multi-Cuisine Restaurant',
+      customerName: body.customerName || 'Guest Customer',
+      customerPhone: body.customerPhone || '+91 99632 61741',
+      deliveryAddress: body.deliveryAddress || 'Korutla Town',
+      landmark: body.landmark,
+      notes: body.notes,
+      items: body.items || [],
+      totalAmount: Number(body.totalAmount) || 0,
+      status: 'PENDING',
+    });
 
     return NextResponse.json({
       success: true,
-      data: {
-        orderId,
-        customerName: body.customerName,
-        totalAmount: body.totalAmount,
-        status: 'WHATSAPP_DISPATCHED',
-        createdAt: new Date().toISOString(),
-      },
+      data: newOrder,
       message: 'Order logged successfully',
     });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       {
         success: false,

@@ -37,6 +37,8 @@ import {
   UserSession,
   ReelRequest,
   EmergencyContact,
+  ReferralRecord,
+  ConfigurableRewardBenefit,
 } from '@/types';
 import { SafeAdminUser } from '@/lib/adminStore';
 import {
@@ -90,6 +92,7 @@ import {
   Filter,
   Gift,
   History as HistoryIcon,
+  Clock,
 } from 'lucide-react';
 
 const JOB_CATEGORIES = [
@@ -383,15 +386,25 @@ export default function AdminDashboardPage() {
     summary: { balance: number; earned: number; spent: number; equivalentRupees: string };
     transactions: RoyalPointTransaction[];
     vouchers: RewardVoucher[];
+    referrals: ReferralRecord[];
+    configuredBenefit: ConfigurableRewardBenefit | null;
   }>({
-    summary: { balance: 800, earned: 1300, spent: 500, equivalentRupees: '8.00' },
+    summary: { balance: 1300, earned: 1800, spent: 500, equivalentRupees: '13.00' },
     transactions: [],
     vouchers: [],
+    referrals: [],
+    configuredBenefit: null,
   });
 
   const [adjAmount, setAdjAmount] = useState('');
   const [adjType, setAdjType] = useState<'EARNED' | 'REDEEMED'>('EARNED');
   const [adjReason, setAdjReason] = useState('');
+
+  // 5,000-Point Benefit Config State
+  const [benefitTitle, setBenefitTitle] = useState('30-Day Royal Free Town Delivery Pass');
+  const [benefitCost, setBenefitCost] = useState('5000');
+  const [benefitIsActive, setBenefitIsActive] = useState(true);
+  const [benefitMinOrder, setBenefitMinOrder] = useState('199');
 
   const [vTitle, setVTitle] = useState('');
   const [vBusiness, setVBusiness] = useState('');
@@ -410,10 +423,84 @@ export default function AdminDashboardPage() {
           summary: data.summary,
           transactions: data.transactions || [],
           vouchers: data.vouchers || [],
+          referrals: data.referrals || [],
+          configuredBenefit: data.configuredBenefit || null,
         });
+        if (data.configuredBenefit) {
+          setBenefitTitle(data.configuredBenefit.title);
+          setBenefitCost(String(data.configuredBenefit.pointsCost));
+          setBenefitIsActive(Boolean(data.configuredBenefit.isActive));
+          setBenefitMinOrder(String(data.configuredBenefit.minOrderValue || '199'));
+        }
       }
     } catch (err) {
       console.error('Failed to fetch rewards admin data', err);
+    }
+  };
+
+  const handleQualifyReferral = async (referralId: string) => {
+    try {
+      const res = await fetch('/api/admin/rewards', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'qualify_referral', referralId }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast(data.message);
+        fetchRewardsAdminData();
+      } else {
+        showToast(data.message || 'Failed to qualify referral', 'error');
+      }
+    } catch {
+      showToast('Error qualifying referral', 'error');
+    }
+  };
+
+  const handleFlagReferral = async (referralId: string) => {
+    const reason = prompt('Enter suspicion / abuse reason to flag this referral:');
+    if (!reason) return;
+    try {
+      const res = await fetch('/api/admin/rewards', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'flag_referral', referralId, reason }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast('Referral marked as FLAGGED_ABUSE');
+        fetchRewardsAdminData();
+      } else {
+        showToast(data.message || 'Failed to flag referral', 'error');
+      }
+    } catch {
+      showToast('Error flagging referral', 'error');
+    }
+  };
+
+  const handleSaveBenefitConfig = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const res = await fetch('/api/admin/rewards', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'update_benefit',
+          title: benefitTitle,
+          pointsCost: Number(benefitCost),
+          isActive: benefitIsActive,
+          minOrderValue: Number(benefitMinOrder),
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast('Benefit configuration updated successfully!');
+        fetchRewardsAdminData();
+      } else {
+        showToast(data.message || 'Failed to update benefit', 'error');
+      }
+    } catch {
+      showToast('Error saving benefit configuration', 'error');
     }
   };
 
@@ -3709,6 +3796,176 @@ export default function AdminDashboardPage() {
                       ))}
                     </div>
                   </div>
+                </div>
+              </div>
+
+              {/* 5,000-Point Benefit Configuration */}
+              <div className="p-6 bg-white rounded-2xl border border-slate-200 space-y-4">
+                <div className="flex items-center justify-between pb-3 border-b border-slate-200">
+                  <div>
+                    <h4 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                      <Zap className="w-4 h-4 text-orange-600" />
+                      <span>Configurable 5,000-Point Delivery Benefit</span>
+                    </h4>
+                    <p className="text-xs text-slate-500">
+                      Configure points cost, active status, and eligibility threshold for the platform free town delivery pass.
+                    </p>
+                  </div>
+                  <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${
+                    benefitIsActive ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-600'
+                  }`}>
+                    {benefitIsActive ? 'ACTIVE BENEFIT' : 'DISABLED'}
+                  </span>
+                </div>
+
+                <form onSubmit={handleSaveBenefitConfig} className="grid grid-cols-1 sm:grid-cols-4 gap-4 text-xs">
+                  <div className="sm:col-span-2 space-y-1">
+                    <label className="font-bold text-slate-700">Benefit Title</label>
+                    <input
+                      type="text"
+                      required
+                      value={benefitTitle}
+                      onChange={(e) => setBenefitTitle(e.target.value)}
+                      className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-semibold focus:outline-none"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="font-bold text-slate-700">Points Cost (Pts)</label>
+                    <input
+                      type="number"
+                      required
+                      value={benefitCost}
+                      onChange={(e) => setBenefitCost(e.target.value)}
+                      className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-semibold focus:outline-none"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="font-bold text-slate-700">Min Cart Value (₹)</label>
+                    <input
+                      type="number"
+                      value={benefitMinOrder}
+                      onChange={(e) => setBenefitMinOrder(e.target.value)}
+                      className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-semibold focus:outline-none"
+                    />
+                  </div>
+
+                  <div className="sm:col-span-4 flex items-center justify-between pt-2 border-t border-slate-100">
+                    <label className="flex items-center gap-2 cursor-pointer font-bold text-slate-700">
+                      <input
+                        type="checkbox"
+                        checked={benefitIsActive}
+                        onChange={(e) => setBenefitIsActive(e.target.checked)}
+                        className="w-4 h-4 rounded text-orange-600"
+                      />
+                      <span>Enable benefit for customer redemption on /rewards page</span>
+                    </label>
+
+                    <button
+                      type="submit"
+                      className="px-5 py-2 rounded-xl bg-slate-900 hover:bg-black text-white font-bold transition-colors"
+                    >
+                      Save Benefit Configuration
+                    </button>
+                  </div>
+                </form>
+              </div>
+
+              {/* Referrals Audit & Anti-Abuse Review Panel */}
+              <div className="p-6 bg-white rounded-2xl border border-slate-200 space-y-4">
+                <div className="flex items-center justify-between pb-3 border-b border-slate-200">
+                  <div>
+                    <h4 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                      <Users className="w-4 h-4 text-purple-600" />
+                      <span>Referral Program Audit &amp; Abuse Prevention ({rewardsAdminData.referrals.length})</span>
+                    </h4>
+                    <p className="text-xs text-slate-500">
+                      Audit who invited whom, approve qualifying orders (+500 Pts each), and review suspicious self-referral attempts.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="overflow-x-auto rounded-xl border border-slate-200">
+                  <table className="w-full text-left text-xs">
+                    <thead className="bg-slate-50 text-slate-600 border-b border-slate-200">
+                      <tr>
+                        <th className="p-3">Inviter</th>
+                        <th className="p-3">Invited User</th>
+                        <th className="p-3">Referral Code</th>
+                        <th className="p-3">Status</th>
+                        <th className="p-3">Notes / Flag Reason</th>
+                        <th className="p-3 text-right">Audit Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {rewardsAdminData.referrals.length === 0 ? (
+                        <tr>
+                          <td colSpan={6} className="p-6 text-center text-slate-500">
+                            No referral records registered.
+                          </td>
+                        </tr>
+                      ) : (
+                        rewardsAdminData.referrals.map((ref) => (
+                          <tr key={ref.id} className="hover:bg-slate-50">
+                            <td className="p-3">
+                              <span className="font-bold text-slate-900 block">{ref.inviterName}</span>
+                              <span className="text-[10px] text-slate-500 font-mono">{ref.inviterEmail}</span>
+                            </td>
+                            <td className="p-3">
+                              <span className="font-bold text-slate-900 block">{ref.invitedName}</span>
+                              <span className="text-[10px] text-slate-500 font-mono">{ref.invitedEmail}</span>
+                            </td>
+                            <td className="p-3 font-mono font-bold text-slate-800">{ref.referralCode}</td>
+                            <td className="p-3">
+                              <span className={`px-2 py-0.5 rounded-md text-[10px] font-black uppercase ${
+                                ref.status === 'REWARDED'
+                                  ? 'bg-emerald-100 text-emerald-800'
+                                  : ref.status === 'FLAGGED_ABUSE'
+                                  ? 'bg-rose-100 text-rose-800'
+                                  : 'bg-amber-100 text-amber-800'
+                              }`}>
+                                {ref.status}
+                              </span>
+                            </td>
+                            <td className="p-3 max-w-xs text-[11px] text-slate-600">
+                              {ref.flagReason ? (
+                                <span className="text-rose-700 font-semibold">{ref.flagReason}</span>
+                              ) : ref.status === 'REWARDED' ? (
+                                <span className="text-emerald-700 font-semibold">Awarded +500 Pts to both</span>
+                              ) : (
+                                <span>Awaiting qualifying order</span>
+                              )}
+                            </td>
+                            <td className="p-3 text-right space-x-2">
+                              {ref.status === 'PENDING_QUALIFYING' && (
+                                <>
+                                  <button
+                                    onClick={() => handleQualifyReferral(ref.id)}
+                                    className="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px]"
+                                  >
+                                    Approve &amp; Reward
+                                  </button>
+                                  <button
+                                    onClick={() => handleFlagReferral(ref.id)}
+                                    className="px-2.5 py-1 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold text-[10px]"
+                                  >
+                                    Flag Abuse
+                                  </button>
+                                </>
+                              )}
+                              {ref.status === 'FLAGGED_ABUSE' && (
+                                <span className="text-rose-600 text-[10px] font-bold">Blocked</span>
+                              )}
+                              {ref.status === 'REWARDED' && (
+                                <span className="text-emerald-600 text-[10px] font-bold">Completed</span>
+                              )}
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
                 </div>
               </div>
             </div>

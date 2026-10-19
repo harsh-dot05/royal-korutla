@@ -22,7 +22,10 @@ export const MobileBottomNav: React.FC = () => {
   ];
 
   return (
-    <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-[#E8E5DF] px-2 py-1.5 shadow-md">
+    <nav
+      aria-label="Mobile Navigation"
+      className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-[#E8E5DF] px-2 pt-1.5 pb-[max(0.375rem,env(safe-area-inset-bottom))] shadow-lg isolate"
+    >
       <div className="flex items-center justify-around max-w-md mx-auto">
         {navItems.map((item) => {
           const Icon = item.icon;
@@ -44,6 +47,6 @@ export const MobileBottomNav: React.FC = () => {
           );
         })}
       </div>
-    </div>
+    </nav>
   );
 };

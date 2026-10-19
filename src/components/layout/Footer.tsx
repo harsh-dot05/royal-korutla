@@ -2,17 +2,15 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Crown, MapPin, MessageCircle, Heart, Shield } from 'lucide-react';
+import { Crown, MapPin, MessageCircle, Heart, Shield, Phone } from 'lucide-react';
+import {
+  getRoyalKorutlaWhatsAppUrl,
+  WHATSAPP_PREFILLED_MESSAGES,
+  ROYAL_KORUTLA_PHONE_DISPLAY,
+} from '@/config/contact';
 
 export const Footer: React.FC = () => {
-  const rawNumber = process.env.NEXT_PUBLIC_ROYAL_KORUTLA_WHATSAPP || '';
-  const whatsappNumber = rawNumber.replace(/[^0-9]/g, '');
-  const defaultMsg = encodeURIComponent(
-    'Hi Royal Korutla! I have an inquiry about local shops, services, or platform information in Korutla.'
-  );
-  const whatsappUrl = whatsappNumber
-    ? `https://wa.me/${whatsappNumber}?text=${defaultMsg}`
-    : `https://wa.me/?text=${defaultMsg}`;
+  const whatsappUrl = getRoyalKorutlaWhatsAppUrl(WHATSAPP_PREFILLED_MESSAGES.footerSupport);
 
   return (
     <footer className="bg-white border-t border-[#E8E5DF] text-[#647067] pt-10 pb-8 mt-12">
@@ -30,7 +28,7 @@ export const Footer: React.FC = () => {
             </div>
 
             <p className="text-xs text-[#647067] leading-relaxed font-normal max-w-sm">
-              Korutla’s dedicated town shopping &amp; discovery platform connecting residents with local shops, food outlets, hospitals, services, real estate, and job opportunities.
+              Korutla’s dedicated platform for everything in Korutla — connecting residents with local shops, food outlets, hospitals, services, real estate, and job opportunities.
             </p>
 
             <div className="flex items-center gap-2 text-xs text-[#26352D] font-medium">
@@ -38,17 +36,24 @@ export const Footer: React.FC = () => {
               <span>Korutla, Jagtial District, Telangana - 505326</span>
             </div>
 
-            <div className="pt-1">
+            <div className="pt-1 flex flex-wrap items-center gap-2">
               <a
                 href={whatsappUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-[#FAF7F2] hover:bg-[#FFF6F0] text-[#26352D] hover:text-[#E66A32] border border-[#E8E5DF] hover:border-[#F8CFBE] text-xs font-bold transition-all focus:outline-none"
-                aria-label="Contact Royal Korutla Support on WhatsApp"
+                aria-label={`Contact Royal Korutla Support on WhatsApp ${ROYAL_KORUTLA_PHONE_DISPLAY}`}
               >
-                <MessageCircle className="w-4 h-4 text-[#E66A32]" />
-                <span>WhatsApp Support</span>
+                <MessageCircle className="w-4 h-4 text-[#25D366]" />
+                <span>WhatsApp: {ROYAL_KORUTLA_PHONE_DISPLAY}</span>
               </a>
+              <Link
+                href="/contact"
+                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white hover:bg-[#FAF7F2] text-[#647067] hover:text-[#26352D] border border-[#E8E5DF] text-xs font-semibold transition-colors"
+              >
+                <Phone className="w-3.5 h-3.5 text-[#E66A32]" />
+                <span>Contact Page</span>
+              </Link>
             </div>
           </div>
 
@@ -162,8 +167,18 @@ export const Footer: React.FC = () => {
                 </Link>
               </li>
               <li>
+                <Link href="/contact" className="hover:text-[#E66A32] transition-colors">
+                  Contact &amp; WhatsApp Support
+                </Link>
+              </li>
+              <li>
                 <Link href="/terms" className="hover:text-[#E66A32] transition-colors">
                   Terms &amp; Conditions
+                </Link>
+              </li>
+              <li>
+                <Link href="/business/login" className="hover:text-[#E66A32] font-semibold transition-colors">
+                  Merchant / Business Login
                 </Link>
               </li>
             </ul>

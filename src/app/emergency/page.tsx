@@ -13,11 +13,6 @@ import {
   Search,
   Filter,
   Info,
-  CheckCircle2,
-  HeartPulse,
-  Flame,
-  Shield,
-  Building,
   RefreshCw,
 } from 'lucide-react';
 import { EmergencyContact } from '@/types';

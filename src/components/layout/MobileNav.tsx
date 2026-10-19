@@ -21,8 +21,15 @@ import {
   AlertCircle,
   Building2,
   Users,
+  MessageCircle,
+  Phone,
 } from 'lucide-react';
 import { CATEGORIES } from '../../data/mockData';
+import {
+  getRoyalKorutlaWhatsAppUrl,
+  WHATSAPP_PREFILLED_MESSAGES,
+  ROYAL_KORUTLA_PHONE_DISPLAY,
+} from '@/config/contact';
 
 interface MobileNavProps {
   isOpen: boolean;
@@ -87,7 +94,7 @@ export const MobileNav: React.FC<MobileNavProps> = ({ isOpen, onClose }) => {
               </span>
               <p className="text-xs text-[#647067] flex items-center gap-1 mt-0.5 font-medium">
                 <MapPin className="w-3.5 h-3.5 text-[#E66A32]" />
-                <span>Korutla Shopping &amp; Services</span>
+                <span>Everything in Korutla</span>
               </p>
             </div>
             <button
@@ -217,6 +224,15 @@ export const MobileNav: React.FC<MobileNavProps> = ({ isOpen, onClose }) => {
               <Users className="w-4 h-4 text-[#E66A32]" />
               <span>Public Representatives</span>
             </Link>
+
+            <Link
+              href="/contact"
+              onClick={onClose}
+              className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#FAF7F2] text-[#26352D] hover:text-[#E66A32] font-medium text-xs transition-colors"
+            >
+              <Phone className="w-4 h-4 text-[#E66A32]" />
+              <span>Contact &amp; WhatsApp Support</span>
+            </Link>
           </div>
 
           {/* Categories List */}
@@ -241,9 +257,18 @@ export const MobileNav: React.FC<MobileNavProps> = ({ isOpen, onClose }) => {
         </div>
 
         {/* Footer info inside Drawer */}
-        <div className="pt-3 border-t border-[#E8E5DF] text-center text-xs text-[#647067] font-medium">
+        <div className="pt-3 border-t border-[#E8E5DF] text-center text-xs text-[#647067] font-medium space-y-2">
+          <a
+            href={getRoyalKorutlaWhatsAppUrl(WHATSAPP_PREFILLED_MESSAGES.defaultSupport)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full py-2.5 px-3 rounded-xl bg-[#25D366] hover:bg-[#1EBE5D] text-white font-bold text-xs flex items-center justify-center gap-2 transition-colors shadow-xs"
+          >
+            <MessageCircle className="w-4 h-4 fill-white text-[#25D366]" />
+            <span>WhatsApp Support: {ROYAL_KORUTLA_PHONE_DISPLAY}</span>
+          </a>
           <p className="font-bold text-[#26352D]">Royal Korutla</p>
-          <p className="text-[10px] mt-0.5">Town Shopping &amp; Discovery Platform</p>
+          <p className="text-[10px] mt-0.5">Everything in Korutla</p>
         </div>
       </div>
     </div>

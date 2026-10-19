@@ -23,7 +23,7 @@ export const Hero: React.FC = () => {
         <div className="text-center max-w-3xl mx-auto">
           {/* Local Directory Badge */}
           <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#FFF6F0] border border-[#F8CFBE] text-[#E66A32] text-xs sm:text-sm font-bold mb-3">
-            <span>Korutla Local Shopping &amp; Services</span>
+            <span>Everything in Korutla</span>
           </div>
 
           {/* Main Hero Heading (<10 words) */}

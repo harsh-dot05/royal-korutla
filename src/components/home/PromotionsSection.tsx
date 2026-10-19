@@ -6,7 +6,12 @@ import Image from 'next/image';
 import { SectionHeader } from '../common/SectionHeader';
 import { Promotion } from '@/types';
 import { PROMOTIONS as FALLBACK_PROMOTIONS, FEATURED_BUSINESSES } from '@/data/mockData';
-import { Calendar, Tag, MapPin, Phone, MessageSquare, ArrowRight } from 'lucide-react';
+import { Calendar, Tag, MapPin, Phone, MessageSquare, ArrowRight, MessageCircle } from 'lucide-react';
+import {
+  getRoyalKorutlaWhatsAppUrl,
+  WHATSAPP_PREFILLED_MESSAGES,
+  ROYAL_KORUTLA_PHONE_DISPLAY,
+} from '@/config/contact';
 
 export const PromotionsSection: React.FC = () => {
   const [promotions, setPromotions] = useState<Promotion[]>([]);
@@ -184,6 +189,29 @@ export const PromotionsSection: React.FC = () => {
           })}
         </div>
       )}
+
+      {/* Merchant Promotional Enquiry Card */}
+      <div className="mt-8 p-5 sm:p-6 rounded-2xl bg-white border border-[#E8E5DF] shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="space-y-1">
+          <h3 className="text-sm sm:text-base font-bold text-[#26352D] flex items-center gap-2">
+            <Tag className="w-4 h-4 text-[#E66A32]" />
+            <span>Are you a Korutla Business Owner? Feature Your Promotions Here</span>
+          </h3>
+          <p className="text-xs text-[#647067]">
+            Reach verified local shoppers across Korutla. Publish your festival campaigns and digital store banners on Royal Korutla.
+          </p>
+        </div>
+        <a
+          href={getRoyalKorutlaWhatsAppUrl(WHATSAPP_PREFILLED_MESSAGES.promotionsAdvertising)}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="shrink-0 inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#25D366] hover:bg-[#1EBE5D] text-white font-bold text-xs shadow-xs transition-colors"
+          aria-label={`Enquire for Store Promotion on WhatsApp ${ROYAL_KORUTLA_PHONE_DISPLAY}`}
+        >
+          <MessageCircle className="w-4 h-4 fill-white text-[#25D366]" />
+          <span>Enquire on WhatsApp ({ROYAL_KORUTLA_PHONE_DISPLAY})</span>
+        </a>
+      </div>
     </section>
   );
 };

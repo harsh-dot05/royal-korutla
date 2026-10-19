@@ -18,8 +18,14 @@ import {
   Globe2,
   CalendarCheck,
   TrendingUp,
+  MessageCircle,
 } from 'lucide-react';
 import { ReelPurpose } from '@/types';
+import {
+  getRoyalKorutlaWhatsAppUrl,
+  WHATSAPP_PREFILLED_MESSAGES,
+  ROYAL_KORUTLA_PHONE_DISPLAY,
+} from '@/config/contact';
 
 const CATEGORY_OPTIONS = [
   'Food & Dining / Restaurants',
@@ -184,7 +190,7 @@ export const InstantReelSection: React.FC = () => {
               </div>
 
               {/* CTA and Disclaimer */}
-              <div className="pt-2 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
                 <button
                   type="button"
                   id="request-reel-btn"
@@ -195,10 +201,30 @@ export const InstantReelSection: React.FC = () => {
                   <span>Request a Reel</span>
                 </button>
 
-                <p className="text-[11px] text-[#647067] leading-snug">
-                  <span className="font-semibold text-[#26352D]">Transparent Process:</span> Request online and our coordinator will confirm your shoot schedule within 1–2 business days.
-                </p>
+                <a
+                  href={getRoyalKorutlaWhatsAppUrl(WHATSAPP_PREFILLED_MESSAGES.instantReel)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl bg-[#25D366] hover:bg-[#1EBE5D] text-white font-bold text-sm shadow-md transition-all transform active:scale-[0.98]"
+                  aria-label={`Enquire for Instant Reel on WhatsApp ${ROYAL_KORUTLA_PHONE_DISPLAY}`}
+                >
+                  <MessageCircle className="w-4 h-4 fill-white text-[#25D366]" />
+                  <span>Enquire on WhatsApp</span>
+                </a>
               </div>
+
+              <p className="text-[11px] text-[#647067] leading-snug">
+                <span className="font-semibold text-[#26352D]">Direct WhatsApp Helpline:</span> Chat with our video production team at{' '}
+                <a
+                  href={getRoyalKorutlaWhatsAppUrl(WHATSAPP_PREFILLED_MESSAGES.instantReel)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-bold text-[#25D366] hover:underline"
+                >
+                  {ROYAL_KORUTLA_PHONE_DISPLAY}
+                </a>{' '}
+                for packages and shoot dates.
+              </p>
             </div>
 
             {/* Right Column: Promotional Visual with 3D Depth Card */}
@@ -234,8 +260,8 @@ export const InstantReelSection: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Bottom Caption Overlay */}
-                  <div className="absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-[#16201A] via-[#16201A]/80 to-transparent text-white z-10">
+                  {/* Bottom Caption Overlay (solid scrim, no gradient) */}
+                  <div className="absolute bottom-0 inset-x-0 p-4 bg-[#16201A]/95 text-white z-10">
                     <div className="flex items-center gap-2 mb-1">
                       <span className="text-[11px] font-extrabold text-[#E66A32]">@RoyalParadiseKorutla</span>
                       <span className="text-[10px] text-white/70">• Sponsored</span>
@@ -339,13 +365,27 @@ export const InstantReelSection: React.FC = () => {
                     Our local video coordinator will call your provided number to understand your shop requirements, timing, and discuss the shoot schedule.
                   </p>
 
-                  <button
-                    type="button"
-                    onClick={handleCloseModal}
-                    className="w-full py-2.5 rounded-xl bg-[#26352D] hover:bg-[#1C2721] text-white text-xs font-bold transition-colors"
-                  >
-                    Done
-                  </button>
+                  <div className="space-y-2 pt-1">
+                    <a
+                      href={getRoyalKorutlaWhatsAppUrl(
+                        `Hi Royal Korutla! I have submitted Instant Reel request ${successData.id} for ${successData.businessName}. Looking forward to discussing our video shoot.`
+                      )}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full py-2.5 rounded-xl bg-[#25D366] hover:bg-[#1EBE5D] text-white text-xs font-bold transition-colors flex items-center justify-center gap-2 shadow-xs"
+                    >
+                      <MessageCircle className="w-4 h-4 fill-white text-[#25D366]" />
+                      <span>Chat on WhatsApp: {ROYAL_KORUTLA_PHONE_DISPLAY}</span>
+                    </a>
+
+                    <button
+                      type="button"
+                      onClick={handleCloseModal}
+                      className="w-full py-2.5 rounded-xl bg-[#26352D] hover:bg-[#1C2721] text-white text-xs font-bold transition-colors"
+                    >
+                      Done
+                    </button>
+                  </div>
                 </div>
               ) : (
                 /* Request Form */
