@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
+import { getActiveBanners } from '@/lib/heroBannersStore';
 import {
-  HERO_SLIDES,
   TODAY_ITEMS,
   FEATURED_BUSINESSES,
   FEATURED_OFFERS,
@@ -13,7 +13,7 @@ export async function GET() {
     return NextResponse.json({
       success: true,
       data: {
-        slider: HERO_SLIDES,
+        slider: getActiveBanners(),
         todayInKorutla: TODAY_ITEMS,
         featuredBusinesses: FEATURED_BUSINESSES,
         offers: FEATURED_OFFERS,

@@ -112,11 +112,16 @@ export interface HeroBannerSlide {
   title: string;
   subtitle: string;
   image: string;
+  mobileImage?: string;
   badgeText: string;
   badgeColor?: string;
   ctaText: string;
   ctaLink: string;
   businessId?: string;
+  isActive?: boolean;
+  order?: number;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface TodayItem {

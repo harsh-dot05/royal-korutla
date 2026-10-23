@@ -42,8 +42,10 @@ import {
   Category,
   BusinessEnquiry,
   PublicRepresentative,
+  HeroBannerSlide,
 } from '@/types';
 import { SafeAdminUser } from '@/lib/adminStore';
+import { PRESET_HERO_IMAGES } from '@/lib/heroBannersStore';
 import {
   Shield,
   Sparkles,
@@ -95,6 +97,11 @@ import {
   Filter,
   Gift,
   History as HistoryIcon,
+  Image as ImageIcon,
+  Upload,
+  Smartphone,
+  Monitor,
+  EyeOff,
 } from 'lucide-react';
 
 const JOB_CATEGORIES = [
@@ -141,6 +148,7 @@ const JOB_BADGE_COLORS = [
 
 type AdminTab =
   | 'dashboard'
+  | 'hero-banners'
   | 'categories'
   | 'enquiries'
   | 'businesses'
@@ -246,6 +254,22 @@ export default function AdminDashboardPage() {
   const [newSlideCtaText, setNewSlideCtaText] = useState('Explore Deals');
   const [newSlideCtaLink, setNewSlideCtaLink] = useState('/offers');
   const [newSlideBg, setNewSlideBg] = useState('https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=1200&auto=format&fit=crop&q=80');
+
+  // Hero Banners (Dedicated Management) State
+  const [heroBannersList, setHeroBannersList] = useState<HeroBannerSlide[]>([]);
+  const [loadingHeroBanners, setLoadingHeroBanners] = useState(false);
+  const [editingBanner, setEditingBanner] = useState<HeroBannerSlide | null>(null);
+  const [bannerTitle, setBannerTitle] = useState('');
+  const [bannerSubtitle, setBannerSubtitle] = useState('');
+  const [bannerImage, setBannerImage] = useState('https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?w=1600&auto=format&fit=crop&q=85');
+  const [bannerMobileImage, setBannerMobileImage] = useState('');
+  const [bannerCtaText, setBannerCtaText] = useState('Explore Stores');
+  const [bannerCtaLink, setBannerCtaLink] = useState('/clothing');
+  const [bannerBadgeText, setBannerBadgeText] = useState('LOCAL SHOPPING');
+  const [bannerBadgeColor, setBannerBadgeColor] = useState('bg-[#E66A32]');
+  const [bannerIsActive, setBannerIsActive] = useState(true);
+  const [uploadingBannerImage, setUploadingBannerImage] = useState(false);
+  const [cropPreviewMode, setCropPreviewMode] = useState<'desktop' | 'mobile'>('desktop');
 
   // Offers State
   const [offers, setOffers] = useState<Offer[]>(FEATURED_OFFERS);
@@ -555,6 +579,25 @@ export default function AdminDashboardPage() {
       console.error('Failed to fetch admin jobs', e);
     } finally {
       setLoadingJobs(false);
+    }
+  };
+
+  // Fetch Hero Banners from API
+  const fetchHeroBanners = async () => {
+    setLoadingHeroBanners(true);
+    try {
+      const storedToken = typeof window !== 'undefined' ? localStorage.getItem('rk_session_token') : null;
+      const headers: Record<string, string> = {};
+      if (storedToken) headers['Authorization'] = `Bearer ${storedToken}`;
+      const res = await fetch('/api/admin/hero-banners', { headers });
+      const data = await res.json();
+      if (data.success && Array.isArray(data.data)) {
+        setHeroBannersList(data.data);
+      }
+    } catch (e) {
+      console.error('Failed to fetch hero banners', e);
+    } finally {
+      setLoadingHeroBanners(false);
     }
   };
 
@@ -965,6 +1008,7 @@ export default function AdminDashboardPage() {
     fetchCategories();
     fetchEnquiries();
     fetchRepresentatives();
+    fetchHeroBanners();
   }, [router]);
 
   const showToast = (message: string, type: 'success' | 'error' = 'success') => {
@@ -1438,9 +1482,225 @@ export default function AdminDashboardPage() {
     }
   };
 
+  // Hero Banners Action Handlers
+  const handleUploadBannerImage = async (e: React.ChangeEvent<HTMLInputElement>, isMobile = false) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      showToast('Please select a valid image file (PNG, JPG, WebP, AVIF)', 'error');
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      showToast('Image size exceeds 5MB limit', 'error');
+      return;
+    }
+
+    setUploadingBannerImage(true);
+    try {
+      const storedToken = typeof window !== 'undefined' ? localStorage.getItem('rk_session_token') : null;
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const res = await fetch('/api/admin/hero-banners/upload', {
+        method: 'POST',
+        headers: storedToken ? { Authorization: `Bearer ${storedToken}` } : undefined,
+        body: formData,
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success && data.url) {
+        if (isMobile) {
+          setBannerMobileImage(data.url);
+        } else {
+          setBannerImage(data.url);
+        }
+        showToast('Banner image uploaded successfully!');
+      } else {
+        showToast(data.error || 'Failed to upload image', 'error');
+      }
+    } catch {
+      showToast('Network error during image upload', 'error');
+    } finally {
+      setUploadingBannerImage(false);
+      e.target.value = '';
+    }
+  };
+
+  const handleSaveHeroBanner = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!bannerTitle.trim() || !bannerSubtitle.trim() || !bannerImage.trim() || !bannerCtaLink.trim()) {
+      showToast('Title, subtitle, image, and destination link are required', 'error');
+      return;
+    }
+
+    const storedToken = typeof window !== 'undefined' ? localStorage.getItem('rk_session_token') : null;
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    if (storedToken) headers['Authorization'] = `Bearer ${storedToken}`;
+
+    const payload = {
+      title: bannerTitle.trim(),
+      subtitle: bannerSubtitle.trim(),
+      image: bannerImage.trim(),
+      mobileImage: bannerMobileImage.trim() || undefined,
+      badgeText: bannerBadgeText.trim() || 'LOCAL SHOPPING',
+      badgeColor: bannerBadgeColor || 'bg-[#E66A32]',
+      ctaText: bannerCtaText.trim() || 'Explore Deals',
+      ctaLink: bannerCtaLink.trim(),
+      isActive: bannerIsActive,
+    };
+
+    try {
+      if (editingBanner) {
+        const res = await fetch('/api/admin/hero-banners', {
+          method: 'PUT',
+          headers,
+          body: JSON.stringify({ id: editingBanner.id, ...payload }),
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          showToast('Hero banner updated successfully!');
+          resetBannerForm();
+          fetchHeroBanners();
+        } else {
+          showToast(data.error || 'Failed to update banner', 'error');
+        }
+      } else {
+        const res = await fetch('/api/admin/hero-banners', {
+          method: 'POST',
+          headers,
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          showToast('New hero banner created!');
+          resetBannerForm();
+          fetchHeroBanners();
+        } else {
+          showToast(data.error || 'Failed to create banner', 'error');
+        }
+      }
+    } catch {
+      showToast('Failed to save banner', 'error');
+    }
+  };
+
+  const resetBannerForm = () => {
+    setEditingBanner(null);
+    setBannerTitle('');
+    setBannerSubtitle('');
+    setBannerImage('https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?w=1600&auto=format&fit=crop&q=85');
+    setBannerMobileImage('');
+    setBannerCtaText('Explore Stores');
+    setBannerCtaLink('/clothing');
+    setBannerBadgeText('LOCAL SHOPPING');
+    setBannerBadgeColor('bg-[#E66A32]');
+    setBannerIsActive(true);
+  };
+
+  const handleStartEditBanner = (banner: HeroBannerSlide) => {
+    setEditingBanner(banner);
+    setBannerTitle(banner.title);
+    setBannerSubtitle(banner.subtitle);
+    setBannerImage(banner.image);
+    setBannerMobileImage(banner.mobileImage || '');
+    setBannerCtaText(banner.ctaText || 'Explore Stores');
+    setBannerCtaLink(banner.ctaLink || '/clothing');
+    setBannerBadgeText(banner.badgeText || 'LOCAL SHOPPING');
+    setBannerBadgeColor(banner.badgeColor || 'bg-[#E66A32]');
+    setBannerIsActive(banner.isActive !== false);
+  };
+
+  const handleDeleteBanner = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this hero banner?')) return;
+    try {
+      const storedToken = typeof window !== 'undefined' ? localStorage.getItem('rk_session_token') : null;
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (storedToken) headers['Authorization'] = `Bearer ${storedToken}`;
+
+      const res = await fetch('/api/admin/hero-banners', {
+        method: 'DELETE',
+        headers,
+        body: JSON.stringify({ id }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        showToast('Banner deleted successfully');
+        setHeroBannersList((prev) => prev.filter((b) => b.id !== id));
+        if (editingBanner?.id === id) resetBannerForm();
+      } else {
+        showToast(data.error || 'Failed to delete banner', 'error');
+      }
+    } catch {
+      showToast('Error deleting banner', 'error');
+    }
+  };
+
+  const handleToggleBannerActive = async (banner: HeroBannerSlide) => {
+    try {
+      const storedToken = typeof window !== 'undefined' ? localStorage.getItem('rk_session_token') : null;
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (storedToken) headers['Authorization'] = `Bearer ${storedToken}`;
+
+      const newStatus = banner.isActive === false ? true : false;
+      const res = await fetch('/api/admin/hero-banners', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ action: 'toggleActive', id: banner.id, isActive: newStatus }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        showToast(`Banner is now ${newStatus ? 'ACTIVE' : 'DEACTIVATED'}`);
+        setHeroBannersList((prev) =>
+          prev.map((b) => (b.id === banner.id ? { ...b, isActive: newStatus } : b))
+        );
+      } else {
+        showToast(data.error || 'Failed to toggle banner status', 'error');
+      }
+    } catch {
+      showToast('Error toggling banner status', 'error');
+    }
+  };
+
+  const handleMoveBannerOrder = async (index: number, direction: 'up' | 'down') => {
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+    if (targetIndex < 0 || targetIndex >= heroBannersList.length) return;
+
+    const reordered = [...heroBannersList];
+    const [moved] = reordered.splice(index, 1);
+    reordered.splice(targetIndex, 0, moved);
+
+    setHeroBannersList(reordered);
+
+    try {
+      const storedToken = typeof window !== 'undefined' ? localStorage.getItem('rk_session_token') : null;
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (storedToken) headers['Authorization'] = `Bearer ${storedToken}`;
+
+      const orderedIds = reordered.map((b) => b.id);
+      const res = await fetch('/api/admin/hero-banners', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ action: 'reorder', orderedIds }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        showToast('Banner order saved successfully');
+      } else {
+        showToast(data.error || 'Failed to save new order', 'error');
+        fetchHeroBanners();
+      }
+    } catch {
+      showToast('Error saving banner order', 'error');
+      fetchHeroBanners();
+    }
+  };
+
   // Tab definitions
   const baseTabs: { id: AdminTab; label: string; icon: any; badge?: string }[] = [
     { id: 'dashboard', label: 'Dashboard', icon: Layout },
+    { id: 'hero-banners', label: 'Hero Banners', icon: ImageIcon, badge: `${heroBannersList.length}` },
     { id: 'categories', label: 'Categories & Sections', icon: Layers, badge: `${categoriesList.length || '14'}` },
     { id: 'enquiries', label: 'Customer Enquiries', icon: MessageSquare, badge: `${enquiriesList.length || '0'}` },
     { id: 'businesses', label: 'Businesses', icon: Building2, badge: `${businesses.length}` },
@@ -2913,9 +3173,543 @@ export default function AdminDashboardPage() {
             </div>
           )}
 
+          {/* TAB: HERO BANNERS MANAGEMENT */}
+          {activeTab === 'hero-banners' && (
+            <div className="space-y-6">
+              {/* Header Card */}
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-6 rounded-2xl bg-white border border-[#E8E5DF] shadow-xs">
+                <div>
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#FFF6F0] border border-[#F8CFBE] text-[#E66A32] text-[11px] font-bold mb-2">
+                    <ImageIcon className="w-3.5 h-3.5" />
+                    <span>Homepage Visual Showcase</span>
+                  </div>
+                  <h2 className="text-xl font-black text-[#26352D]">Hero Banner Management ({heroBannersList.length})</h2>
+                  <p className="text-xs text-[#647067] mt-1 max-w-2xl leading-relaxed">
+                    Control the horizontal hero banner carousel situated between the search bar and statistics section on the public homepage. Upload photography, select curated presets, customize titles, set destination links, and preview desktop (~3:1) and mobile (16:9) crops.
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    onClick={fetchHeroBanners}
+                    disabled={loadingHeroBanners}
+                    className="px-3.5 py-2.5 rounded-xl border border-[#E8E5DF] bg-[#FAF7F2] hover:bg-[#F4EFE7] text-[#26352D] text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer"
+                  >
+                    <RefreshCw className={`w-3.5 h-3.5 ${loadingHeroBanners ? 'animate-spin text-[#E66A32]' : ''}`} />
+                    <span>Refresh Banners</span>
+                  </button>
+                  <button
+                    onClick={resetBannerForm}
+                    className="px-4 py-2.5 rounded-xl bg-[#E66A32] hover:bg-[#D45B25] text-white text-xs font-extrabold flex items-center gap-1.5 transition-all cursor-pointer shadow-xs"
+                  >
+                    <Plus className="w-4 h-4" />
+                    <span>New Slide</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Form & Live Crop Preview Grid */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                {/* Left Column: Form (7 cols) */}
+                <div className="lg:col-span-7 p-6 rounded-2xl bg-white border border-[#E8E5DF] space-y-4 shadow-xs">
+                  <div className="flex items-center justify-between pb-3 border-b border-[#E8E5DF]">
+                    <h3 className="text-sm font-black text-[#26352D] flex items-center gap-2">
+                      <Edit3 className="w-4 h-4 text-[#E66A32]" />
+                      <span>{editingBanner ? `Edit Banner: ${editingBanner.title.slice(0, 32)}...` : 'Create New Hero Banner'}</span>
+                    </h3>
+                    {editingBanner && (
+                      <button
+                        onClick={resetBannerForm}
+                        className="text-xs font-bold text-[#647067] hover:text-[#26352D] underline cursor-pointer"
+                      >
+                        Cancel Editing
+                      </button>
+                    )}
+                  </div>
+
+                  <form onSubmit={handleSaveHeroBanner} className="space-y-4 text-xs">
+                    {/* Title */}
+                    <div>
+                      <label className="block text-[#26352D] font-bold mb-1">
+                        Banner Main Title <span className="text-rose-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="e.g. Korutla Traditional Handlooms & Saree Market"
+                        value={bannerTitle}
+                        onChange={(e) => setBannerTitle(e.target.value)}
+                        className="w-full bg-[#FAF7F2] border border-[#E8E5DF] rounded-xl px-3.5 py-2.5 text-[#26352D] font-semibold placeholder-[#647067]/60 focus:outline-none focus:border-[#E66A32] focus:ring-2 focus:ring-[#E66A32]/20"
+                      />
+                    </div>
+
+                    {/* Subtitle */}
+                    <div>
+                      <label className="block text-[#26352D] font-bold mb-1">
+                        Subtitle / Short Description <span className="text-rose-500">*</span>
+                      </label>
+                      <textarea
+                        required
+                        rows={2}
+                        placeholder="e.g. Discover authentic Pattu sarees, bridal lehengas, and festive menswear from renowned cloth merchants in Korutla."
+                        value={bannerSubtitle}
+                        onChange={(e) => setBannerSubtitle(e.target.value)}
+                        className="w-full bg-[#FAF7F2] border border-[#E8E5DF] rounded-xl px-3.5 py-2.5 text-[#26352D] font-medium placeholder-[#647067]/60 focus:outline-none focus:border-[#E66A32] focus:ring-2 focus:ring-[#E66A32]/20"
+                      />
+                    </div>
+
+                    {/* Destination Link & CTA Text */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-[#26352D] font-bold mb-1">
+                          Destination Link <span className="text-rose-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          placeholder="e.g. /clothing, /groceries, /food"
+                          value={bannerCtaLink}
+                          onChange={(e) => setBannerCtaLink(e.target.value)}
+                          className="w-full bg-[#FAF7F2] border border-[#E8E5DF] rounded-xl px-3.5 py-2.5 text-[#26352D] font-semibold placeholder-[#647067]/60 focus:outline-none focus:border-[#E66A32] focus:ring-2 focus:ring-[#E66A32]/20"
+                        />
+                        <div className="flex flex-wrap gap-1 mt-1.5">
+                          {['/clothing', '/groceries', '/food', '/hospitals', '/shopping'].map((path) => (
+                            <button
+                              key={path}
+                              type="button"
+                              onClick={() => setBannerCtaLink(path)}
+                              className="px-2 py-0.5 rounded text-[10px] font-bold bg-[#FAF7F2] border border-[#E8E5DF] text-[#647067] hover:text-[#E66A32] hover:border-[#F8CFBE] cursor-pointer"
+                            >
+                              {path}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-[#26352D] font-bold mb-1">
+                          CTA Button Label <span className="text-rose-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          placeholder="e.g. Explore Clothing Stores"
+                          value={bannerCtaText}
+                          onChange={(e) => setBannerCtaText(e.target.value)}
+                          className="w-full bg-[#FAF7F2] border border-[#E8E5DF] rounded-xl px-3.5 py-2.5 text-[#26352D] font-semibold placeholder-[#647067]/60 focus:outline-none focus:border-[#E66A32] focus:ring-2 focus:ring-[#E66A32]/20"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Badge Text */}
+                    <div>
+                      <label className="block text-[#26352D] font-bold mb-1">
+                        Category Pill / Badge Text
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="e.g. CLOTH MARKET, FRESH MARKET, HEALTHCARE"
+                        value={bannerBadgeText}
+                        onChange={(e) => setBannerBadgeText(e.target.value)}
+                        className="w-full bg-[#FAF7F2] border border-[#E8E5DF] rounded-xl px-3.5 py-2.5 text-[#26352D] font-semibold placeholder-[#647067]/60 focus:outline-none focus:border-[#E66A32] focus:ring-2 focus:ring-[#E66A32]/20 uppercase"
+                      />
+                    </div>
+
+                    {/* Main Image Source & Upload */}
+                    <div className="space-y-2 pt-2 border-t border-[#E8E5DF]">
+                      <div className="flex items-center justify-between">
+                        <label className="block text-[#26352D] font-bold">
+                          Desktop Banner Image URL <span className="text-rose-500">*</span>
+                        </label>
+                        <label className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#FFF6F0] hover:bg-[#F8CFBE] border border-[#F8CFBE] text-[#E66A32] text-xs font-bold cursor-pointer transition-colors shadow-2xs">
+                          <Upload className="w-3.5 h-3.5" />
+                          <span>{uploadingBannerImage ? 'Uploading...' : 'Upload Image (≤5MB)'}</span>
+                          <input
+                            type="file"
+                            accept="image/png,image/jpeg,image/webp,image/avif"
+                            disabled={uploadingBannerImage}
+                            onChange={(e) => handleUploadBannerImage(e, false)}
+                            className="hidden"
+                          />
+                        </label>
+                      </div>
+
+                      <input
+                        type="url"
+                        required
+                        placeholder="https://images.unsplash.com/... or base64 data"
+                        value={bannerImage}
+                        onChange={(e) => setBannerImage(e.target.value)}
+                        className="w-full bg-[#FAF7F2] border border-[#E8E5DF] rounded-xl px-3.5 py-2.5 text-[#26352D] font-semibold placeholder-[#647067]/60 focus:outline-none focus:border-[#E66A32] focus:ring-2 focus:ring-[#E66A32]/20 font-mono text-[11px]"
+                      />
+
+                      {/* Curated Presets Picker */}
+                      <div className="p-3 rounded-xl bg-[#FAF7F2] border border-[#E8E5DF] space-y-2">
+                        <p className="text-[11px] font-bold text-[#26352D] flex items-center gap-1.5">
+                          <Sparkles className="w-3.5 h-3.5 text-[#E66A32]" />
+                          <span>Or select authentic Korutla shopping photography presets:</span>
+                        </p>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                          {PRESET_HERO_IMAGES.map((preset) => (
+                            <button
+                              key={preset.id}
+                              type="button"
+                              onClick={() => {
+                                setBannerImage(preset.url);
+                                if (!bannerTitle) setBannerTitle(preset.title);
+                                if (!bannerBadgeText) setBannerBadgeText(preset.category.toUpperCase());
+                                showToast(`Applied ${preset.title}`);
+                              }}
+                              className={`p-1.5 rounded-xl border text-left flex items-center gap-2 transition-all cursor-pointer ${
+                                bannerImage === preset.url
+                                  ? 'bg-white border-[#E66A32] ring-2 ring-[#E66A32]/20 shadow-xs'
+                                  : 'bg-white/80 border-[#E8E5DF] hover:border-[#647067]'
+                              }`}
+                            >
+                              <img src={preset.url} alt={preset.title} className="w-9 h-9 rounded-lg object-cover shrink-0" />
+                              <div className="min-w-0">
+                                <p className="text-[10px] font-bold text-[#26352D] truncate">{preset.category}</p>
+                                <p className="text-[9px] text-[#647067] truncate">Use Photo</p>
+                              </div>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Optional Mobile Crop Override */}
+                    <div className="space-y-1.5">
+                      <div className="flex items-center justify-between">
+                        <label className="block text-[#647067] font-bold text-[11px]">
+                          Optional Mobile Crop Override URL (16:9)
+                        </label>
+                        <label className="inline-flex items-center gap-1 text-[11px] font-bold text-[#E66A32] hover:underline cursor-pointer">
+                          <Upload className="w-3 h-3" />
+                          <span>Upload Mobile Version</span>
+                          <input
+                            type="file"
+                            accept="image/png,image/jpeg,image/webp,image/avif"
+                            disabled={uploadingBannerImage}
+                            onChange={(e) => handleUploadBannerImage(e, true)}
+                            className="hidden"
+                          />
+                        </label>
+                      </div>
+                      <input
+                        type="url"
+                        placeholder="Leave blank to automatically responsive crop the desktop image"
+                        value={bannerMobileImage}
+                        onChange={(e) => setBannerMobileImage(e.target.value)}
+                        className="w-full bg-[#FAF7F2] border border-[#E8E5DF] rounded-xl px-3.5 py-2 text-[#26352D] font-semibold placeholder-[#647067]/60 focus:outline-none focus:border-[#E66A32] focus:ring-2 focus:ring-[#E66A32]/20 font-mono text-[11px]"
+                      />
+                    </div>
+
+                    {/* Active toggle */}
+                    <div className="pt-2 border-t border-[#E8E5DF] flex items-center justify-between">
+                      <label className="flex items-center gap-2 cursor-pointer font-bold text-[#26352D]">
+                        <input
+                          type="checkbox"
+                          checked={bannerIsActive}
+                          onChange={(e) => setBannerIsActive(e.target.checked)}
+                          className="w-4 h-4 rounded text-[#E66A32] focus:ring-[#E66A32] accent-[#E66A32]"
+                        />
+                        <span>Active on Homepage Hero Carousel</span>
+                      </label>
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${bannerIsActive ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' : 'bg-slate-100 text-slate-600'}`}>
+                        {bannerIsActive ? 'WILL SHOW TO VISITORS' : 'HIDDEN FROM HOMEPAGE'}
+                      </span>
+                    </div>
+
+                    {/* Submit Buttons */}
+                    <div className="flex items-center gap-2 pt-2">
+                      <button
+                        type="submit"
+                        className="flex-1 py-3 rounded-xl bg-[#E66A32] hover:bg-[#D45B25] text-white font-extrabold text-xs shadow-md transition-all cursor-pointer flex items-center justify-center gap-2"
+                      >
+                        <Check className="w-4 h-4" />
+                        <span>{editingBanner ? 'Save Changes' : 'Publish Hero Banner'}</span>
+                      </button>
+                      {editingBanner && (
+                        <button
+                          type="button"
+                          onClick={resetBannerForm}
+                          className="px-5 py-3 rounded-xl bg-[#FAF7F2] hover:bg-[#F4EFE7] text-[#26352D] font-bold text-xs border border-[#E8E5DF] transition-all cursor-pointer"
+                        >
+                          Cancel
+                        </button>
+                      )}
+                    </div>
+                  </form>
+                </div>
+
+                {/* Right Column: Live Interactive Crop Preview (5 cols) */}
+                <div className="lg:col-span-5 p-6 rounded-2xl bg-white border border-[#E8E5DF] space-y-4 shadow-xs flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center justify-between pb-3 border-b border-[#E8E5DF]">
+                      <h3 className="text-sm font-black text-[#26352D] flex items-center gap-2">
+                        <Eye className="w-4 h-4 text-[#E66A32]" />
+                        <span>Live Crop Preview</span>
+                      </h3>
+                      {/* Desktop / Mobile Mode Switch */}
+                      <div className="flex items-center p-0.5 rounded-xl bg-[#FAF7F2] border border-[#E8E5DF]">
+                        <button
+                          type="button"
+                          onClick={() => setCropPreviewMode('desktop')}
+                          className={`px-2.5 py-1 rounded-lg text-[10px] font-bold flex items-center gap-1 transition-all cursor-pointer ${
+                            cropPreviewMode === 'desktop'
+                              ? 'bg-[#E66A32] text-white shadow-2xs'
+                              : 'text-[#647067] hover:text-[#26352D]'
+                          }`}
+                        >
+                          <Monitor className="w-3 h-3" />
+                          <span>Desktop (3:1)</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setCropPreviewMode('mobile')}
+                          className={`px-2.5 py-1 rounded-lg text-[10px] font-bold flex items-center gap-1 transition-all cursor-pointer ${
+                            cropPreviewMode === 'mobile'
+                              ? 'bg-[#E66A32] text-white shadow-2xs'
+                              : 'text-[#647067] hover:text-[#26352D]'
+                          }`}
+                        >
+                          <Smartphone className="w-3 h-3" />
+                          <span>Mobile (16:9)</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    <p className="text-[11px] text-[#647067] my-3">
+                      {cropPreviewMode === 'desktop'
+                        ? 'Desktop crop displays a wide 3:1 horizontal aspect ratio.'
+                        : 'Mobile crop adapts smoothly to a 16:9 vertical-friendly aspect ratio on mobile devices.'}
+                    </p>
+
+                    {/* Preview Screen Box */}
+                    <div className="p-3 rounded-2xl bg-[#FAF7F2] border border-[#E8E5DF]">
+                      <div
+                        className={`relative overflow-hidden rounded-xl border border-[#E8E5DF] shadow-sm transition-all duration-300 mx-auto ${
+                          cropPreviewMode === 'desktop'
+                            ? 'w-full aspect-[3/1]'
+                            : 'w-[280px] max-w-full aspect-[16/9]'
+                        }`}
+                      >
+                        {/* Background Image */}
+                        <img
+                          src={cropPreviewMode === 'mobile' && bannerMobileImage ? bannerMobileImage : bannerImage}
+                          alt="Crop Preview"
+                          className="absolute inset-0 w-full h-full object-cover"
+                          onError={(e) => {
+                            (e.currentTarget as HTMLImageElement).src =
+                              'https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?w=1600&auto=format&fit=crop&q=85';
+                          }}
+                        />
+
+                        {/* Solid Scrim overlay for AAA contrast without gradient */}
+                        <div className="absolute inset-0 bg-[#16201A]/80 z-10" />
+
+                        {/* Live Overlay Content */}
+                        <div className="relative z-20 h-full p-4 md:p-6 flex flex-col justify-center">
+                          <span className="inline-block px-2 py-0.5 rounded text-[9px] font-extrabold uppercase bg-[#E66A32] text-white w-max mb-1.5 shadow-2xs">
+                            {bannerBadgeText || 'LOCAL SHOPPING'}
+                          </span>
+                          <h4 className={`font-black text-[#FAF7F2] line-clamp-2 leading-tight ${cropPreviewMode === 'desktop' ? 'text-sm md:text-base' : 'text-xs'}`}>
+                            {bannerTitle || 'Your Banner Title Appears Here'}
+                          </h4>
+                          <p className={`text-[#FAF7F2]/90 line-clamp-2 mt-1 leading-relaxed ${cropPreviewMode === 'desktop' ? 'text-[11px]' : 'text-[10px]'}`}>
+                            {bannerSubtitle || 'Your banner subtitle description appears here.'}
+                          </p>
+                          <div className="mt-2.5">
+                            <span className="inline-flex items-center gap-1 px-3 py-1 rounded-lg bg-[#E66A32] text-white font-extrabold text-[10px] shadow-sm">
+                              <span>{bannerCtaText || 'Explore'}</span>
+                              <ExternalLink className="w-2.5 h-2.5" />
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="p-3 rounded-xl bg-[#FFF6F0] border border-[#F8CFBE] text-[10px] text-[#647067] space-y-1">
+                    <p className="font-bold text-[#E66A32] flex items-center gap-1">
+                      <Shield className="w-3 h-3" />
+                      <span>Brand Quality Assurance</span>
+                    </p>
+                    <p>
+                      Styled strictly within the Royal Korutla brand palette: warm off-white (#FAF7F2), orange (#E66A32), forest green (#26352D), and neutral gray (#647067). No blue gradients, no glowing effects, and no emoji icons.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Banners List & Reordering Management */}
+              <div className="p-6 rounded-2xl bg-white border border-[#E8E5DF] space-y-4 shadow-xs">
+                <div className="flex items-center justify-between pb-3 border-b border-[#E8E5DF]">
+                  <div>
+                    <h3 className="text-base font-black text-[#26352D] flex items-center gap-2">
+                      <Layers className="w-4 h-4 text-[#E66A32]" />
+                      <span>Configured Homepage Banners ({heroBannersList.length})</span>
+                    </h3>
+                    <p className="text-xs text-[#647067] mt-0.5">
+                      Drag or move banners up and down to change carousel display sequence. Public homepage displays all active banners in real time.
+                    </p>
+                  </div>
+                  <span className="text-xs font-bold text-emerald-800 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
+                    {heroBannersList.filter((b) => b.isActive !== false).length} Active on Live Site
+                  </span>
+                </div>
+
+                {heroBannersList.length === 0 ? (
+                  <div className="p-12 text-center text-[#647067] space-y-3 bg-[#FAF7F2] rounded-2xl border border-[#E8E5DF]">
+                    <ImageIcon className="w-8 h-8 text-[#647067] mx-auto opacity-50" />
+                    <p className="text-sm font-bold text-[#26352D]">No hero banners found</p>
+                    <p className="text-xs max-w-sm mx-auto">Create your first banner above or reload default presets.</p>
+                    <button
+                      onClick={fetchHeroBanners}
+                      className="px-4 py-2 rounded-xl bg-[#E66A32] text-white text-xs font-bold cursor-pointer"
+                    >
+                      Reload Banners
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {heroBannersList.map((banner, idx) => {
+                      const isActive = banner.isActive !== false;
+                      const isEditing = editingBanner?.id === banner.id;
+
+                      return (
+                        <div
+                          key={banner.id}
+                          className={`p-4 rounded-2xl border transition-all flex flex-col md:flex-row md:items-center justify-between gap-4 ${
+                            isEditing
+                              ? 'bg-[#FFF6F0] border-[#E66A32] ring-2 ring-[#E66A32]/20 shadow-sm'
+                              : 'bg-white border-[#E8E5DF] hover:border-[#647067]/40 shadow-xs'
+                          }`}
+                        >
+                          <div className="flex items-start sm:items-center gap-3.5 min-w-0">
+                            {/* Sequence number */}
+                            <span className="w-7 h-7 rounded-lg bg-[#FAF7F2] border border-[#E8E5DF] flex items-center justify-center font-black text-xs text-[#26352D] shrink-0">
+                              #{idx + 1}
+                            </span>
+
+                            {/* Thumbnail preview */}
+                            <div className="relative w-24 h-12 rounded-lg overflow-hidden border border-[#E8E5DF] shrink-0 bg-slate-100">
+                              <img src={banner.image} alt={banner.title} className="w-full h-full object-cover" />
+                            </div>
+
+                            {/* Details */}
+                            <div className="min-w-0">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <span className="text-[10px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-[#FAF7F2] text-[#E66A32] border border-[#F8CFBE]">
+                                  {banner.badgeText || 'LOCAL SHOPPING'}
+                                </span>
+                                <span
+                                  className={`text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-full border ${
+                                    isActive
+                                      ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                                      : 'bg-slate-100 text-slate-600 border-slate-200'
+                                  }`}
+                                >
+                                  {isActive ? 'ACTIVE' : 'INACTIVE'}
+                                </span>
+                              </div>
+                              <h4 className="text-xs font-bold text-[#26352D] truncate mt-1">{banner.title}</h4>
+                              <p className="text-[11px] text-[#647067] truncate max-w-lg mt-0.5">{banner.subtitle}</p>
+                              <p className="text-[10px] text-[#E66A32] font-semibold mt-0.5 flex items-center gap-1">
+                                <span>Link:</span>
+                                <span className="font-mono text-[#26352D]">{banner.ctaLink}</span>
+                                <span className="text-[#647067]">• CTA: &quot;{banner.ctaText}&quot;</span>
+                              </p>
+                            </div>
+                          </div>
+
+                          {/* Control actions */}
+                          <div className="flex items-center gap-2 shrink-0 pt-2 md:pt-0 border-t md:border-t-0 border-[#E8E5DF]">
+                            {/* Up / Down reordering */}
+                            <div className="flex items-center gap-1 pr-2 border-r border-[#E8E5DF]">
+                              <button
+                                type="button"
+                                title="Move Up"
+                                disabled={idx === 0}
+                                onClick={() => handleMoveBannerOrder(idx, 'up')}
+                                className="p-2 rounded-xl bg-[#FAF7F2] hover:bg-[#F4EFE7] text-[#26352D] border border-[#E8E5DF] disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors"
+                              >
+                                <ArrowUp className="w-3.5 h-3.5" />
+                              </button>
+                              <button
+                                type="button"
+                                title="Move Down"
+                                disabled={idx === heroBannersList.length - 1}
+                                onClick={() => handleMoveBannerOrder(idx, 'down')}
+                                className="p-2 rounded-xl bg-[#FAF7F2] hover:bg-[#F4EFE7] text-[#26352D] border border-[#E8E5DF] disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors"
+                              >
+                                <ArrowDown className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+
+                            {/* Active / Inactive toggle */}
+                            <button
+                              type="button"
+                              onClick={() => handleToggleBannerActive(banner)}
+                              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer border ${
+                                isActive
+                                  ? 'bg-emerald-50 text-emerald-800 border-emerald-200 hover:bg-emerald-100'
+                                  : 'bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200'
+                              }`}
+                            >
+                              {isActive ? 'Active' : 'Deactivated'}
+                            </button>
+
+                            {/* Edit */}
+                            <button
+                              type="button"
+                              onClick={() => handleStartEditBanner(banner)}
+                              className="px-3 py-1.5 rounded-xl bg-[#FAF7F2] hover:bg-[#FFF6F0] text-[#26352D] hover:text-[#E66A32] border border-[#E8E5DF] hover:border-[#F8CFBE] text-xs font-bold transition-all cursor-pointer flex items-center gap-1"
+                            >
+                              <Edit3 className="w-3.5 h-3.5" />
+                              <span>Edit</span>
+                            </button>
+
+                            {/* Delete */}
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteBanner(banner.id)}
+                              className="p-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-bold transition-all cursor-pointer"
+                              title="Delete Banner"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* TAB: HOMEPAGE CONTENT MANAGEMENT */}
           {activeTab === 'homepage-content' && (
             <div className="space-y-6">
+              {/* Hero Banners Quick Banner */}
+              <div className="p-4 rounded-2xl bg-[#FFF6F0] border border-[#F8CFBE] flex items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-[#E66A32] text-white flex items-center justify-center shrink-0">
+                    <ImageIcon className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-black text-[#26352D]">Hero Banners Upgraded &amp; Dedicated Screen Available</h4>
+                    <p className="text-[11px] text-[#647067]">Manage persistent hero banners with interactive 3:1 desktop and 16:9 mobile crop previews.</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setActiveTab('hero-banners')}
+                  className="px-3.5 py-2 rounded-xl bg-[#E66A32] text-white font-bold text-xs shrink-0 cursor-pointer hover:bg-[#D45B25] transition-colors"
+                >
+                  Open Hero Banners Manager →
+                </button>
+              </div>
+
               <div className="p-5 rounded-2xl bg-white border border-slate-200 space-y-2">
                 <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#FFF6F0] text-[#E66A32] border border-[#F8CFBE] text-xs font-bold">
                   <Eye className="w-3.5 h-3.5" />
@@ -4884,7 +5678,7 @@ export default function AdminDashboardPage() {
           )}
 
           {/* FALLBACK FOR OTHER TABS */}
-          {!['dashboard', 'categories', 'enquiries', 'representatives', 'photography', 'promotions', 'businesses', 'add-business', 'edit-business', 'verify-business', 'homepage-content', 'offers', 'food', 'jobs', 'users', 'royal-points', 'admin-management', 'settings', 'emergency', 'stories'].includes(activeTab) && (
+          {!['dashboard', 'hero-banners', 'categories', 'enquiries', 'representatives', 'photography', 'promotions', 'businesses', 'add-business', 'edit-business', 'verify-business', 'homepage-content', 'offers', 'food', 'jobs', 'users', 'royal-points', 'admin-management', 'settings', 'emergency', 'stories'].includes(activeTab) && (
             <div className="p-8 text-center space-y-3 bg-white rounded-2xl border border-[#E8E5DF]">
               <div className="w-12 h-12 rounded-2xl bg-[#FFF6F0] border border-[#F8CFBE] flex items-center justify-center mx-auto text-[#E66A32]">
                 <Crown className="w-6 h-6" />
