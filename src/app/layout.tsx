@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { MobileBottomNav } from "@/components/layout/MobileBottomNav";
 import { FloatingWhatsApp } from "@/components/common/FloatingWhatsApp";
-import { NetlifyBadgeRemover } from "@/components/common/NetlifyBadgeRemover";
 
 export const metadata: Metadata = {
   title: "Royal Korutla - Everything in Korutla | Local Shopping & Discovery Platform",
@@ -17,8 +16,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="scroll-smooth">
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{localStorage.setItem('nl-hud:public:v1','true');}catch(e){}`,
+          }}
+        />
+      </head>
       <body className="min-h-screen bg-[#FAF7F2] text-[#26352D] antialiased selection:bg-[#E66A32] selection:text-white flex flex-col justify-between">
-        <NetlifyBadgeRemover />
         {children}
         <FloatingWhatsApp />
         <MobileBottomNav />

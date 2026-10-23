@@ -8,22 +8,7 @@
 
 [build.environment]
   NODE_VERSION = "20"
-  # Disable Netlify Drawer, Feedback, and Collaborative Deploy Preview floating badges
-  NETLIFY_FEEDBACK_DISABLED = "true"
-  DRAWER = "false"
-  NETLIFY_DRAWER = "false"
-
-[context.production.environment]
-  NETLIFY_FEEDBACK_DISABLED = "true"
-  DRAWER = "false"
-  NETLIFY_DRAWER = "false"
 
 [context.deploy-preview.environment]
+  # Suppress the Collaborative Deploy Preview feedback drawer on PR previews
   NETLIFY_FEEDBACK_DISABLED = "true"
-  DRAWER = "false"
-  NETLIFY_DRAWER = "false"
-
-[context.branch-deploy.environment]
-  NETLIFY_FEEDBACK_DISABLED = "true"
-  DRAWER = "false"
-  NETLIFY_DRAWER = "false"
