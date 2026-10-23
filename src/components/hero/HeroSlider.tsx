@@ -179,7 +179,7 @@ export const HeroSlider: React.FC = () => {
             >
               {/* Background Image with Fallback handling */}
               {!hasError ? (
-                <picture>
+                <picture className="absolute inset-0 w-full h-full">
                   {slide.mobileImage && <source media="(max-width: 640px)" srcSet={slide.mobileImage} />}
                   <img
                     src={slide.image}
@@ -191,7 +191,7 @@ export const HeroSlider: React.FC = () => {
                   />
                 </picture>
               ) : (
-                <div className="w-full h-full bg-[#1C2721] flex items-center justify-center p-6 text-center text-white">
+                <div className="absolute inset-0 w-full h-full bg-[#1C2721] flex items-center justify-center p-6 text-center text-white">
                   <div className="max-w-md space-y-2">
                     <Store className="w-10 h-10 text-[#E66A32] mx-auto" />
                     <p className="text-sm font-bold">{slide.title}</p>
@@ -201,10 +201,13 @@ export const HeroSlider: React.FC = () => {
               )}
 
               {/* Solid High-Contrast Scrim (No Gradients, accessible contrast) */}
-              <div className="absolute inset-0 bg-[#16201A]/75 sm:bg-[#16201A]/70" />
+              <div
+                className="absolute inset-0 z-10 pointer-events-none"
+                style={{ backgroundColor: 'rgba(22, 32, 26, 0.72)' }}
+              />
 
               {/* Content Block */}
-              <div className="relative h-full max-w-2xl px-5 sm:px-10 lg:px-14 flex flex-col justify-center text-left">
+              <div className="relative z-20 h-full max-w-2xl px-5 sm:px-10 lg:px-14 flex flex-col justify-center text-left pointer-events-auto">
                 {/* Category/Highlight Badge */}
                 <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#E66A32] text-white text-[10px] sm:text-xs font-black uppercase tracking-wider w-fit mb-2 sm:mb-3 shadow-xs">
                   <span>{slide.badgeText || 'ROYAL SPOTLIGHT'}</span>
