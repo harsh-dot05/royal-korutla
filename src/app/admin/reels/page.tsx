@@ -23,8 +23,8 @@ import {
 
 const STATUS_CONFIG: Record<ReelRequestStatus, { label: string; color: string; bg: string }> = {
   PENDING: { label: 'New Request', color: 'text-amber-800', bg: 'bg-amber-100 border-amber-300' },
-  CONTACTED: { label: 'Contacted', color: 'text-blue-800', bg: 'bg-blue-100 border-blue-300' },
-  SCHEDULED: { label: 'Shoot Scheduled', color: 'text-purple-800', bg: 'bg-purple-100 border-purple-300' },
+  CONTACTED: { label: 'Contacted', color: 'text-[#E66A32]', bg: 'bg-[#FFF6F0] border-[#F8CFBE]' },
+  SCHEDULED: { label: 'Shoot Scheduled', color: 'text-[#26352D]', bg: 'bg-[#F0F7F3] border-[#C8DFD1]' },
   COMPLETED: { label: 'Reel Delivered', color: 'text-emerald-800', bg: 'bg-emerald-100 border-emerald-300' },
   CANCELLED: { label: 'Cancelled', color: 'text-slate-700', bg: 'bg-slate-200 border-slate-300' },
 };
@@ -232,14 +232,14 @@ export default function AdminReelsPage() {
             </p>
           </div>
           <div className="p-4 rounded-xl bg-white border border-[#E8E5DF] shadow-xs">
-            <p className="text-[10px] font-bold text-blue-700 uppercase">Contacted</p>
-            <p className="text-xl font-black text-blue-700 mt-1">
+            <p className="text-[10px] font-bold text-[#E66A32] uppercase">Contacted</p>
+            <p className="text-xl font-black text-[#E66A32] mt-1">
               {requests.filter((r) => r.status === 'CONTACTED').length}
             </p>
           </div>
           <div className="p-4 rounded-xl bg-white border border-[#E8E5DF] shadow-xs">
-            <p className="text-[10px] font-bold text-purple-700 uppercase">Scheduled</p>
-            <p className="text-xl font-black text-purple-700 mt-1">
+            <p className="text-[10px] font-bold text-[#26352D] uppercase">Scheduled</p>
+            <p className="text-xl font-black text-[#26352D] mt-1">
               {requests.filter((r) => r.status === 'SCHEDULED').length}
             </p>
           </div>

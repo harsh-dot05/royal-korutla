@@ -549,6 +549,10 @@ export function deleteOffer(id: string, businessId: string): boolean {
 
 // ==================== CUSTOMER ENQUIRIES ====================
 
+export function getAllEnquiries(): BusinessEnquiry[] {
+  return enquiriesStore;
+}
+
 export function getEnquiriesByBusinessId(businessId: string): BusinessEnquiry[] {
   return enquiriesStore.filter((e) => e.businessId === businessId);
 }
@@ -564,6 +568,24 @@ export function updateEnquiryStatus(
   responseNotes?: string
 ): BusinessEnquiry | null {
   const index = enquiriesStore.findIndex((e) => e.id === id && e.businessId === businessId);
+  if (index === -1) return null;
+
+  enquiriesStore[index] = {
+    ...enquiriesStore[index],
+    status,
+    responseNotes: responseNotes !== undefined ? responseNotes : enquiriesStore[index].responseNotes,
+    updatedAt: new Date().toISOString(),
+  };
+
+  return enquiriesStore[index];
+}
+
+export function updateEnquiryStatusAdmin(
+  id: string,
+  status: BusinessEnquiry['status'],
+  responseNotes?: string
+): BusinessEnquiry | null {
+  const index = enquiriesStore.findIndex((e) => e.id === id);
   if (index === -1) return null;
 
   enquiriesStore[index] = {

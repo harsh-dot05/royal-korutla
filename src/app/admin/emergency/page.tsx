@@ -305,8 +305,8 @@ export default function AdminEmergencyPage() {
             </p>
           </div>
           <div className="p-4 rounded-xl bg-white border border-[#E8E5DF] shadow-xs">
-            <p className="text-[10px] font-bold text-blue-700 uppercase">Verified Records</p>
-            <p className="text-2xl font-black text-blue-700 mt-1">
+            <p className="text-[10px] font-bold text-[#26352D] uppercase">Verified Records</p>
+            <p className="text-2xl font-black text-[#26352D] mt-1">
               {contacts.filter((c) => c.isVerified).length}
             </p>
           </div>

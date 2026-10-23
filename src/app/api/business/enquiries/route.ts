@@ -4,6 +4,7 @@ import {
   getEnquiriesByBusinessId,
   updateEnquiryStatus,
   getEnquiryById,
+  createEnquiry,
 } from '@/lib/businessDataStore';
 
 export async function GET(request: Request) {
@@ -60,3 +61,47 @@ export async function PATCH(request: Request) {
     );
   }
 }
+
+export async function POST(request: Request) {
+  try {
+    const body = await request.json();
+    const {
+      businessId,
+      businessName,
+      customerName,
+      customerPhone,
+      customerEmail,
+      subject,
+      serviceOrProduct,
+      message,
+    } = body;
+
+    if (!businessId || !customerName || !customerPhone) {
+      return NextResponse.json(
+        { success: false, error: 'MISSING_FIELDS', message: 'Business ID, your name and phone number are required.' },
+        { status: 400 }
+      );
+    }
+
+    const enquiry = createEnquiry(businessId, {
+      businessName: businessName || 'Local Business',
+      customerName: String(customerName).trim(),
+      customerPhone: String(customerPhone).trim(),
+      customerEmail: customerEmail ? String(customerEmail).trim() : undefined,
+      subject: subject || serviceOrProduct || 'General Enquiry',
+      message: message ? String(message).trim() : 'Customer requested contact via Royal Korutla.',
+    });
+
+    return NextResponse.json({
+      success: true,
+      data: enquiry,
+      message: 'Enquiry submitted successfully to the merchant.',
+    });
+  } catch {
+    return NextResponse.json(
+      { success: false, error: 'SERVER_ERROR', message: 'Failed to submit enquiry.' },
+      { status: 500 }
+    );
+  }
+}
+

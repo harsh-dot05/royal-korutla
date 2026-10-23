@@ -1,6 +1,7 @@
 export type CategorySlug = 
   | 'food'
   | 'groceries'
+  | 'clothing'
   | 'shopping'
   | 'services'
   | 'hospitals'
@@ -21,6 +22,7 @@ export interface Category {
   itemCount: number;
   badge?: string;
   colorGradient: string;
+  isActive?: boolean;
 }
 
 export type PromotionType = 

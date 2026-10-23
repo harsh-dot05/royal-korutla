@@ -91,26 +91,26 @@ export default function AdminPromotionsPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-white text-slate-900 font-sans">
+    <div className="min-h-screen flex flex-col bg-[#FAF7F2] text-[#26352D] font-sans">
       <Header />
 
       <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-        <div className="flex items-center gap-2 text-xs text-slate-500 font-semibold">
-          <Link href="/admin" className="hover:text-blue-600 flex items-center gap-1 transition-colors">
+        <div className="flex items-center gap-2 text-xs text-[#647067] font-semibold">
+          <Link href="/admin" className="hover:text-[#E66A32] flex items-center gap-1 transition-colors">
             <ArrowLeft className="w-3.5 h-3.5" /> Back to Owner Control Center
           </Link>
         </div>
 
         {/* Header */}
-        <div className="rounded-2xl p-6 sm:p-8 border border-slate-200 bg-white shadow-xs space-y-2">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-blue-50 border border-blue-200 text-blue-700 text-xs font-bold">
-            <Sparkles className="w-3.5 h-3.5 text-blue-600" />
+        <div className="rounded-2xl p-6 sm:p-8 border border-[#E8E5DF] bg-white shadow-xs space-y-2">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-[#FFF6F0] border border-[#F8CFBE] text-[#E66A32] text-xs font-bold">
+            <Sparkles className="w-3.5 h-3.5 text-[#E66A32]" />
             <span>Zero-Code Paid Promotion Engine</span>
           </div>
-          <h1 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+          <h1 className="text-2xl sm:text-4xl font-extrabold text-[#26352D] tracking-tight">
             Publish Business Promotion Campaigns
           </h1>
-          <p className="text-xs sm:text-sm text-slate-600 max-w-2xl font-normal">
+          <p className="text-xs sm:text-sm text-[#647067] max-w-2xl font-normal">
             When a local business pays for promotion in Korutla, select the business, set banner image &amp; dates, and publish without editing code. Active promotions display dynamically on the website and auto-hide on expiry.
           </p>
         </div>
@@ -118,19 +118,19 @@ export default function AdminPromotionsPage() {
         {/* Layout: Add Form + Active Promotions */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Add Promotion Form */}
-          <div className="rounded-2xl p-6 border border-slate-200 bg-white shadow-xs space-y-4">
-            <h2 className="text-base font-bold text-slate-900 flex items-center gap-2 pb-3 border-b border-slate-100">
-              <Plus className="w-5 h-5 text-blue-600" />
+          <div className="rounded-2xl p-6 border border-[#E8E5DF] bg-white shadow-xs space-y-4">
+            <h2 className="text-base font-bold text-[#26352D] flex items-center gap-2 pb-3 border-b border-[#E8E5DF]">
+              <Plus className="w-5 h-5 text-[#E66A32]" />
               <span>Create Paid Promotion</span>
             </h2>
 
             <form onSubmit={handleAddPromotion} className="space-y-4 text-xs">
               <div>
-                <label className="block font-bold text-slate-700 mb-1">Select Registered Business *</label>
+                <label className="block font-bold text-[#26352D] mb-1">Select Registered Business *</label>
                 <select
                   value={selectedBizId}
                   onChange={(e) => setSelectedBizId(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-slate-900 font-medium focus:outline-none focus:border-blue-600"
+                  className="w-full bg-[#FAF7F2] border border-[#E8E5DF] rounded-xl px-3 py-2.5 text-[#26352D] font-medium focus:outline-none focus:border-[#E66A32]"
                 >
                   {FEATURED_BUSINESSES.map((b) => (
                     <option key={b.id} value={b.id}>
@@ -141,33 +141,33 @@ export default function AdminPromotionsPage() {
               </div>
 
               <div>
-                <label className="block font-bold text-slate-700 mb-1">Or Enter Custom Business Name</label>
+                <label className="block font-bold text-[#26352D] mb-1">Or Enter Custom Business Name</label>
                 <input
                   type="text"
                   placeholder="e.g. Korutla Fresh Juice Center"
                   value={customBizName}
                   onChange={(e) => setCustomBizName(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-slate-900 focus:outline-none focus:border-blue-600 font-medium"
+                  className="w-full bg-[#FAF7F2] border border-[#E8E5DF] rounded-xl px-3 py-2.5 text-[#26352D] focus:outline-none focus:border-[#E66A32] font-medium"
                 />
               </div>
 
               <div>
-                <label className="block font-bold text-slate-700 mb-1">Promotional Banner Image URL *</label>
+                <label className="block font-bold text-[#26352D] mb-1">Promotional Banner Image URL *</label>
                 <input
                   type="url"
                   required
                   value={promImage}
                   onChange={(e) => setPromImage(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-slate-900 focus:outline-none focus:border-blue-600 font-medium"
+                  className="w-full bg-[#FAF7F2] border border-[#E8E5DF] rounded-xl px-3 py-2.5 text-[#26352D] focus:outline-none focus:border-[#E66A32] font-medium"
                 />
               </div>
 
               <div>
-                <label className="block font-bold text-slate-700 mb-1">Promotion Type *</label>
+                <label className="block font-bold text-[#26352D] mb-1">Promotion Type *</label>
                 <select
                   value={promotionType}
                   onChange={(e) => setPromotionType(e.target.value as PromotionType)}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-slate-900 font-medium focus:outline-none focus:border-blue-600"
+                  className="w-full bg-[#FAF7F2] border border-[#E8E5DF] rounded-xl px-3 py-2.5 text-[#26352D] font-medium focus:outline-none focus:border-[#E66A32]"
                 >
                   <option value="HOMEPAGE_FEATURED">Homepage Featured</option>
                   <option value="FEATURED_BUSINESS">Featured Business Ticker</option>
@@ -179,22 +179,22 @@ export default function AdminPromotionsPage() {
               </div>
 
               <div>
-                <label className="block font-bold text-slate-700 mb-1">Badge Display Label</label>
+                <label className="block font-bold text-[#26352D] mb-1">Badge Display Label</label>
                 <input
                   type="text"
                   placeholder="e.g. PROMOTED, SPONSORED, RK FEATURED"
                   value={badgeLabel}
                   onChange={(e) => setBadgeLabel(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-slate-900 focus:outline-none focus:border-blue-600 font-medium"
+                  className="w-full bg-[#FAF7F2] border border-[#E8E5DF] rounded-xl px-3 py-2.5 text-[#26352D] focus:outline-none focus:border-[#E66A32] font-medium"
                 />
               </div>
 
               <div>
-                <label className="block font-bold text-slate-700 mb-1">Placement Target</label>
+                <label className="block font-bold text-[#26352D] mb-1">Placement Target</label>
                 <select
                   value={placement}
                   onChange={(e) => setPlacement(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-slate-900 font-medium focus:outline-none focus:border-blue-600"
+                  className="w-full bg-[#FAF7F2] border border-[#E8E5DF] rounded-xl px-3 py-2.5 text-[#26352D] font-medium focus:outline-none focus:border-[#E66A32]"
                 >
                   <option value="Homepage Top Banner">Homepage Top Section</option>
                   <option value="Food Section Header">Food Category Header</option>
@@ -204,40 +204,40 @@ export default function AdminPromotionsPage() {
               </div>
 
               <div>
-                <label className="block font-bold text-slate-700 mb-1">Offer Tagline / Highlight</label>
+                <label className="block font-bold text-[#26352D] mb-1">Offer Tagline / Highlight</label>
                 <input
                   type="text"
                   placeholder="e.g. Flat 20% OFF on all purchases"
                   value={offerText}
                   onChange={(e) => setOfferText(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-slate-900 focus:outline-none focus:border-blue-600 font-medium"
+                  className="w-full bg-[#FAF7F2] border border-[#E8E5DF] rounded-xl px-3 py-2.5 text-[#26352D] focus:outline-none focus:border-[#E66A32] font-medium"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Start Date</label>
+                  <label className="block font-bold text-[#26352D] mb-1">Start Date</label>
                   <input
                     type="date"
                     value={startDate}
                     onChange={(e) => setStartDate(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 focus:outline-none focus:border-blue-600 font-medium"
+                    className="w-full bg-[#FAF7F2] border border-[#E8E5DF] rounded-xl px-3 py-2 text-[#26352D] focus:outline-none focus:border-[#E66A32] font-medium"
                   />
                 </div>
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">End Date (Expiry)</label>
+                  <label className="block font-bold text-[#26352D] mb-1">End Date (Expiry)</label>
                   <input
                     type="date"
                     value={endDate}
                     onChange={(e) => setEndDate(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 focus:outline-none focus:border-blue-600 font-medium"
+                    className="w-full bg-[#FAF7F2] border border-[#E8E5DF] rounded-xl px-3 py-2 text-[#26352D] focus:outline-none focus:border-[#E66A32] font-medium"
                   />
                 </div>
               </div>
 
               <button
                 type="submit"
-                className="w-full py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-xs transition-colors cursor-pointer"
+                className="w-full py-3.5 rounded-xl bg-[#E66A32] hover:bg-[#D45B25] text-white font-bold text-xs flex items-center justify-center gap-2 shadow-xs transition-colors cursor-pointer"
               >
                 <Sparkles className="w-4 h-4 fill-white text-white" />
                 <span>Publish Promotion Live</span>
@@ -246,38 +246,38 @@ export default function AdminPromotionsPage() {
           </div>
 
           {/* Active Campaigns List */}
-          <div className="lg:col-span-2 rounded-2xl p-6 border border-slate-200 bg-white shadow-xs space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-blue-600" />
+          <div className="lg:col-span-2 rounded-2xl p-6 border border-[#E8E5DF] bg-white shadow-xs space-y-4">
+            <div className="flex items-center justify-between border-b border-[#E8E5DF] pb-3">
+              <h2 className="text-base font-bold text-[#26352D] flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-[#E66A32]" />
                 <span>Current Promotional Campaigns ({promotionsList.length})</span>
               </h2>
-              <button onClick={loadPromotions} className="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1">
+              <button onClick={loadPromotions} className="text-xs font-bold text-[#E66A32] hover:underline flex items-center gap-1">
                 <RefreshCw className="w-3.5 h-3.5" /> Refresh
               </button>
             </div>
 
             {loading ? (
-              <div className="p-8 text-center text-xs font-medium text-slate-500">Loading active promotions...</div>
+              <div className="p-8 text-center text-xs font-medium text-[#647067]">Loading active promotions...</div>
             ) : (
               <div className="space-y-4">
                 {promotionsList.map((prom) => (
                   <div
                     key={prom.id}
-                    className="p-4 rounded-xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+                    className="p-4 rounded-xl bg-[#FAF7F2] border border-[#E8E5DF] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
                   >
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
-                        <span className="px-2.5 py-0.5 rounded-md bg-blue-600 text-white font-bold text-[10px] uppercase">
+                        <span className="px-2.5 py-0.5 rounded-md bg-[#E66A32] text-white font-bold text-[10px] uppercase">
                           {prom.badgeLabel || 'PROMOTED'}
                         </span>
-                        <span className="text-[11px] font-bold text-blue-600">{prom.placement}</span>
+                        <span className="text-[11px] font-bold text-[#26352D]">{prom.placement}</span>
                       </div>
 
-                      <h3 className="text-base font-bold text-slate-900">{prom.businessName}</h3>
-                      {prom.offerText && <p className="text-xs text-blue-600 font-bold">{prom.offerText}</p>}
-                      <p className="text-[11px] text-slate-500 font-medium flex items-center gap-1">
-                        <Calendar className="w-3 h-3 text-slate-400" />
+                      <h3 className="text-base font-bold text-[#26352D]">{prom.businessName}</h3>
+                      {prom.offerText && <p className="text-xs text-[#E66A32] font-bold">{prom.offerText}</p>}
+                      <p className="text-[11px] text-[#647067] font-medium flex items-center gap-1">
+                        <Calendar className="w-3 h-3 text-[#647067]" />
                         <span>{prom.startDate} to {prom.endDate}</span>
                       </p>
                     </div>
@@ -285,7 +285,7 @@ export default function AdminPromotionsPage() {
                     <div className="flex items-center gap-2">
                       <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold border ${
                         prom.status === 'ACTIVE'
-                          ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                          ? 'bg-[#EAFBF0] text-emerald-800 border-emerald-200'
                           : 'bg-rose-50 text-rose-700 border-rose-200'
                       }`}>
                         {prom.status}

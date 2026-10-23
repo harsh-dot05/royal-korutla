@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
-import { GraduationCap, MapPin, Phone, MessageSquare, Clock, BookOpen, Search } from 'lucide-react';
+import { GraduationCap, MapPin, Phone, MessageCircle, Clock, BookOpen, Search } from 'lucide-react';
 
 interface EducationInstitute {
   id: string;
@@ -86,23 +86,23 @@ export default function EducationPage() {
   });
 
   return (
-    <div className="min-h-screen flex flex-col bg-white text-slate-900">
+    <div className="min-h-screen flex flex-col bg-[#FAF7F2] text-[#26352D]">
       <Header />
 
       <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         {/* Banner */}
-        <div className="rounded-xl p-6 sm:p-8 border border-slate-200 bg-white shadow-xs">
+        <div className="rounded-2xl p-6 sm:p-8 border border-[#E8E5DF] bg-white shadow-xs">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
             <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-blue-50 border border-blue-200 text-blue-800 text-xs font-bold mb-3">
-                <GraduationCap className="w-3.5 h-3.5 text-blue-700" />
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FFF6F0] border border-[#F8CFBE] text-[#E66A32] text-xs font-bold mb-3">
+                <GraduationCap className="w-3.5 h-3.5 text-[#E66A32]" />
                 <span>Korutla Education Directory</span>
               </div>
-              <h1 className="text-2xl sm:text-4xl font-extrabold text-slate-900">
-                Schools, Colleges &amp; Institutes in <span className="text-blue-700">Korutla</span>
+              <h1 className="text-2xl sm:text-4xl font-extrabold text-[#26352D] tracking-tight">
+                Schools, Colleges &amp; Institutes in <span className="text-[#E66A32]">Korutla</span>
               </h1>
-              <p className="text-xs sm:text-sm text-slate-600 mt-2 max-w-xl">
-                Junior colleges, degree institutes, coaching centers, tuition hubs, and computer training centers in Korutla.
+              <p className="text-xs sm:text-sm text-[#647067] mt-2 max-w-xl leading-relaxed">
+                Junior colleges, degree institutes, coaching academies, tuition hubs, and computer training centers in Korutla town.
               </p>
             </div>
           </div>
@@ -111,25 +111,25 @@ export default function EducationPage() {
         {/* Search & Filters */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="relative w-full sm:max-w-md">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#647067]" />
             <input
               type="text"
               placeholder="Search computer, college, school..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-white border border-slate-200 rounded-lg pl-10 pr-4 py-2.5 text-xs sm:text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-700 shadow-xs"
+              className="w-full bg-white border border-[#E8E5DF] focus:border-[#E66A32] rounded-xl pl-10 pr-4 py-2.5 text-xs sm:text-sm text-[#26352D] placeholder-[#647067] focus:outline-none shadow-xs"
             />
           </div>
 
-          <div className="flex items-center gap-2 overflow-x-auto w-full sm:w-auto scrollbar-none">
+          <div className="flex items-center gap-2 overflow-x-auto w-full sm:w-auto pb-1 scrollbar-none">
             {categories.map((cat) => (
               <button
                 key={cat}
                 onClick={() => setSelectedCat(cat)}
-                className={`px-3.5 py-2 rounded-lg text-xs font-bold transition-colors whitespace-nowrap ${
+                className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-colors whitespace-nowrap ${
                   selectedCat === cat
-                    ? 'bg-blue-700 text-white shadow-xs'
-                    : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200'
+                    ? 'bg-[#E66A32] text-white shadow-xs'
+                    : 'bg-white text-[#647067] hover:text-[#26352D] border border-[#E8E5DF]'
                 }`}
               >
                 {cat}
@@ -140,11 +140,11 @@ export default function EducationPage() {
 
         {/* Institutions Grid */}
         {filteredInstitutes.length === 0 ? (
-          <div className="py-12 text-center bg-white rounded-xl border border-slate-200 p-6">
-            <p className="text-sm font-semibold text-slate-700 mb-4">No educational institutions match your search.</p>
+          <div className="py-12 text-center bg-white rounded-2xl border border-[#E8E5DF] p-8 space-y-4">
+            <p className="text-sm font-semibold text-[#26352D]">No educational institutions match your search.</p>
             <button
               onClick={() => { setSelectedCat('All'); setSearchQuery(''); }}
-              className="px-4 py-2 rounded-lg bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs transition-colors"
+              className="px-4 py-2 rounded-xl bg-[#E66A32] hover:bg-[#D45B25] text-white font-bold text-xs transition-colors"
             >
               Reset Search
             </button>
@@ -154,43 +154,43 @@ export default function EducationPage() {
             {filteredInstitutes.map((inst) => (
               <div
                 key={inst.id}
-                className="rounded-xl border border-slate-200 bg-white shadow-xs p-5 flex flex-col justify-between space-y-4"
+                className="rounded-2xl border border-[#E8E5DF] hover:border-[#E66A32] bg-white shadow-xs p-6 flex flex-col justify-between space-y-4 transition-all"
               >
                 <div className="space-y-3">
-                  <div className="relative h-44 w-full rounded-lg overflow-hidden bg-slate-100 border border-slate-200">
+                  <div className="relative h-44 w-full rounded-xl overflow-hidden bg-[#FAF7F2] border border-[#E8E5DF]">
                     <Image src={inst.image} alt={inst.name} fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" />
                     {inst.badge && (
-                      <span className="absolute top-3 left-3 px-2.5 py-1 rounded-md bg-blue-700 text-white text-[10px] font-bold shadow-xs">
+                      <span className="absolute top-3 left-3 px-2.5 py-1 rounded-md bg-[#26352D] text-white text-[10px] font-bold shadow-xs">
                         {inst.badge}
                       </span>
                     )}
                   </div>
 
                   <div>
-                    <span className="text-[11px] font-bold text-blue-700 uppercase tracking-wider">{inst.category}</span>
-                    <h3 className="text-base font-bold text-slate-900 mt-0.5">{inst.name}</h3>
-                    <p className="text-xs text-slate-600 mt-1 flex items-center gap-1.5">
-                      <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                    <span className="text-[11px] font-bold text-[#E66A32] uppercase tracking-wider">{inst.category}</span>
+                    <h3 className="text-base font-bold text-[#26352D] mt-0.5">{inst.name}</h3>
+                    <p className="text-xs text-[#647067] mt-1 flex items-center gap-1.5">
+                      <MapPin className="w-3.5 h-3.5 text-[#E66A32] shrink-0" />
                       <span>{inst.location}</span>
                     </p>
-                    <p className="text-xs text-slate-600 mt-0.5 flex items-center gap-1.5">
-                      <Clock className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                    <p className="text-xs text-[#647067] mt-0.5 flex items-center gap-1.5">
+                      <Clock className="w-3.5 h-3.5 text-[#647067] shrink-0" />
                       <span>{inst.timings}</span>
                     </p>
                   </div>
 
-                  <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed">
+                  <p className="text-xs text-[#647067] line-clamp-2 leading-relaxed">
                     {inst.description}
                   </p>
 
                   {/* Courses List */}
                   <div>
-                    <p className="text-[11px] font-bold text-slate-700 mb-1 flex items-center gap-1">
-                      <BookOpen className="w-3.5 h-3.5 text-blue-700" /> Offered Courses:
+                    <p className="text-[11px] font-bold text-[#26352D] mb-1 flex items-center gap-1">
+                      <BookOpen className="w-3.5 h-3.5 text-[#E66A32]" /> Offered Courses:
                     </p>
                     <div className="flex flex-wrap gap-1.5">
                       {inst.courses.map((course, idx) => (
-                        <span key={idx} className="px-2 py-0.5 rounded-md bg-blue-50 text-[10px] font-semibold text-blue-800 border border-blue-100">
+                        <span key={idx} className="px-2.5 py-0.5 rounded-md bg-[#FFF6F0] text-[10px] font-semibold text-[#E66A32] border border-[#F8CFBE]">
                           {course}
                         </span>
                       ))}
@@ -199,21 +199,21 @@ export default function EducationPage() {
                 </div>
 
                 {/* Action Buttons */}
-                <div className="pt-3 border-t border-slate-100 grid grid-cols-2 gap-3 text-xs font-bold">
+                <div className="pt-3 border-t border-[#E8E5DF] grid grid-cols-2 gap-3 text-xs font-bold">
                   <a
                     href={`tel:${inst.phone}`}
-                    className="flex items-center justify-center gap-1.5 py-2.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 transition-colors border border-slate-200"
+                    className="flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-[#FAF7F2] hover:bg-[#E8E5DF] text-[#26352D] transition-colors border border-[#E8E5DF]"
                   >
-                    <Phone className="w-3.5 h-3.5 text-blue-700" />
-                    <span>Call Institution</span>
+                    <Phone className="w-3.5 h-3.5 text-[#E66A32]" />
+                    <span>Call Institute</span>
                   </a>
                   <a
                     href={`https://wa.me/${inst.whatsapp.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hi ${inst.name}, I found your institution on Royal Korutla. I would like to inquire about admissions and courses.`)}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-center gap-1.5 py-2.5 rounded-lg bg-blue-700 hover:bg-blue-800 text-white transition-colors"
+                    className="flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-[#25D366] hover:bg-[#1EBE5D] text-white transition-colors"
                   >
-                    <MessageSquare className="w-3.5 h-3.5" />
+                    <MessageCircle className="w-3.5 h-3.5" />
                     <span>WhatsApp Inquiry</span>
                   </a>
                 </div>

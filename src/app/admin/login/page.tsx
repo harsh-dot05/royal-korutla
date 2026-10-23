@@ -48,14 +48,14 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white text-slate-900 flex flex-col justify-between p-4 sm:p-6 lg:p-8">
+    <div className="min-h-screen bg-[#FAF7F2] text-[#26352D] flex flex-col justify-between p-4 sm:p-6 lg:p-8">
       {/* Top Bar */}
       <div className="max-w-md mx-auto w-full flex items-center justify-between">
-        <Link href="/" className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-900 transition-colors">
+        <Link href="/" className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#647067] hover:text-[#26352D] transition-colors">
           <ArrowLeft className="w-4 h-4" />
           <span>Back to Korutla Directory</span>
         </Link>
-        <span className="text-[11px] font-bold px-2.5 py-1 rounded-md bg-blue-50 text-blue-800 border border-blue-200">
+        <span className="text-[11px] font-bold px-2.5 py-1 rounded-md bg-[#FFF6F0] text-[#E66A32] border border-[#F8CFBE]">
           Owner Access Only
         </span>
       </div>
@@ -63,16 +63,16 @@ export default function AdminLoginPage() {
       {/* Main Login Card */}
       <div className="max-w-md mx-auto w-full my-auto py-8 space-y-6">
         <div className="text-center space-y-2">
-          <div className="w-14 h-14 rounded-xl bg-blue-700 text-white mx-auto flex items-center justify-center shadow-xs">
-            <Shield className="w-7 h-7" />
+          <div className="w-14 h-14 rounded-xl bg-[#26352D] text-white mx-auto flex items-center justify-center shadow-xs">
+            <Shield className="w-7 h-7 text-[#E66A32]" />
           </div>
-          <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">Royal Korutla Admin</h1>
-          <p className="text-xs text-slate-500 max-w-xs mx-auto">
+          <h1 className="text-2xl font-extrabold text-[#26352D] tracking-tight">Royal Korutla Admin</h1>
+          <p className="text-xs text-[#647067] max-w-xs mx-auto">
             Restricted access for authorized platform owner.
           </p>
         </div>
 
-        <div className="bg-white rounded-xl p-6 sm:p-8 border border-slate-200 shadow-xs space-y-5">
+        <div className="bg-white rounded-2xl p-6 sm:p-8 border border-[#E8E5DF] shadow-xs space-y-5">
           {error && (
             <div className="p-3.5 rounded-lg bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold flex items-center gap-2">
               <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
@@ -82,8 +82,8 @@ export default function AdminLoginPage() {
 
           <form onSubmit={handleSubmit} className="space-y-4 text-xs">
             <div>
-              <label htmlFor="admin-email" className="block font-bold text-slate-700 mb-1 flex items-center gap-1.5">
-                <Mail className="w-3.5 h-3.5 text-blue-700" />
+              <label htmlFor="admin-email" className="block font-bold text-[#26352D] mb-1 flex items-center gap-1.5">
+                <Mail className="w-3.5 h-3.5 text-[#E66A32]" />
                 <span>Admin Email Address</span>
               </label>
               <input
@@ -93,13 +93,13 @@ export default function AdminLoginPage() {
                 placeholder="admin@royalkorutla.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-white border border-slate-300 rounded-lg px-3.5 py-3 text-xs text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 shadow-2xs"
+                className="w-full bg-[#FAF7F2] border border-[#E8E5DF] rounded-xl px-3.5 py-3 text-xs text-[#26352D] font-semibold placeholder-[#647067]/60 focus:outline-none focus:border-[#E66A32] focus:ring-2 focus:ring-[#FFF6F0] shadow-2xs"
               />
             </div>
 
             <div>
-              <label htmlFor="admin-password" className="block font-bold text-slate-700 mb-1 flex items-center gap-1.5">
-                <KeyRound className="w-3.5 h-3.5 text-blue-700" />
+              <label htmlFor="admin-password" className="block font-bold text-[#26352D] mb-1 flex items-center gap-1.5">
+                <KeyRound className="w-3.5 h-3.5 text-[#E66A32]" />
                 <span>Admin Password</span>
               </label>
               <input
@@ -109,14 +109,14 @@ export default function AdminLoginPage() {
                 placeholder="••••••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-white border border-slate-300 rounded-lg px-3.5 py-3 text-xs text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 shadow-2xs"
+                className="w-full bg-[#FAF7F2] border border-[#E8E5DF] rounded-xl px-3.5 py-3 text-xs text-[#26352D] font-semibold placeholder-[#647067]/60 focus:outline-none focus:border-[#E66A32] focus:ring-2 focus:ring-[#FFF6F0] shadow-2xs"
               />
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3.5 rounded-lg bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs flex items-center justify-center gap-2 transition-colors shadow-xs disabled:opacity-50 cursor-pointer"
+              className="w-full py-3.5 rounded-xl bg-[#E66A32] hover:bg-[#D45B25] text-white font-bold text-xs flex items-center justify-center gap-2 transition-colors shadow-xs disabled:opacity-50 cursor-pointer"
             >
               {loading ? (
                 <span>Verifying Credentials...</span>
@@ -129,11 +129,11 @@ export default function AdminLoginPage() {
             </button>
           </form>
 
-          <div className="pt-3 border-t border-slate-100 text-center text-[11px] text-slate-500 space-y-1">
-            <p className="font-semibold text-slate-700 flex items-center justify-center gap-1">
-              <CheckCircle2 className="w-3.5 h-3.5 text-blue-700" /> Server Authorization Active
+          <div className="pt-3 border-t border-[#E8E5DF] text-center text-[11px] text-[#647067] space-y-1">
+            <p className="font-semibold text-[#26352D] flex items-center justify-center gap-1">
+              <CheckCircle2 className="w-3.5 h-3.5 text-[#E66A32]" /> Server Authorization Active
             </p>
-            <p className="text-[10px] text-slate-400">
+            <p className="text-[10px] text-[#647067]">
               Unauthenticated access attempts are logged.
             </p>
           </div>

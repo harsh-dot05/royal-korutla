@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
-import { ShoppingBag, Plus, Minus, Search, MessageSquare, Store } from 'lucide-react';
+import { ShoppingBag, Plus, Minus, Search, MessageCircle, Store, CheckCircle2 } from 'lucide-react';
 
 interface GroceryProduct {
   id: string;
@@ -81,35 +81,35 @@ export default function GroceriesPage() {
     });
 
     msg += `\n*Total Estimated Bill:* ₹${subtotal}\n`;
-    msg += `*Delivery:* Free Doorstep Delivery in Korutla\n`;
+    msg += `*Delivery:* Free Doorstep Delivery in Korutla Town\n`;
 
     window.open(`https://wa.me/919989077665?text=${encodeURIComponent(msg)}`, '_blank');
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-white text-slate-900">
+    <div className="min-h-screen flex flex-col bg-[#FAF7F2] text-[#26352D]">
       <Header />
 
       <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-        <div className="rounded-xl p-6 sm:p-8 border border-slate-200 bg-white shadow-xs">
+        <div className="rounded-2xl p-6 sm:p-8 border border-[#E8E5DF] bg-white shadow-xs">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
             <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-blue-50 border border-blue-200 text-blue-800 text-xs font-bold mb-3">
-                <Store className="w-3.5 h-3.5 text-blue-700" />
-                <span>Korutla Grocery Store</span>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FFF6F0] border border-[#F8CFBE] text-[#E66A32] text-xs font-bold mb-3">
+                <Store className="w-3.5 h-3.5 text-[#E66A32]" />
+                <span>Korutla Grocery &amp; Marts</span>
               </div>
-              <h1 className="text-2xl sm:text-4xl font-extrabold text-slate-900">
-                Fresh Groceries in <span className="text-blue-700">Korutla</span>
+              <h1 className="text-2xl sm:text-4xl font-extrabold text-[#26352D] tracking-tight">
+                Fresh Groceries in <span className="text-[#E66A32]">Korutla</span>
               </h1>
-              <p className="text-xs sm:text-sm text-slate-600 mt-2">
-                Order vegetables, rice, dal, milk, and cooking oil directly on WhatsApp.
+              <p className="text-xs sm:text-sm text-[#647067] mt-2 max-w-2xl leading-relaxed">
+                Order vegetables, rice, dal, milk, and cooking oil from verified supermarkets in Korutla directly on WhatsApp.
               </p>
             </div>
 
             {totalItems > 0 && (
-              <div className="p-4 rounded-xl bg-slate-100 border border-slate-200 text-center w-full md:w-auto">
-                <p className="text-xs text-slate-500 font-semibold">{totalItems} Items Selected</p>
-                <p className="text-xl font-extrabold text-blue-700">₹{subtotal}</p>
+              <div className="p-5 rounded-2xl bg-[#FFF6F0] border border-[#F8CFBE] text-center w-full md:w-auto">
+                <p className="text-xs text-[#647067] font-semibold">{totalItems} Items Selected</p>
+                <p className="text-2xl font-extrabold text-[#E66A32]">₹{subtotal}</p>
               </div>
             )}
           </div>
@@ -118,25 +118,25 @@ export default function GroceriesPage() {
         {/* Search & Category filter */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="relative w-full sm:max-w-md">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#647067]" />
             <input
               type="text"
-              placeholder="Search tomatoes, milk, rice..."
+              placeholder="Search tomatoes, milk, rice, oil..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-white border border-slate-200 rounded-lg pl-10 pr-4 py-2.5 text-xs sm:text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-700 shadow-xs"
+              className="w-full bg-white border border-[#E8E5DF] focus:border-[#E66A32] rounded-xl pl-10 pr-4 py-2.5 text-xs sm:text-sm text-[#26352D] placeholder-[#647067] focus:outline-none shadow-xs"
             />
           </div>
 
-          <div className="flex items-center gap-2 overflow-x-auto w-full sm:w-auto scrollbar-none">
+          <div className="flex items-center gap-2 overflow-x-auto w-full sm:w-auto pb-1 scrollbar-none">
             {categories.map((cat) => (
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={`px-3.5 py-2 rounded-lg text-xs font-bold transition-colors whitespace-nowrap ${
+                className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-colors whitespace-nowrap ${
                   selectedCategory === cat
-                    ? 'bg-blue-700 text-white shadow-xs'
-                    : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200'
+                    ? 'bg-[#E66A32] text-white shadow-xs'
+                    : 'bg-white text-[#647067] hover:text-[#26352D] border border-[#E8E5DF]'
                 }`}
               >
                 {cat}
@@ -147,11 +147,11 @@ export default function GroceriesPage() {
 
         {/* Products Grid & Cart Sidebar */}
         {filteredProducts.length === 0 ? (
-          <div className="py-12 text-center bg-white rounded-xl border border-slate-200 p-6">
-            <p className="text-sm font-semibold text-slate-700 mb-4">No grocery products match your search.</p>
+          <div className="py-12 text-center bg-white rounded-2xl border border-[#E8E5DF] p-8 space-y-4">
+            <p className="text-sm font-semibold text-[#26352D]">No grocery products match your search.</p>
             <button
               onClick={() => { setSelectedCategory('All'); setSearchQuery(''); }}
-              className="px-4 py-2 rounded-lg bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs transition-colors"
+              className="px-4 py-2 rounded-xl bg-[#E66A32] hover:bg-[#D45B25] text-white font-bold text-xs transition-colors"
             >
               Reset Search
             </button>
@@ -165,36 +165,36 @@ export default function GroceriesPage() {
                 return (
                   <div
                     key={prod.id}
-                    className="rounded-xl p-4 flex gap-4 border border-slate-200 bg-white shadow-xs"
+                    className="rounded-2xl p-4 flex gap-4 border border-[#E8E5DF] hover:border-[#E66A32] bg-white shadow-xs transition-all"
                   >
-                    <div className="relative w-24 h-24 rounded-lg overflow-hidden bg-slate-100 shrink-0 border border-slate-200">
+                    <div className="relative w-24 h-24 rounded-xl overflow-hidden bg-[#FAF7F2] shrink-0 border border-[#E8E5DF]">
                       <Image src={prod.image} alt={prod.name} fill sizes="96px" className="object-cover" />
                     </div>
 
                     <div className="flex-1 flex flex-col justify-between">
                       <div>
-                        <span className="text-[10px] font-bold text-blue-700 uppercase tracking-wider">{prod.category}</span>
-                        <h3 className="text-xs sm:text-sm font-bold text-slate-900 leading-snug">{prod.name}</h3>
-                        <p className="text-[11px] text-slate-500 mt-0.5">{prod.weight}</p>
+                        <span className="text-[10px] font-bold text-[#E66A32] uppercase tracking-wider">{prod.category}</span>
+                        <h3 className="text-xs sm:text-sm font-bold text-[#26352D] leading-snug">{prod.name}</h3>
+                        <p className="text-[11px] text-[#647067] mt-0.5">{prod.weight}</p>
                       </div>
 
                       <div className="flex items-center justify-between mt-3">
-                        <span className="text-sm font-bold text-slate-900">₹{prod.price}</span>
+                        <span className="text-sm font-bold text-[#26352D]">₹{prod.price}</span>
 
                         {qty > 0 ? (
-                          <div className="flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-lg px-2 py-1">
-                            <button onClick={() => updateQty(prod.id, -1)} className="text-slate-700 hover:text-blue-700">
+                          <div className="flex items-center gap-2 bg-[#FFF6F0] border border-[#F8CFBE] rounded-xl px-2.5 py-1">
+                            <button onClick={() => updateQty(prod.id, -1)} className="text-[#26352D] hover:text-[#E66A32]">
                               <Minus className="w-3 h-3" />
                             </button>
-                            <span className="text-xs font-bold text-blue-700">{qty}</span>
-                            <button onClick={() => updateQty(prod.id, 1)} className="text-slate-700 hover:text-blue-700">
+                            <span className="text-xs font-bold text-[#E66A32]">{qty}</span>
+                            <button onClick={() => updateQty(prod.id, 1)} className="text-[#26352D] hover:text-[#E66A32]">
                               <Plus className="w-3 h-3" />
                             </button>
                           </div>
                         ) : (
                           <button
                             onClick={() => updateQty(prod.id, 1)}
-                            className="px-3 py-1.5 rounded-lg bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs flex items-center gap-1 transition-colors"
+                            className="px-3.5 py-1.5 rounded-xl bg-[#E66A32] hover:bg-[#D45B25] text-white font-bold text-xs flex items-center gap-1 transition-colors shadow-2xs"
                           >
                             <Plus className="w-3 h-3" />
                             <span>ADD</span>
@@ -208,14 +208,14 @@ export default function GroceriesPage() {
             </div>
 
             {/* Cart Form */}
-            <div className="rounded-xl p-5 border border-slate-200 bg-white shadow-xs h-fit space-y-4">
-              <h2 className="text-base font-bold text-slate-900 flex items-center gap-2 pb-3 border-b border-slate-100">
-                <ShoppingBag className="w-4 h-4 text-blue-700" />
+            <div className="rounded-2xl p-6 border border-[#E8E5DF] bg-white shadow-xs h-fit space-y-4">
+              <h2 className="text-base font-bold text-[#26352D] flex items-center gap-2 pb-3 border-b border-[#E8E5DF]">
+                <ShoppingBag className="w-4 h-4 text-[#E66A32]" />
                 <span>Grocery Order Checkout</span>
               </h2>
 
               {totalItems === 0 ? (
-                <p className="text-xs text-slate-500 text-center py-6">No items selected yet. Click + ADD on products!</p>
+                <p className="text-xs text-[#647067] text-center py-6">No items selected yet. Click + ADD on products!</p>
               ) : (
                 <div className="space-y-4">
                   <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
@@ -223,48 +223,48 @@ export default function GroceriesPage() {
                       const p = GROCERY_PRODUCTS.find((item) => item.id === id);
                       if (!p) return null;
                       return (
-                        <div key={id} className="flex items-center justify-between text-xs py-1 border-b border-slate-100">
-                          <span className="text-slate-700 font-semibold truncate max-w-[160px]">{p.name} x {qty}</span>
-                          <span className="text-blue-700 font-bold">₹{p.price * qty}</span>
+                        <div key={id} className="flex items-center justify-between text-xs py-1.5 border-b border-[#FAF7F2]">
+                          <span className="text-[#26352D] font-semibold truncate max-w-[160px]">{p.name} x {qty}</span>
+                          <span className="text-[#E66A32] font-bold">₹{p.price * qty}</span>
                         </div>
                       );
                     })}
                   </div>
 
-                  <div className="pt-2 border-t border-slate-200 flex justify-between text-sm font-bold text-slate-900">
+                  <div className="pt-2 border-t border-[#E8E5DF] flex justify-between text-sm font-bold text-[#26352D]">
                     <span>Total Amount</span>
-                    <span className="text-blue-700">₹{subtotal}</span>
+                    <span className="text-[#E66A32]">₹{subtotal}</span>
                   </div>
 
-                  <div className="space-y-2 pt-2">
+                  <div className="space-y-2.5 pt-2 text-xs">
                     <input
                       type="text"
                       placeholder="Your Name *"
                       value={customerName}
                       onChange={(e) => setCustomerName(e.target.value)}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-blue-700"
+                      className="w-full bg-[#FAF7F2] border border-[#E8E5DF] focus:border-[#E66A32] rounded-xl px-3.5 py-2 text-[#26352D] focus:outline-none"
                     />
                     <input
                       type="tel"
                       placeholder="Phone Number *"
                       value={customerPhone}
                       onChange={(e) => setCustomerPhone(e.target.value)}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-blue-700"
+                      className="w-full bg-[#FAF7F2] border border-[#E8E5DF] focus:border-[#E66A32] rounded-xl px-3.5 py-2 text-[#26352D] focus:outline-none"
                     />
                     <textarea
                       placeholder="Korutla Delivery Address *"
                       rows={2}
                       value={address}
                       onChange={(e) => setAddress(e.target.value)}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-blue-700"
+                      className="w-full bg-[#FAF7F2] border border-[#E8E5DF] focus:border-[#E66A32] rounded-xl px-3.5 py-2 text-[#26352D] focus:outline-none"
                     />
                   </div>
 
                   <button
                     onClick={handleOrderWhatsApp}
-                    className="w-full py-3 rounded-lg bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs flex items-center justify-center gap-2 transition-colors"
+                    className="w-full py-3 rounded-xl bg-[#25D366] hover:bg-[#1EBE5D] text-white font-bold text-xs flex items-center justify-center gap-2 transition-colors shadow-xs"
                   >
-                    <MessageSquare className="w-4 h-4" />
+                    <MessageCircle className="w-4 h-4" />
                     <span>Send Order to WhatsApp</span>
                   </button>
                 </div>

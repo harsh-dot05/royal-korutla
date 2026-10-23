@@ -11,7 +11,40 @@ export const Hero: React.FC = () => {
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (selectedCategory !== 'all') {
+      window.location.href = `/${selectedCategory}`;
+      return;
+    }
     if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase().trim();
+      if (q.includes('cloth') || q.includes('saree') || q.includes('textile') || q.includes('suit')) {
+        window.location.href = '/clothing';
+        return;
+      }
+      if (q.includes('food') || q.includes('biryani') || q.includes('hotel') || q.includes('restaurant')) {
+        window.location.href = '/food';
+        return;
+      }
+      if (q.includes('grocery') || q.includes('vegetable') || q.includes('supermarket')) {
+        window.location.href = '/groceries';
+        return;
+      }
+      if (q.includes('doctor') || q.includes('hospital') || q.includes('clinic') || q.includes('emergency')) {
+        window.location.href = '/hospitals';
+        return;
+      }
+      if (q.includes('job') || q.includes('vacancy') || q.includes('work') || q.includes('hiring')) {
+        window.location.href = '/jobs';
+        return;
+      }
+      if (q.includes('house') || q.includes('rent') || q.includes('plot') || q.includes('real estate')) {
+        window.location.href = '/real-estate';
+        return;
+      }
+      if (q.includes('service') || q.includes('electric') || q.includes('plumb') || q.includes('repair')) {
+        window.location.href = '/services';
+        return;
+      }
       const catEl = document.getElementById('categories');
       if (catEl) catEl.scrollIntoView({ behavior: 'smooth' });
     }

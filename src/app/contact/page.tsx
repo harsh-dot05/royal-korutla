@@ -39,7 +39,7 @@ export default function ContactPage() {
       badge: 'General Help',
       message: WHATSAPP_PREFILLED_MESSAGES.customerHelp,
       buttonText: 'Chat for Support',
-      highlightColor: 'border-blue-200 bg-blue-50/50 text-blue-700',
+      highlightColor: 'border-[#E8E5DF] bg-[#FAF7F2] text-[#26352D]',
     },
     {
       id: 'instant-reel',
@@ -49,7 +49,7 @@ export default function ContactPage() {
       badge: 'Video Production',
       message: WHATSAPP_PREFILLED_MESSAGES.instantReel,
       buttonText: 'Enquire for Instant Reel',
-      highlightColor: 'border-orange-200 bg-orange-50/50 text-[#E66A32]',
+      highlightColor: 'border-[#F8CFBE] bg-[#FFF6F0] text-[#E66A32]',
     },
     {
       id: 'website-creation',
@@ -59,7 +59,7 @@ export default function ContactPage() {
       badge: 'Digital Solutions',
       message: WHATSAPP_PREFILLED_MESSAGES.websiteCreation,
       buttonText: 'Enquire for Website Creation',
-      highlightColor: 'border-emerald-200 bg-emerald-50/50 text-emerald-700',
+      highlightColor: 'border-[#C8DFD1] bg-[#F0F7F3] text-[#26352D]',
     },
     {
       id: 'promotions',
@@ -69,7 +69,7 @@ export default function ContactPage() {
       badge: 'Marketing Reach',
       message: WHATSAPP_PREFILLED_MESSAGES.promotionsAdvertising,
       buttonText: 'Enquire for Promotion',
-      highlightColor: 'border-purple-200 bg-purple-50/50 text-purple-700',
+      highlightColor: 'border-[#F8CFBE] bg-[#FFF6F0] text-[#E66A32]',
     },
     {
       id: 'merchant-listing',
@@ -79,7 +79,7 @@ export default function ContactPage() {
       badge: 'Listing & Badges',
       message: WHATSAPP_PREFILLED_MESSAGES.serviceOnboarding,
       buttonText: 'Enquire to List Business',
-      highlightColor: 'border-amber-200 bg-amber-50/50 text-amber-700',
+      highlightColor: 'border-[#E8E5DF] bg-[#FAF7F2] text-[#647067]',
     },
   ];
 

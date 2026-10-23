@@ -623,12 +623,12 @@ export default function RewardsPage() {
                         <span
                           className={`px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider ${
                             tx.category === 'SIGNUP'
-                              ? 'bg-blue-100 text-blue-900 border border-blue-200'
+                              ? 'bg-[#FFF6F0] text-[#E66A32] border border-[#F8CFBE]'
                               : tx.category === 'REFERRAL'
-                              ? 'bg-purple-100 text-purple-900 border border-purple-200'
+                              ? 'bg-[#F0F7F3] text-[#26352D] border border-[#C8DFD1]'
                               : tx.category === 'REDEMPTION'
-                              ? 'bg-rose-100 text-rose-900 border border-rose-200'
-                              : 'bg-emerald-100 text-emerald-900 border border-emerald-200'
+                              ? 'bg-[#FFF6F0] text-[#E66A32] border border-[#F8CFBE]'
+                              : 'bg-[#F0F7F3] text-[#26352D] border border-[#C8DFD1]'
                           }`}
                         >
                           {tx.category || (isEarned ? 'EARNED' : 'REDEEMED')}

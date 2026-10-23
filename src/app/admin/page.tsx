@@ -39,6 +39,9 @@ import {
   EmergencyContact,
   ReferralRecord,
   ConfigurableRewardBenefit,
+  Category,
+  BusinessEnquiry,
+  PublicRepresentative,
 } from '@/types';
 import { SafeAdminUser } from '@/lib/adminStore';
 import {
@@ -107,7 +110,7 @@ const JOB_CATEGORIES = [
 ];
 
 const JOB_COLOR_THEMES = [
-  { id: 'blue', label: 'Royal Blue', border: 'border-blue-300 hover:border-blue-500', bg: 'bg-blue-600', text: 'text-blue-700', badgeBg: 'bg-blue-600', lightBg: 'bg-blue-50', ring: 'ring-blue-500' },
+  { id: 'orange', label: 'Royal Orange', border: 'border-[#F8CFBE] hover:border-[#E66A32]', bg: 'bg-[#E66A32]', text: 'text-[#E66A32]', badgeBg: 'bg-[#E66A32]', lightBg: 'bg-[#FFF6F0]', ring: 'ring-[#E66A32]' },
   { id: 'emerald', label: 'Emerald Green', border: 'border-emerald-300 hover:border-emerald-500', bg: 'bg-emerald-600', text: 'text-emerald-700', badgeBg: 'bg-emerald-600', lightBg: 'bg-emerald-50', ring: 'ring-emerald-500' },
   { id: 'purple', label: 'Royal Purple', border: 'border-purple-300 hover:border-purple-500', bg: 'bg-purple-600', text: 'text-purple-700', badgeBg: 'bg-purple-600', lightBg: 'bg-purple-50', ring: 'ring-purple-500' },
   { id: 'amber', label: 'Amber Gold', border: 'border-amber-300 hover:border-amber-500', bg: 'bg-amber-600', text: 'text-amber-700', badgeBg: 'bg-amber-600', lightBg: 'bg-amber-50', ring: 'ring-amber-500' },
@@ -131,13 +134,15 @@ const JOB_BADGE_COLORS = [
   { id: 'rose', label: 'Rose Red', bg: 'bg-rose-600', text: 'text-white' },
   { id: 'emerald', label: 'Emerald Green', bg: 'bg-emerald-600', text: 'text-white' },
   { id: 'amber', label: 'Amber Gold', bg: 'bg-amber-500', text: 'text-slate-950' },
-  { id: 'blue', label: 'Royal Blue', bg: 'bg-blue-600', text: 'text-white' },
+  { id: 'orange', label: 'Royal Orange', bg: 'bg-[#E66A32]', text: 'text-white' },
   { id: 'purple', label: 'Royal Purple', bg: 'bg-purple-600', text: 'text-white' },
   { id: 'indigo', label: 'Deep Indigo', bg: 'bg-indigo-600', text: 'text-white' },
 ];
 
 type AdminTab =
   | 'dashboard'
+  | 'categories'
+  | 'enquiries'
   | 'businesses'
   | 'add-business'
   | 'edit-business'
@@ -328,6 +333,179 @@ export default function AdminDashboardPage() {
   const [supportPhone, setSupportPhone] = useState('+91 98480 12345');
   const [supportEmail, setSupportEmail] = useState('support@royalkorutla.com');
   const [maintenanceMode, setMaintenanceMode] = useState(false);
+
+  // Categories State & Management
+  const [categoriesList, setCategoriesList] = useState<Category[]>([]);
+  const [loadingCategories, setLoadingCategories] = useState(false);
+  const [editingCategorySlug, setEditingCategorySlug] = useState<string | null>(null);
+  const [catBadgeInput, setCatBadgeInput] = useState('');
+  const [catDescInput, setCatDescInput] = useState('');
+  const [catCountInput, setCatCountInput] = useState(0);
+
+  const fetchCategories = async () => {
+    setLoadingCategories(true);
+    try {
+      const res = await fetch('/api/admin/categories');
+      const data = await res.json();
+      if (data.success && Array.isArray(data.data)) {
+        setCategoriesList(data.data);
+      }
+    } catch (e) {
+      console.error('Failed to fetch categories', e);
+    } finally {
+      setLoadingCategories(false);
+    }
+  };
+
+  const handleToggleCategoryActive = async (category: Category) => {
+    try {
+      const storedToken = typeof window !== 'undefined' ? localStorage.getItem('rk_session_token') : null;
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (storedToken) headers['Authorization'] = `Bearer ${storedToken}`;
+
+      const res = await fetch('/api/admin/categories', {
+        method: 'PUT',
+        headers,
+        body: JSON.stringify({ slug: category.slug, isActive: category.isActive === false ? true : false }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        showToast(category.isActive === false ? `${category.name} activated on website` : `${category.name} hidden from website`);
+        setCategoriesList(prev => prev.map(c => c.slug === category.slug ? { ...c, isActive: !c.isActive } : c));
+      }
+    } catch {
+      showToast('Failed to update category', 'error');
+    }
+  };
+
+  const handleSaveCategoryDetails = async (category: Category) => {
+    try {
+      const storedToken = typeof window !== 'undefined' ? localStorage.getItem('rk_session_token') : null;
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (storedToken) headers['Authorization'] = `Bearer ${storedToken}`;
+
+      const res = await fetch('/api/admin/categories', {
+        method: 'PUT',
+        headers,
+        body: JSON.stringify({
+          slug: category.slug,
+          badge: catBadgeInput,
+          description: catDescInput,
+          itemCount: Number(catCountInput),
+        }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        showToast(`Saved changes for ${category.name}`);
+        setEditingCategorySlug(null);
+        fetchCategories();
+      }
+    } catch {
+      showToast('Failed to save category details', 'error');
+    }
+  };
+
+  // Customer Enquiries State & Management
+  const [enquiriesList, setEnquiriesList] = useState<BusinessEnquiry[]>([]);
+  const [loadingEnquiries, setLoadingEnquiries] = useState(false);
+  const [enquiryFilter, setEnquiryFilter] = useState<'ALL' | 'NEW' | 'RESPONDED' | 'CLOSED'>('ALL');
+  const [enquiryNotesInput, setEnquiryNotesInput] = useState<{ [id: string]: string }>({});
+
+  const fetchEnquiries = async () => {
+    setLoadingEnquiries(true);
+    try {
+      const storedToken = typeof window !== 'undefined' ? localStorage.getItem('rk_session_token') : null;
+      const headers: Record<string, string> = {};
+      if (storedToken) headers['Authorization'] = `Bearer ${storedToken}`;
+
+      const res = await fetch('/api/admin/enquiries', { headers });
+      const data = await res.json();
+      if (data.success && Array.isArray(data.data)) {
+        setEnquiriesList(data.data);
+      }
+    } catch (e) {
+      console.error('Failed to fetch enquiries', e);
+    } finally {
+      setLoadingEnquiries(false);
+    }
+  };
+
+  const handleUpdateEnquiryStatus = async (id: string, newStatus: 'NEW' | 'RESPONDED' | 'CLOSED') => {
+    try {
+      const storedToken = typeof window !== 'undefined' ? localStorage.getItem('rk_session_token') : null;
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (storedToken) headers['Authorization'] = `Bearer ${storedToken}`;
+
+      const res = await fetch('/api/admin/enquiries', {
+        method: 'PATCH',
+        headers,
+        body: JSON.stringify({
+          id,
+          status: newStatus,
+          responseNotes: enquiryNotesInput[id] || undefined,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        showToast(`Enquiry marked as ${newStatus}`);
+        fetchEnquiries();
+      }
+    } catch {
+      showToast('Failed to update enquiry status', 'error');
+    }
+  };
+
+  // Public Representatives State & Inline Management
+  const [representativesList, setRepresentativesList] = useState<PublicRepresentative[]>([]);
+  const [loadingReps, setLoadingReps] = useState(false);
+  const [repFilterRole, setRepFilterRole] = useState<'ALL' | 'KEY' | 'WARDS' | 'VERIFIED' | 'PENDING'>('ALL');
+  const [repSearchQuery, setRepSearchQuery] = useState('');
+
+  const fetchRepresentatives = async () => {
+    setLoadingReps(true);
+    try {
+      const storedToken = typeof window !== 'undefined' ? localStorage.getItem('rk_session_token') : null;
+      const headers: Record<string, string> = {};
+      if (storedToken) headers['Authorization'] = `Bearer ${storedToken}`;
+
+      const res = await fetch('/api/admin/representatives', { headers });
+      const data = await res.json();
+      if (data.success && Array.isArray(data.data)) {
+        setRepresentativesList(data.data);
+      } else {
+        const pubRes = await fetch('/api/representatives');
+        const pubData = await pubRes.json();
+        if (pubData.success && pubData.data?.all) {
+          setRepresentativesList(pubData.data.all);
+        }
+      }
+    } catch (e) {
+      console.error('Failed to fetch representatives', e);
+    } finally {
+      setLoadingReps(false);
+    }
+  };
+
+  const handleToggleRepVerification = async (rep: PublicRepresentative) => {
+    try {
+      const storedToken = typeof window !== 'undefined' ? localStorage.getItem('rk_session_token') : null;
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (storedToken) headers['Authorization'] = `Bearer ${storedToken}`;
+
+      const res = await fetch('/api/admin/representatives', {
+        method: 'PUT',
+        headers,
+        body: JSON.stringify({ id: rep.id, isVerified: !rep.isVerified }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        showToast(rep.isVerified ? `Verification removed for ${rep.name}` : `${rep.name} verified! 🛡️`);
+        setRepresentativesList(prev => prev.map(r => r.id === rep.id ? { ...r, isVerified: !r.isVerified } : r));
+      }
+    } catch {
+      showToast('Failed to toggle verification', 'error');
+    }
+  };
 
   // Fetch Promotions from API
   const fetchPromotions = async () => {
@@ -784,6 +962,9 @@ export default function AdminDashboardPage() {
     fetchRewardsAdminData();
     fetchReelRequests();
     fetchEmergencyContacts();
+    fetchCategories();
+    fetchEnquiries();
+    fetchRepresentatives();
   }, [router]);
 
   const showToast = (message: string, type: 'success' | 'error' = 'success') => {
@@ -1260,6 +1441,8 @@ export default function AdminDashboardPage() {
   // Tab definitions
   const baseTabs: { id: AdminTab; label: string; icon: any; badge?: string }[] = [
     { id: 'dashboard', label: 'Dashboard', icon: Layout },
+    { id: 'categories', label: 'Categories & Sections', icon: Layers, badge: `${categoriesList.length || '14'}` },
+    { id: 'enquiries', label: 'Customer Enquiries', icon: MessageSquare, badge: `${enquiriesList.length || '0'}` },
     { id: 'businesses', label: 'Businesses', icon: Building2, badge: `${businesses.length}` },
     { id: 'add-business', label: 'Add Business', icon: Plus },
     { id: 'edit-business', label: 'Edit Business', icon: Edit3 },
@@ -1267,7 +1450,7 @@ export default function AdminDashboardPage() {
     { id: 'featured-businesses', label: 'Featured Ticker', icon: Crown },
     { id: 'photography', label: 'Photography & Studios', icon: Camera, badge: `${photographyList.length}` },
     { id: 'promotions', label: 'Promotions (Paid)', icon: Sparkles, badge: `${promotions.length}` },
-    { id: 'representatives', label: 'Public Representatives', icon: Users, badge: '35' },
+    { id: 'representatives', label: 'Public Representatives', icon: Users, badge: `${representativesList.length || '35'}` },
     { id: 'homepage-content', label: 'Homepage Content', icon: Eye },
     { id: 'offers', label: 'Offers & Deals', icon: Tag },
     { id: 'food', label: 'Food & Menus', icon: Utensils },
@@ -1297,61 +1480,61 @@ export default function AdminDashboardPage() {
 
   if (checkingAuth) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center text-slate-500 text-xs font-semibold">
-        <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-white border border-slate-200">
-          <Shield className="w-5 h-5 text-blue-500 animate-pulse" />
-          <span>Verifying Admin Authorization...</span>
+      <div className="min-h-screen bg-[#FAF7F2] flex items-center justify-center text-[#647067] text-xs font-semibold">
+        <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-white border border-[#E8E5DF] shadow-xs">
+          <Shield className="w-5 h-5 text-[#E66A32] animate-pulse" />
+          <span className="text-[#26352D]">Verifying Admin Authorization...</span>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 font-sans">
+    <div className="min-h-screen flex flex-col bg-[#FAF7F2] text-[#26352D] font-sans">
       {/* Toast Notification */}
       {notification && (
         <div className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-xl shadow-2xl flex items-center gap-2 border text-xs font-bold transition-all ${
           notification.type === 'success'
-            ? 'bg-emerald-900/90 text-emerald-200 border-emerald-500'
+            ? 'bg-[#26352D] text-emerald-200 border-[#C8DFD1]'
             : 'bg-rose-900/90 text-rose-200 border-rose-500'
         }`}>
-          {notification.type === 'success' ? <CheckCircle2 className="w-4 h-4 text-emerald-700" /> : <AlertCircle className="w-4 h-4 text-rose-700" />}
+          {notification.type === 'success' ? <CheckCircle2 className="w-4 h-4 text-emerald-400" /> : <AlertCircle className="w-4 h-4 text-rose-400" />}
           <span>{notification.message}</span>
         </div>
       )}
 
       {/* Top Security Header */}
-      <header className="bg-white border-b border-slate-200 shadow-xs sticky top-0 z-40">
+      <header className="bg-white border-b border-[#E8E5DF] shadow-xs sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-blue-600 p-0.5 flex items-center justify-center shadow-lg">
-              <Crown className="w-5 h-5 text-white" />
+            <div className="w-10 h-10 rounded-xl bg-[#26352D] p-0.5 flex items-center justify-center shadow-md">
+              <Crown className="w-5 h-5 text-[#E66A32]" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-base font-extrabold text-slate-900 tracking-tight">Royal Korutla Admin</h1>
+                <h1 className="text-base font-extrabold text-[#26352D] tracking-tight">Royal Korutla Admin</h1>
                 <span className={`text-[10px] font-black px-2 py-0.5 rounded-md border uppercase tracking-wide ${
                   currentUser?.role === 'SUPER_ADMIN'
-                    ? 'bg-blue-50 text-blue-700 border-blue-200'
-                    : 'bg-slate-100 text-slate-700 border-slate-200'
+                    ? 'bg-[#FFF6F0] text-[#E66A32] border-[#F8CFBE]'
+                    : 'bg-[#FAF7F2] text-[#647067] border-[#E8E5DF]'
                 }`}>
                   {currentUser?.role === 'SUPER_ADMIN' ? 'Super Admin' : 'Admin'}
                 </span>
               </div>
-              <p className="text-[11px] text-slate-500 flex items-center gap-1">
-                <Lock className="w-3 h-3 text-emerald-700 inline" /> Session: <strong className="text-slate-800 font-medium">{currentUser?.email || 'admin'}</strong>
+              <p className="text-[11px] text-[#647067] flex items-center gap-1">
+                <Lock className="w-3 h-3 text-[#E66A32] inline" /> Session: <strong className="text-[#26352D] font-medium">{currentUser?.email || 'admin'}</strong>
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
-            <Link href="/" target="_blank" className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-semibold text-slate-700 transition-colors">
-              <Eye className="w-3.5 h-3.5" />
+            <Link href="/" target="_blank" className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#FAF7F2] hover:bg-[#F4EFE7] border border-[#E8E5DF] text-xs font-semibold text-[#26352D] transition-colors">
+              <Eye className="w-3.5 h-3.5 text-[#E66A32]" />
               <span>Preview Website</span>
             </Link>
             <button
               onClick={handleLogout}
-              className="px-3.5 py-1.5 rounded-xl bg-rose-600/20 hover:bg-rose-600 text-rose-800 hover:text-white border border-rose-500/30 text-xs font-bold flex items-center gap-1.5 transition-all"
+              className="px-3.5 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer"
             >
               <LogOut className="w-3.5 h-3.5" />
               <span>Admin Logout</span>
@@ -1365,8 +1548,8 @@ export default function AdminDashboardPage() {
         
         {/* Module Sidebar Navigation */}
         <aside className="w-full md:w-64 shrink-0 space-y-2">
-          <div className="p-3 bg-white rounded-2xl border border-slate-200">
-            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider px-3 mb-2">Admin Modules ({tabsList.length})</p>
+          <div className="p-3 bg-white rounded-2xl border border-[#E8E5DF] shadow-xs">
+            <p className="text-[10px] font-bold text-[#647067] uppercase tracking-wider px-3 mb-2">Admin Modules ({tabsList.length})</p>
             <nav className="space-y-0.5 max-h-[75vh] overflow-y-auto pr-1">
               {tabsList.map((tab) => {
                 const IconComp = tab.icon;
@@ -1375,19 +1558,19 @@ export default function AdminDashboardPage() {
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium transition-all ${
+                    className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium transition-all cursor-pointer ${
                       isActive
-                        ? 'bg-blue-600 text-white font-extrabold shadow-md'
-                        : 'text-slate-700 hover:bg-slate-100 hover:text-white'
+                        ? 'bg-[#E66A32] text-white font-extrabold shadow-md'
+                        : 'text-[#26352D] hover:bg-[#FAF7F2]'
                     }`}
                   >
                     <div className="flex items-center gap-2.5">
-                      <IconComp className={`w-4 h-4 shrink-0 ${isActive ? 'text-white' : 'text-slate-500'}`} />
+                      <IconComp className={`w-4 h-4 shrink-0 ${isActive ? 'text-white' : 'text-[#647067]'}`} />
                       <span className="truncate">{tab.label}</span>
                     </div>
                     {tab.badge && (
                       <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
-                        isActive ? 'bg-white text-blue-900' : 'bg-slate-100 text-slate-500'
+                        isActive ? 'bg-white text-[#E66A32]' : 'bg-[#FAF7F2] text-[#647067] border border-[#E8E5DF]'
                       }`}>
                         {tab.badge}
                       </span>
@@ -1400,98 +1583,402 @@ export default function AdminDashboardPage() {
         </aside>
 
         {/* Content Area */}
-        <main className="flex-1 bg-white rounded-3xl border border-slate-200 p-4 sm:p-6 space-y-6">
+        <main className="flex-1 bg-white rounded-3xl border border-[#E8E5DF] p-4 sm:p-6 space-y-6 shadow-xs">
 
           {/* TAB 1: DASHBOARD OVERVIEW */}
           {activeTab === 'dashboard' && (
             <div className="space-y-6">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-6 rounded-2xl bg-white border border-slate-200">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-6 rounded-2xl bg-[#FAF7F2] border border-[#E8E5DF]">
                 <div>
-                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-[11px] font-bold mb-2">
-                    <Shield className="w-3.5 h-3.5" />
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#FFF6F0] border border-[#F8CFBE] text-[#E66A32] text-[11px] font-bold mb-2">
+                    <Shield className="w-3.5 h-3.5 text-[#E66A32]" />
                     <span>Royal Korutla Private Control Center</span>
                   </div>
-                  <h2 className="text-2xl font-black text-slate-900">Welcome, Owner Admin</h2>
-                  <p className="text-xs text-slate-500 mt-1 max-w-lg">
-                    Manage town businesses, photography studios, paid promotions, homepage banners, and verified listing badges.
+                  <h2 className="text-2xl font-black text-[#26352D]">Welcome, Owner Admin</h2>
+                  <p className="text-xs text-[#647067] mt-1 max-w-lg">
+                    Manage town businesses, categories, customer enquiries, photography studios, paid promotions, homepage banners, and verified listing badges.
                   </p>
                 </div>
-                <button
-                  onClick={() => setActiveTab('promotions')}
-                  className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs flex items-center gap-2 shrink-0 transition-all"
-                >
-                  <Sparkles className="w-4 h-4" />
-                  <span>Publish New Promotion</span>
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setActiveTab('categories')}
+                    className="px-3.5 py-2.5 rounded-xl bg-white hover:bg-[#FAF7F2] border border-[#E8E5DF] text-[#26352D] font-bold text-xs flex items-center gap-2 transition-all cursor-pointer shadow-xs"
+                  >
+                    <Layers className="w-4 h-4 text-[#E66A32]" />
+                    <span>Manage Categories</span>
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('promotions')}
+                    className="px-4 py-2.5 rounded-xl bg-[#E66A32] hover:bg-[#D45B25] text-white font-extrabold text-xs flex items-center gap-2 shrink-0 transition-all cursor-pointer shadow-xs"
+                  >
+                    <Sparkles className="w-4 h-4" />
+                    <span>Publish New Promotion</span>
+                  </button>
+                </div>
               </div>
 
               {/* Stats Cards Grid */}
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="p-4 rounded-2xl bg-white border border-slate-200 space-y-1">
-                  <div className="flex items-center justify-between text-slate-500 text-xs font-semibold">
+                <div className="p-4 rounded-2xl bg-white border border-[#E8E5DF] space-y-1 shadow-xs">
+                  <div className="flex items-center justify-between text-[#647067] text-xs font-semibold">
                     <span>Total Businesses</span>
-                    <Building2 className="w-4 h-4 text-blue-600" />
+                    <Building2 className="w-4 h-4 text-[#E66A32]" />
                   </div>
-                  <p className="text-2xl font-black text-slate-900">{businesses.length}</p>
-                  <p className="text-[10px] text-emerald-700 font-semibold">{businesses.filter(b=>b.isVerified).length} Verified</p>
+                  <p className="text-2xl font-black text-[#26352D]">{businesses.length}</p>
+                  <p className="text-[10px] text-emerald-700 font-semibold">{businesses.filter(b=>b.isVerified).length} Verified Listings</p>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-white border border-slate-200 space-y-1">
-                  <div className="flex items-center justify-between text-slate-500 text-xs font-semibold">
-                    <span>Photography Studios</span>
-                    <Camera className="w-4 h-4 text-blue-600" />
+                <div className="p-4 rounded-2xl bg-white border border-[#E8E5DF] space-y-1 shadow-xs">
+                  <div className="flex items-center justify-between text-[#647067] text-xs font-semibold">
+                    <span>Customer Enquiries</span>
+                    <MessageSquare className="w-4 h-4 text-[#E66A32]" />
                   </div>
-                  <p className="text-2xl font-black text-slate-900">{photographyList.length}</p>
-                  <p className="text-[10px] text-blue-700 font-semibold">Korutla Studios</p>
+                  <p className="text-2xl font-black text-[#26352D]">{enquiriesList.length}</p>
+                  <p className="text-[10px] text-[#E66A32] font-semibold">{enquiriesList.filter(e=>e.status==='NEW').length} New Enquiries</p>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-white border border-slate-200 space-y-1">
-                  <div className="flex items-center justify-between text-slate-500 text-xs font-semibold">
-                    <span>Active Promotions</span>
-                    <Sparkles className="w-4 h-4 text-blue-600" />
+                <div className="p-4 rounded-2xl bg-white border border-[#E8E5DF] space-y-1 shadow-xs">
+                  <div className="flex items-center justify-between text-[#647067] text-xs font-semibold">
+                    <span>Town Categories</span>
+                    <Layers className="w-4 h-4 text-[#26352D]" />
                   </div>
-                  <p className="text-2xl font-black text-blue-600">{promotions.filter(p=>p.status==='ACTIVE').length}</p>
-                  <p className="text-[10px] text-blue-700 font-semibold">Live on website</p>
+                  <p className="text-2xl font-black text-[#26352D]">{categoriesList.length || 14}</p>
+                  <p className="text-[10px] text-[#647067] font-semibold">Clothing, Shopping &amp; Services</p>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-white border border-slate-200 space-y-1">
-                  <div className="flex items-center justify-between text-slate-500 text-xs font-semibold">
+                <div className="p-4 rounded-2xl bg-white border border-[#E8E5DF] space-y-1 shadow-xs">
+                  <div className="flex items-center justify-between text-[#647067] text-xs font-semibold">
                     <span>Town Coverage</span>
                     <MapPin className="w-4 h-4 text-emerald-700" />
                   </div>
-                  <p className="text-2xl font-black text-slate-900">505326</p>
-                  <p className="text-[10px] text-slate-500">Korutla Town Portal</p>
+                  <p className="text-2xl font-black text-[#26352D]">505326</p>
+                  <p className="text-[10px] text-[#647067]">Korutla Town Portal</p>
                 </div>
               </div>
 
               {/* Quick Actions Grid */}
-              <div className="p-5 rounded-2xl bg-white border border-slate-200 space-y-3">
-                <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                  <Sliders className="w-4 h-4 text-blue-600" />
+              <div className="p-5 rounded-2xl bg-white border border-[#E8E5DF] space-y-3 shadow-xs">
+                <h3 className="text-sm font-bold text-[#26352D] flex items-center gap-2">
+                  <Sliders className="w-4 h-4 text-[#E66A32]" />
                   <span>Quick Admin Short-Cuts</span>
                 </h3>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-                  <button onClick={() => setActiveTab('photography')} className="p-3 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-200 text-left space-y-1 transition-all">
-                    <Camera className="w-4 h-4 text-blue-600" />
-                    <p className="font-bold text-white">Photography Studios</p>
-                    <p className="text-[10px] text-slate-500">Add studio / wedding photography</p>
+                  <button onClick={() => setActiveTab('categories')} className="p-3 rounded-xl bg-[#FAF7F2] hover:bg-[#F4EFE7] border border-[#E8E5DF] text-left space-y-1 transition-all cursor-pointer">
+                    <Layers className="w-4 h-4 text-[#E66A32]" />
+                    <p className="font-bold text-[#26352D]">Categories &amp; Sections</p>
+                    <p className="text-[10px] text-[#647067]">Clothing, shopping, healthcare</p>
                   </button>
-                  <button onClick={() => setActiveTab('add-business')} className="p-3 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-200 text-left space-y-1 transition-all">
-                    <Plus className="w-4 h-4 text-blue-600" />
-                    <p className="font-bold text-white">Add New Business</p>
-                    <p className="text-[10px] text-slate-500">Register shop in Korutla</p>
+                  <button onClick={() => setActiveTab('enquiries')} className="p-3 rounded-xl bg-[#FAF7F2] hover:bg-[#F4EFE7] border border-[#E8E5DF] text-left space-y-1 transition-all cursor-pointer">
+                    <MessageSquare className="w-4 h-4 text-[#E66A32]" />
+                    <p className="font-bold text-[#26352D]">Customer Enquiries</p>
+                    <p className="text-[10px] text-[#647067]">Respond to store inquiries</p>
                   </button>
-                  <button onClick={() => setActiveTab('promotions')} className="p-3 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-200 text-left space-y-1 transition-all">
-                    <Sparkles className="w-4 h-4 text-blue-600" />
-                    <p className="font-bold text-white">Publish Paid Promo</p>
-                    <p className="text-[10px] text-slate-500">Banner &amp; date placement</p>
+                  <button onClick={() => setActiveTab('representatives')} className="p-3 rounded-xl bg-[#FAF7F2] hover:bg-[#F4EFE7] border border-[#E8E5DF] text-left space-y-1 transition-all cursor-pointer">
+                    <Users className="w-4 h-4 text-[#26352D]" />
+                    <p className="font-bold text-[#26352D]">35 Representatives</p>
+                    <p className="text-[10px] text-[#647067]">MLA, Chairperson &amp; Wards</p>
                   </button>
-                  <button onClick={() => setActiveTab('homepage-content')} className="p-3 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-200 text-left space-y-1 transition-all">
+                  <button onClick={() => setActiveTab('homepage-content')} className="p-3 rounded-xl bg-[#FAF7F2] hover:bg-[#F4EFE7] border border-[#E8E5DF] text-left space-y-1 transition-all cursor-pointer">
                     <Eye className="w-4 h-4 text-emerald-700" />
-                    <p className="font-bold text-white">Homepage Banners</p>
-                    <p className="text-[10px] text-slate-500">Hero slides &amp; featured order</p>
+                    <p className="font-bold text-[#26352D]">Homepage Banners</p>
+                    <p className="text-[10px] text-[#647067]">Hero slides &amp; featured order</p>
                   </button>
                 </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB: CATEGORIES & TOWN SECTIONS */}
+          {activeTab === 'categories' && (
+            <div className="space-y-6">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-6 rounded-2xl bg-[#FAF7F2] border border-[#E8E5DF]">
+                <div>
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#FFF6F0] border border-[#F8CFBE] text-[#E66A32] text-[11px] font-bold mb-2">
+                    <Layers className="w-3.5 h-3.5 text-[#E66A32]" />
+                    <span>Town Directory Architecture</span>
+                  </div>
+                  <h2 className="text-xl font-extrabold text-[#26352D]">Categories &amp; Homepage Sections ({categoriesList.length})</h2>
+                  <p className="text-xs text-[#647067] max-w-2xl mt-1 leading-relaxed">
+                    Control category listings across the website including Clothing Stores, Shopping, Groceries, Hospitals, Dining, and Public Services. Toggle live visibility, edit headline badges, and update item counts.
+                  </p>
+                </div>
+                <button
+                  onClick={fetchCategories}
+                  disabled={loadingCategories}
+                  className="px-3.5 py-2 rounded-xl bg-white hover:bg-[#FAF7F2] border border-[#E8E5DF] text-[#26352D] font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer shadow-xs"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 text-[#E66A32] ${loadingCategories ? 'animate-spin' : ''}`} />
+                  <span>Refresh Categories</span>
+                </button>
+              </div>
+
+              {/* Categories Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {categoriesList.map((cat) => {
+                  const isEditing = editingCategorySlug === cat.slug;
+                  return (
+                    <div
+                      key={cat.id}
+                      className="p-5 rounded-2xl bg-white border border-[#E8E5DF] shadow-xs flex flex-col justify-between space-y-4 hover:border-[#E66A32] transition-colors"
+                    >
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2.5">
+                            <div className="w-10 h-10 rounded-xl bg-[#FFF6F0] border border-[#F8CFBE] flex items-center justify-center text-[#E66A32] font-black text-sm">
+                              {cat.name.slice(0, 2).toUpperCase()}
+                            </div>
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <h3 className="text-base font-bold text-[#26352D]">{cat.name}</h3>
+                                <Link
+                                  href={`/${cat.slug}`}
+                                  target="_blank"
+                                  className="text-[#647067] hover:text-[#E66A32] transition-colors"
+                                  title="View Live Category Page"
+                                >
+                                  <ExternalLink className="w-3.5 h-3.5" />
+                                </Link>
+                              </div>
+                              <p className="text-[11px] font-mono text-[#647067]">/{cat.slug}</p>
+                            </div>
+                          </div>
+
+                          <button
+                            onClick={() => handleToggleCategoryActive(cat)}
+                            className={`px-3 py-1 rounded-full text-xs font-bold border transition-colors cursor-pointer ${
+                              cat.isActive !== false
+                                ? 'bg-[#EAFBF0] text-emerald-800 border-emerald-300 hover:bg-emerald-100'
+                                : 'bg-rose-50 text-rose-700 border-rose-200 hover:bg-rose-100'
+                            }`}
+                          >
+                            {cat.isActive !== false ? 'Live Active' : 'Hidden'}
+                          </button>
+                        </div>
+
+                        {!isEditing ? (
+                          <div className="space-y-2 text-xs">
+                            <p className="text-[#647067] leading-relaxed line-clamp-2">
+                              {cat.description}
+                            </p>
+                            <div className="flex items-center gap-2 flex-wrap pt-1">
+                              {cat.badge && (
+                                <span className="px-2 py-0.5 rounded-md bg-[#FFF6F0] border border-[#F8CFBE] text-[#E66A32] font-bold text-[10px]">
+                                  {cat.badge}
+                                </span>
+                              )}
+                              <span className="px-2 py-0.5 rounded-md bg-[#FAF7F2] border border-[#E8E5DF] text-[#647067] font-bold text-[10px]">
+                                {cat.itemCount} Verified Records
+                              </span>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="space-y-2 text-xs bg-[#FAF7F2] p-3 rounded-xl border border-[#E8E5DF]">
+                            <div>
+                              <label className="block text-[10px] font-bold text-[#26352D] mb-0.5">Badge Highlight</label>
+                              <input
+                                type="text"
+                                value={catBadgeInput}
+                                onChange={(e) => setCatBadgeInput(e.target.value)}
+                                placeholder="e.g. Silk Sarees & Bridal"
+                                className="w-full bg-white border border-[#E8E5DF] rounded-lg px-2.5 py-1.5 text-xs text-[#26352D] focus:border-[#E66A32] focus:outline-none"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-[10px] font-bold text-[#26352D] mb-0.5">Listing Count</label>
+                              <input
+                                type="number"
+                                value={catCountInput}
+                                onChange={(e) => setCatCountInput(Number(e.target.value))}
+                                className="w-full bg-white border border-[#E8E5DF] rounded-lg px-2.5 py-1.5 text-xs text-[#26352D] focus:border-[#E66A32] focus:outline-none"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-[10px] font-bold text-[#26352D] mb-0.5">Description</label>
+                              <textarea
+                                rows={2}
+                                value={catDescInput}
+                                onChange={(e) => setCatDescInput(e.target.value)}
+                                className="w-full bg-white border border-[#E8E5DF] rounded-lg px-2.5 py-1.5 text-xs text-[#26352D] focus:border-[#E66A32] focus:outline-none"
+                              />
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="pt-2 border-t border-[#E8E5DF] flex items-center justify-between">
+                        {!isEditing ? (
+                          <button
+                            onClick={() => {
+                              setEditingCategorySlug(cat.slug);
+                              setCatBadgeInput(cat.badge || '');
+                              setCatDescInput(cat.description || '');
+                              setCatCountInput(cat.itemCount || 0);
+                            }}
+                            className="px-3 py-1.5 rounded-lg bg-[#FAF7F2] hover:bg-[#F4EFE7] border border-[#E8E5DF] text-[#26352D] font-bold text-xs flex items-center gap-1.5 cursor-pointer"
+                          >
+                            <Edit3 className="w-3.5 h-3.5 text-[#E66A32]" />
+                            <span>Edit Metadata</span>
+                          </button>
+                        ) : (
+                          <div className="flex items-center gap-2 w-full justify-end">
+                            <button
+                              onClick={() => setEditingCategorySlug(null)}
+                              className="px-3 py-1.5 rounded-lg border border-[#E8E5DF] text-[#647067] font-bold text-xs cursor-pointer hover:bg-slate-50"
+                            >
+                              Cancel
+                            </button>
+                            <button
+                              onClick={() => handleSaveCategoryDetails(cat)}
+                              className="px-3.5 py-1.5 rounded-lg bg-[#E66A32] hover:bg-[#D45B25] text-white font-bold text-xs flex items-center gap-1.5 cursor-pointer"
+                            >
+                              <Check className="w-3.5 h-3.5" />
+                              <span>Save Changes</span>
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* TAB: CUSTOMER STORE ENQUIRIES */}
+          {activeTab === 'enquiries' && (
+            <div className="space-y-6">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-6 rounded-2xl bg-[#FAF7F2] border border-[#E8E5DF]">
+                <div>
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#FFF6F0] border border-[#F8CFBE] text-[#E66A32] text-[11px] font-bold mb-2">
+                    <MessageSquare className="w-3.5 h-3.5 text-[#E66A32]" />
+                    <span>Customer &amp; Merchant Communication</span>
+                  </div>
+                  <h2 className="text-xl font-extrabold text-[#26352D]">Customer Store Enquiries ({enquiriesList.length})</h2>
+                  <p className="text-xs text-[#647067] max-w-2xl mt-1 leading-relaxed">
+                    Direct inquiries submitted by shoppers and residents for clothing stores, dining orders, clinics, and local services in Korutla.
+                  </p>
+                </div>
+                <button
+                  onClick={fetchEnquiries}
+                  disabled={loadingEnquiries}
+                  className="px-3.5 py-2 rounded-xl bg-white hover:bg-[#FAF7F2] border border-[#E8E5DF] text-[#26352D] font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer shadow-xs"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 text-[#E66A32] ${loadingEnquiries ? 'animate-spin' : ''}`} />
+                  <span>Refresh Enquiries</span>
+                </button>
+              </div>
+
+              {/* Status Filters */}
+              <div className="flex items-center gap-2 overflow-x-auto pb-1">
+                {(['ALL', 'NEW', 'RESPONDED', 'CLOSED'] as const).map((st) => (
+                  <button
+                    key={st}
+                    onClick={() => setEnquiryFilter(st)}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                      enquiryFilter === st
+                        ? 'bg-[#E66A32] text-white shadow-xs'
+                        : 'bg-[#FAF7F2] hover:bg-[#F4EFE7] border border-[#E8E5DF] text-[#26352D]'
+                    }`}
+                  >
+                    {st === 'ALL' ? `All Enquiries (${enquiriesList.length})` : `${st} (${enquiriesList.filter(e => e.status === st).length})`}
+                  </button>
+                ))}
+              </div>
+
+              {/* Enquiries List */}
+              <div className="space-y-4">
+                {enquiriesList
+                  .filter((e) => enquiryFilter === 'ALL' || e.status === enquiryFilter)
+                  .map((enq) => {
+                    const cleanPhone = enq.customerPhone.replace(/[^0-9+]/g, '');
+                    return (
+                      <div
+                        key={enq.id}
+                        className="p-5 rounded-2xl bg-white border border-[#E8E5DF] shadow-xs space-y-3 hover:border-[#E66A32] transition-colors"
+                      >
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#E8E5DF] pb-3">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="font-bold text-sm text-[#26352D]">{enq.customerName}</span>
+                            <span className="text-xs text-[#647067]">•</span>
+                            <span className="text-xs font-semibold text-[#E66A32]">{enq.businessName || 'General Town Enquiry'}</span>
+                            <span className="text-[10px] text-[#647067] font-mono">
+                              ({new Date(enq.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })})
+                            </span>
+                          </div>
+
+                          <span
+                            className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border uppercase tracking-wide self-start sm:self-auto ${
+                              enq.status === 'NEW'
+                                ? 'bg-[#FFF6F0] text-[#E66A32] border-[#F8CFBE]'
+                                : enq.status === 'RESPONDED'
+                                ? 'bg-[#EAFBF0] text-emerald-800 border-emerald-300'
+                                : 'bg-[#FAF7F2] text-[#647067] border-[#E8E5DF]'
+                            }`}
+                          >
+                            {enq.status}
+                          </span>
+                        </div>
+
+                        <div className="space-y-1 text-xs">
+                          <p className="font-bold text-[#26352D]">{enq.subject}</p>
+                          <p className="text-[#647067] leading-relaxed whitespace-pre-wrap">{enq.message}</p>
+                        </div>
+
+                        {enq.responseNotes && (
+                          <div className="p-3 rounded-xl bg-[#FAF7F2] border border-[#E8E5DF] text-xs space-y-1">
+                            <p className="text-[10px] font-bold text-[#26352D] uppercase tracking-wider">Internal Admin Notes</p>
+                            <p className="text-[#647067] italic">&quot;{enq.responseNotes}&quot;</p>
+                          </div>
+                        )}
+
+                        <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                          <div className="flex items-center gap-2">
+                            <a
+                              href={`tel:${cleanPhone}`}
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#FAF7F2] hover:bg-[#F4EFE7] border border-[#E8E5DF] text-[#26352D] font-bold"
+                            >
+                              <Phone className="w-3.5 h-3.5 text-[#E66A32]" />
+                              <span>Call {enq.customerPhone}</span>
+                            </a>
+                            <a
+                              href={`https://wa.me/${cleanPhone.replace('+', '')}?text=${encodeURIComponent(`Namaste ${enq.customerName}, following up on your enquiry for ${enq.businessName || 'Royal Korutla'}.`)}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#EAFBF0] hover:bg-[#D5F5E0] text-emerald-800 font-bold border border-emerald-200"
+                            >
+                              <span>WhatsApp</span>
+                            </a>
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="text"
+                              placeholder="Add follow-up notes..."
+                              value={enquiryNotesInput[enq.id] ?? ''}
+                              onChange={(e) => setEnquiryNotesInput({ ...enquiryNotesInput, [enq.id]: e.target.value })}
+                              className="px-2.5 py-1.5 rounded-lg bg-[#FAF7F2] border border-[#E8E5DF] text-xs text-[#26352D] focus:border-[#E66A32] focus:outline-none"
+                            />
+                            {enq.status !== 'RESPONDED' && (
+                              <button
+                                onClick={() => handleUpdateEnquiryStatus(enq.id, 'RESPONDED')}
+                                className="px-3 py-1.5 rounded-lg bg-[#26352D] hover:bg-[#1E2B24] text-white font-bold text-xs cursor-pointer shadow-xs"
+                              >
+                                Mark Responded
+                              </button>
+                            )}
+                            {enq.status !== 'CLOSED' && (
+                              <button
+                                onClick={() => handleUpdateEnquiryStatus(enq.id, 'CLOSED')}
+                                className="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-[#647067] font-bold text-xs cursor-pointer"
+                              >
+                                Close
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
               </div>
             </div>
           )}
@@ -1499,14 +1986,14 @@ export default function AdminDashboardPage() {
           {/* TAB: PUBLIC REPRESENTATIVES MANAGEMENT */}
           {activeTab === 'representatives' && (
             <div className="space-y-6">
-              <div className="p-6 rounded-2xl bg-white border border-slate-200 space-y-3">
+              <div className="p-6 rounded-2xl bg-[#FAF7F2] border border-[#E8E5DF] space-y-3">
                 <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FFF6F0] text-[#E66A32] text-xs font-bold border border-[#F8CFBE]">
-                  <Users className="w-3.5 h-3.5" />
+                  <Users className="w-3.5 h-3.5 text-[#E66A32]" />
                   <span>Civic Directory &amp; Governance</span>
                 </div>
-                <h2 className="text-xl font-extrabold text-slate-900 tracking-tight">Public Representatives Management</h2>
-                <p className="text-xs text-slate-600 max-w-2xl leading-relaxed">
-                  Manage the official records for the Member of Legislative Assembly (MLA), Municipal Chairperson, and all 33 Municipal Ward Councillors. Profiles pending verification remain marked until validated.
+                <h2 className="text-xl font-extrabold text-[#26352D] tracking-tight">Public Representatives Management ({representativesList.length || 35})</h2>
+                <p className="text-xs text-[#647067] max-w-2xl leading-relaxed">
+                  Manage official profiles for the Korutla Member of Legislative Assembly (MLA), Municipal Chairperson, and all 33 Municipal Ward Councillors. Profiles pending verification are marked until verified.
                 </p>
                 <div className="pt-2 flex flex-wrap gap-3">
                   <Link
@@ -1514,17 +2001,127 @@ export default function AdminDashboardPage() {
                     className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#26352D] hover:bg-[#1E2B24] text-white text-xs font-bold transition-all shadow-xs"
                   >
                     <span>Launch Dedicated Representative Manager</span>
-                    <ExternalLink className="w-3.5 h-3.5" />
+                    <ExternalLink className="w-3.5 h-3.5 text-[#E66A32]" />
                   </Link>
                   <Link
                     href="/representatives"
                     target="_blank"
-                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-xs font-semibold transition-all"
+                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white hover:bg-[#FAF7F2] border border-[#E8E5DF] text-[#26352D] text-xs font-semibold transition-all"
                   >
                     <span>View Public Page Live</span>
-                    <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
+                    <ExternalLink className="w-3.5 h-3.5 text-[#647067]" />
                   </Link>
                 </div>
+              </div>
+
+              {/* Inline Search and Filter */}
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-4 rounded-2xl bg-white border border-[#E8E5DF] shadow-xs">
+                <div className="relative flex-1 max-w-md">
+                  <Search className="w-4 h-4 text-[#647067] absolute left-3 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    placeholder="Search by name, designation, ward number, or area..."
+                    value={repSearchQuery}
+                    onChange={(e) => setRepSearchQuery(e.target.value)}
+                    className="w-full pl-9 pr-3 py-2 rounded-xl border border-[#E8E5DF] text-xs text-[#26352D] bg-[#FAF7F2] focus:bg-white focus:outline-none focus:border-[#E66A32]"
+                  />
+                </div>
+
+                <div className="flex items-center gap-2 overflow-x-auto">
+                  {(['ALL', 'KEY', 'WARDS', 'VERIFIED', 'PENDING'] as const).map((rf) => (
+                    <button
+                      key={rf}
+                      onClick={() => setRepFilterRole(rf)}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
+                        repFilterRole === rf
+                          ? 'bg-[#E66A32] text-white shadow-xs'
+                          : 'bg-[#FAF7F2] hover:bg-[#F4EFE7] border border-[#E8E5DF] text-[#26352D]'
+                      }`}
+                    >
+                      {rf === 'ALL' ? 'All (35)' : rf === 'KEY' ? 'MLA & Chairman' : rf === 'WARDS' ? '33 Ward Councillors' : rf}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Representatives Inline Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {representativesList
+                  .filter((r) => {
+                    if (repFilterRole === 'KEY' && r.role !== 'MLA' && r.role !== 'MUNICIPAL_CHAIRMAN') return false;
+                    if (repFilterRole === 'WARDS' && r.role !== 'WARD_COUNCILLOR') return false;
+                    if (repFilterRole === 'VERIFIED' && !r.isVerified) return false;
+                    if (repFilterRole === 'PENDING' && r.isVerified) return false;
+                    if (repSearchQuery.trim()) {
+                      const q = repSearchQuery.toLowerCase();
+                      return (
+                        r.name.toLowerCase().includes(q) ||
+                        r.designation.toLowerCase().includes(q) ||
+                        (r.areaName || '').toLowerCase().includes(q) ||
+                        String(r.wardNumber || '').includes(q)
+                      );
+                    }
+                    return true;
+                  })
+                  .map((rep) => (
+                    <div
+                      key={rep.id}
+                      className="p-4 rounded-2xl bg-white border border-[#E8E5DF] shadow-xs flex flex-col justify-between space-y-3 hover:border-[#E66A32] transition-colors"
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 rounded-xl bg-[#FAF7F2] border border-[#E8E5DF] flex items-center justify-center text-[#26352D] font-bold text-sm shrink-0 overflow-hidden relative">
+                            {rep.photoUrl ? (
+                              <img src={rep.photoUrl} alt={rep.name} className="w-full h-full object-cover" />
+                            ) : (
+                              <span>{rep.wardNumber ? `W${rep.wardNumber}` : 'GOV'}</span>
+                            )}
+                          </div>
+                          <div>
+                            <h4 className="text-sm font-bold text-[#26352D] leading-tight">{rep.name}</h4>
+                            <p className="text-[11px] text-[#E66A32] font-semibold mt-0.5">{rep.designation}</p>
+                            <p className="text-[10px] text-[#647067] mt-0.5">{rep.areaName || 'Korutla'}</p>
+                          </div>
+                        </div>
+
+                        <button
+                          onClick={() => handleToggleRepVerification(rep)}
+                          className={`px-2 py-0.5 rounded-full text-[10px] font-bold border transition-colors cursor-pointer shrink-0 ${
+                            rep.isVerified
+                              ? 'bg-[#EAFBF0] text-emerald-800 border-emerald-300 hover:bg-emerald-100'
+                              : 'bg-amber-50 text-amber-800 border-amber-300 hover:bg-amber-100'
+                          }`}
+                        >
+                          {rep.isVerified ? 'Verified' : 'Pending'}
+                        </button>
+                      </div>
+
+                      <div className="pt-2 border-t border-[#E8E5DF] flex items-center justify-between text-xs">
+                        {rep.phone ? (
+                          <a
+                            href={`tel:${rep.phone.replace(/[^0-9+]/g, '')}`}
+                            className="text-[#647067] hover:text-[#26352D] font-mono text-[11px] flex items-center gap-1"
+                          >
+                            <Phone className="w-3 h-3 text-[#E66A32]" />
+                            <span>{rep.phone}</span>
+                          </a>
+                        ) : (
+                          <span className="text-[#647067] font-mono text-[11px] flex items-center gap-1">
+                            <Phone className="w-3 h-3 text-[#647067]" />
+                            <span>No Phone Listed</span>
+                          </span>
+                        )}
+
+                        <Link
+                          href="/admin/representatives"
+                          className="text-[#E66A32] hover:underline font-bold text-[11px] flex items-center gap-1"
+                        >
+                          <span>Full Edit</span>
+                          <Edit3 className="w-3 h-3" />
+                        </Link>
+                      </div>
+                    </div>
+                  ))}
               </div>
             </div>
           )}
@@ -1532,27 +2129,27 @@ export default function AdminDashboardPage() {
           {/* TAB: PHOTOGRAPHY & STUDIOS MANAGEMENT */}
           {activeTab === 'photography' && (
             <div className="space-y-6">
-              <div className="p-5 rounded-2xl bg-blue-50 border border-blue-200 space-y-2">
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 text-xs font-bold">
-                  <Camera className="w-3.5 h-3.5 text-blue-600" />
+              <div className="p-5 rounded-2xl bg-[#FAF7F2] border border-[#E8E5DF] space-y-2">
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#FFF6F0] text-[#E66A32] text-xs font-bold border border-[#F8CFBE]">
+                  <Camera className="w-3.5 h-3.5 text-[#E66A32]" />
                   <span>Photography &amp; Studios Content Management</span>
                 </div>
-                <h2 className="text-xl font-bold text-slate-900">Manage Photography &amp; Studios</h2>
-                <p className="text-xs text-slate-700 max-w-2xl">
+                <h2 className="text-xl font-bold text-[#26352D]">Manage Photography &amp; Studios</h2>
+                <p className="text-xs text-[#647067] max-w-2xl">
                   Add, edit, or manage Korutla photo studios, camera rentals, wedding photography teams, pricing, portfolio galleries, and contact details.
                 </p>
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Add/Edit Form */}
-                <div className="p-5 rounded-2xl bg-white border border-slate-200 space-y-4">
-                  <div className="flex items-center justify-between pb-2 border-b border-slate-200">
-                    <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                      <Camera className="w-4 h-4 text-blue-600" />
+                <div className="p-5 rounded-2xl bg-white border border-[#E8E5DF] space-y-4 shadow-xs">
+                  <div className="flex items-center justify-between pb-2 border-b border-[#E8E5DF]">
+                    <h3 className="text-sm font-bold text-[#26352D] flex items-center gap-2">
+                      <Camera className="w-4 h-4 text-[#E66A32]" />
                       <span>{editingPhotoStudio ? 'Edit Studio Profile' : 'Add Photography Studio'}</span>
                     </h3>
                     {editingPhotoStudio && (
-                      <button onClick={resetPhotoForm} className="text-[11px] text-slate-500 hover:text-white">
+                      <button onClick={resetPhotoForm} className="text-[11px] text-[#647067] hover:text-[#26352D] cursor-pointer">
                         Cancel Edit
                       </button>
                     )}
@@ -1560,106 +2157,106 @@ export default function AdminDashboardPage() {
 
                   <form onSubmit={handleSavePhotographyStudio} className="space-y-3 text-xs">
                     <div>
-                      <label className="block text-slate-700 font-bold mb-1">Studio / Photographer Name *</label>
+                      <label className="block text-[#26352D] font-bold mb-1">Studio / Photographer Name *</label>
                       <input
                         type="text"
                         required
                         placeholder="e.g. Royal Digital Photography Studio"
                         value={photoName}
                         onChange={(e) => setPhotoName(e.target.value)}
-                        className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 shadow-2xs"
+                        className="w-full bg-[#FAF7F2] border border-[#E8E5DF] rounded-xl px-3 py-2 text-[#26352D] font-semibold placeholder-[#647067]/60 focus:outline-none focus:border-[#E66A32] focus:ring-2 focus:ring-[#FFF6F0] shadow-2xs"
                       />
                     </div>
 
                     <div className="grid grid-cols-2 gap-2">
                       <div>
-                        <label className="block text-slate-700 font-bold mb-1">Phone Number *</label>
+                        <label className="block text-[#26352D] font-bold mb-1">Phone Number *</label>
                         <input
                           type="text"
                           required
                           placeholder="+91 98480 12345"
                           value={photoPhone}
                           onChange={(e) => setPhotoPhone(e.target.value)}
-                          className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 shadow-2xs"
+                          className="w-full bg-[#FAF7F2] border border-[#E8E5DF] rounded-xl px-3 py-2 text-[#26352D] font-semibold placeholder-[#647067]/60 focus:outline-none focus:border-[#E66A32] focus:ring-2 focus:ring-[#FFF6F0] shadow-2xs"
                         />
                       </div>
                       <div>
-                        <label className="block text-slate-700 font-bold mb-1">WhatsApp Number</label>
+                        <label className="block text-[#26352D] font-bold mb-1">WhatsApp Number</label>
                         <input
                           type="text"
                           placeholder="+91 98480 12345"
                           value={photoWhatsapp}
                           onChange={(e) => setPhotoWhatsapp(e.target.value)}
-                          className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 shadow-2xs"
+                          className="w-full bg-[#FAF7F2] border border-[#E8E5DF] rounded-xl px-3 py-2 text-[#26352D] font-semibold placeholder-[#647067]/60 focus:outline-none focus:border-[#E66A32] focus:ring-2 focus:ring-[#FFF6F0] shadow-2xs"
                         />
                       </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-2">
                       <div>
-                        <label className="block text-slate-700 font-bold mb-1">Profile Image URL</label>
+                        <label className="block text-[#26352D] font-bold mb-1">Profile Image URL</label>
                         <input
                           type="url"
                           placeholder="https://images.unsplash.com/..."
                           value={photoProfile}
                           onChange={(e) => setPhotoProfile(e.target.value)}
-                          className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 shadow-2xs"
+                          className="w-full bg-[#FAF7F2] border border-[#E8E5DF] rounded-xl px-3 py-2 text-[#26352D] font-semibold placeholder-[#647067]/60 focus:outline-none focus:border-[#E66A32] focus:ring-2 focus:ring-[#FFF6F0] shadow-2xs"
                         />
                       </div>
                       <div>
-                        <label className="block text-slate-700 font-bold mb-1">Cover Image URL</label>
+                        <label className="block text-[#26352D] font-bold mb-1">Cover Image URL</label>
                         <input
                           type="url"
                           placeholder="https://images.unsplash.com/..."
                           value={photoCover}
                           onChange={(e) => setPhotoCover(e.target.value)}
-                          className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 shadow-2xs"
+                          className="w-full bg-[#FAF7F2] border border-[#E8E5DF] rounded-xl px-3 py-2 text-[#26352D] font-semibold placeholder-[#647067]/60 focus:outline-none focus:border-[#E66A32] focus:ring-2 focus:ring-[#FFF6F0] shadow-2xs"
                         />
                       </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-2">
                       <div>
-                        <label className="block text-slate-700 font-bold mb-1">Location / Address</label>
+                        <label className="block text-[#26352D] font-bold mb-1">Location / Address</label>
                         <input
                           type="text"
                           placeholder="e.g. Main Road, Korutla"
                           value={photoLocation}
                           onChange={(e) => setPhotoLocation(e.target.value)}
-                          className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 shadow-2xs"
+                          className="w-full bg-[#FAF7F2] border border-[#E8E5DF] rounded-xl px-3 py-2 text-[#26352D] font-semibold placeholder-[#647067]/60 focus:outline-none focus:border-[#E66A32] focus:ring-2 focus:ring-[#FFF6F0] shadow-2xs"
                         />
                       </div>
                       <div>
-                        <label className="block text-slate-700 font-bold mb-1">Starting Price</label>
+                        <label className="block text-[#26352D] font-bold mb-1">Starting Price</label>
                         <input
                           type="text"
                           placeholder="e.g. ₹15,000 / day"
                           value={photoPrice}
                           onChange={(e) => setPhotoPrice(e.target.value)}
-                          className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 shadow-2xs"
+                          className="w-full bg-[#FAF7F2] border border-[#E8E5DF] rounded-xl px-3 py-2 text-[#26352D] font-semibold placeholder-[#647067]/60 focus:outline-none focus:border-[#E66A32] focus:ring-2 focus:ring-[#FFF6F0] shadow-2xs"
                         />
                       </div>
                     </div>
 
                     <div>
-                      <label className="block text-slate-700 font-bold mb-1">Instagram Handle</label>
+                      <label className="block text-[#26352D] font-bold mb-1">Instagram Handle</label>
                       <input
                         type="text"
                         placeholder="e.g. @royal_korutla_studios"
                         value={photoInstagram}
                         onChange={(e) => setPhotoInstagram(e.target.value)}
-                        className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 shadow-2xs"
+                        className="w-full bg-[#FAF7F2] border border-[#E8E5DF] rounded-xl px-3 py-2 text-[#26352D] font-semibold placeholder-[#647067]/60 focus:outline-none focus:border-[#E66A32] focus:ring-2 focus:ring-[#FFF6F0] shadow-2xs"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-slate-700 font-bold mb-1">Description / Services</label>
+                      <label className="block text-[#26352D] font-bold mb-1">Description / Services</label>
                       <textarea
                         rows={2}
                         placeholder="Specialist in cinematic wedding photography, candid video shoots, drone coverage in Korutla."
                         value={photoDesc}
                         onChange={(e) => setPhotoDesc(e.target.value)}
-                        className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 shadow-2xs"
+                        className="w-full bg-[#FAF7F2] border border-[#E8E5DF] rounded-xl px-3 py-2 text-[#26352D] font-semibold placeholder-[#647067]/60 focus:outline-none focus:border-[#E66A32] focus:ring-2 focus:ring-[#FFF6F0] shadow-2xs"
                       />
                     </div>
 
@@ -1673,10 +2270,10 @@ export default function AdminDashboardPage() {
                               type="button"
                               key={type}
                               onClick={() => togglePhotoTypeSelection(type)}
-                              className={`px-2.5 py-1 rounded-lg text-[10px] font-bold border transition-colors ${
+                              className={`px-2.5 py-1 rounded-lg text-[10px] font-bold border transition-colors cursor-pointer ${
                                 isSel
-                                  ? 'bg-blue-50 text-blue-700 border-blue-600'
-                                  : 'bg-slate-50 text-slate-500 border-slate-200 hover:text-white'
+                                  ? 'bg-[#FFF6F0] text-[#E66A32] border-[#F8CFBE]'
+                                  : 'bg-[#FAF7F2] text-[#647067] border-[#E8E5DF] hover:border-[#E66A32]'
                               }`}
                             >
                               {isSel ? '✓ ' : ''}{type}
@@ -1692,24 +2289,24 @@ export default function AdminDashboardPage() {
                           type="checkbox"
                           checked={photoVerified}
                           onChange={(e) => setPhotoVerified(e.target.checked)}
-                          className="rounded text-blue-700"
+                          className="rounded text-[#E66A32] accent-[#E66A32]"
                         />
-                        <span className="text-slate-700 font-bold">Verified</span>
+                        <span className="text-[#26352D] font-bold">Verified</span>
                       </label>
                       <label className="flex items-center gap-2 cursor-pointer">
                         <input
                           type="checkbox"
                           checked={photoFeatured}
                           onChange={(e) => setPhotoFeatured(e.target.checked)}
-                          className="rounded text-blue-700"
+                          className="rounded text-[#E66A32] accent-[#E66A32]"
                         />
-                        <span className="text-slate-700 font-bold">Featured Studio</span>
+                        <span className="text-[#26352D] font-bold">Featured Studio</span>
                       </label>
                     </div>
 
                     <button
                       type="submit"
-                      className="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs flex items-center justify-center gap-2 shadow-lg transition-all mt-2"
+                      className="w-full py-3 rounded-xl bg-[#E66A32] hover:bg-[#D45B25] text-white font-extrabold text-xs flex items-center justify-center gap-2 shadow-xs transition-all mt-2 cursor-pointer"
                     >
                       <Camera className="w-4 h-4" />
                       <span>{editingPhotoStudio ? 'Update Studio Profile' : 'Save Photography Studio'}</span>
@@ -1720,37 +2317,37 @@ export default function AdminDashboardPage() {
                 {/* Studios List */}
                 <div className="lg:col-span-2 space-y-4">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                      <Camera className="w-4 h-4 text-blue-600" />
+                    <h3 className="text-sm font-bold text-[#26352D] flex items-center gap-2">
+                      <Camera className="w-4 h-4 text-[#E66A32]" />
                       <span>Korutla Photography Studios ({photographyList.length})</span>
                     </h3>
-                    <button onClick={fetchPhotography} className="text-xs text-blue-600 hover:underline flex items-center gap-1">
+                    <button onClick={fetchPhotography} className="text-xs text-[#E66A32] hover:underline flex items-center gap-1 cursor-pointer">
                       <RefreshCw className="w-3 h-3" /> Refresh
                     </button>
                   </div>
 
                   {loadingPhoto ? (
-                    <div className="p-8 text-center text-slate-500 text-xs">Loading studios...</div>
+                    <div className="p-8 text-center text-[#647067] text-xs">Loading studios...</div>
                   ) : photographyList.length === 0 ? (
-                    <div className="p-8 text-center text-slate-500 text-xs bg-white rounded-2xl border border-slate-200">
+                    <div className="p-8 text-center text-[#647067] text-xs bg-white rounded-2xl border border-[#E8E5DF]">
                       No photography studios registered yet.
                     </div>
                   ) : (
                     <div className="space-y-3">
                       {photographyList.map((studio) => (
-                        <div key={studio.id} className="p-4 rounded-2xl bg-white border border-slate-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                        <div key={studio.id} className="p-4 rounded-2xl bg-white border border-[#E8E5DF] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xs">
                           <div className="flex items-center gap-3">
                             <img src={studio.profileImage} alt={studio.name} className="w-14 h-14 object-cover rounded-xl shrink-0" />
                             <div className="space-y-1">
                               <div className="flex items-center gap-2">
-                                <h4 className="text-sm font-bold text-slate-900">{studio.name}</h4>
+                                <h4 className="text-sm font-bold text-[#26352D]">{studio.name}</h4>
                                 {studio.isVerified && (
-                                  <span className="px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 font-bold text-[10px]">
+                                  <span className="px-2 py-0.5 rounded-full bg-[#EAFBF0] text-emerald-800 border border-emerald-300 font-bold text-[10px]">
                                     VERIFIED
                                   </span>
                                 )}
                                 {studio.isFeatured && (
-                                  <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200 font-bold text-[10px]">
+                                  <span className="px-2 py-0.5 rounded-full bg-[#FFF6F0] text-[#E66A32] border border-[#F8CFBE] font-bold text-[10px]">
                                     FEATURED
                                   </span>
                                 )}
@@ -1797,79 +2394,79 @@ export default function AdminDashboardPage() {
           {/* TAB 7: PROMOTIONS */}
           {activeTab === 'promotions' && (
             <div className="space-y-6">
-              <div className="p-5 rounded-2xl bg-blue-50 border border-blue-200 space-y-2">
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-900/40 text-slate-700 text-xs font-bold">
-                  <Sparkles className="w-3.5 h-3.5" />
+              <div className="p-5 rounded-2xl bg-[#FAF7F2] border border-[#E8E5DF] space-y-2">
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#FFF6F0] text-[#E66A32] text-xs font-bold border border-[#F8CFBE]">
+                  <Sparkles className="w-3.5 h-3.5 text-[#E66A32]" />
                   <span>Paid Business Promotion Publisher</span>
                 </div>
-                <h2 className="text-xl font-bold text-slate-900">Publish Paid Business Promotions</h2>
-                <p className="text-xs text-slate-700 max-w-2xl">
+                <h2 className="text-xl font-bold text-[#26352D]">Publish Paid Business Promotions</h2>
+                <p className="text-xs text-[#647067] max-w-2xl">
                   When a local business pays for promotion, enter the details here. Select the business, upload/paste the banner image, set start and end dates, and publish live on Royal Korutla.
                 </p>
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Add Form */}
-                <div className="p-5 rounded-2xl bg-white border border-slate-200 space-y-4">
-                  <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2 pb-2 border-b border-slate-200">
-                    <Plus className="w-4 h-4 text-blue-600" />
+                <div className="p-5 rounded-2xl bg-white border border-[#E8E5DF] space-y-4 shadow-xs">
+                  <h3 className="text-sm font-bold text-[#26352D] flex items-center gap-2 pb-2 border-b border-[#E8E5DF]">
+                    <Plus className="w-4 h-4 text-[#E66A32]" />
                     <span>Create Paid Campaign</span>
                   </h3>
 
                   <form onSubmit={handlePublishPromotion} className="space-y-3 text-xs">
                     <div>
-                      <label className="block text-slate-700 font-bold mb-1">Business Name *</label>
+                      <label className="block text-[#26352D] font-bold mb-1">Business Name *</label>
                       <input
                         type="text"
                         required
                         placeholder="e.g. Royal Paradise Biryani"
                         value={promBizName}
                         onChange={(e) => setPromBizName(e.target.value)}
-                        className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 shadow-2xs"
+                        className="w-full bg-[#FAF7F2] border border-[#E8E5DF] rounded-xl px-3 py-2 text-[#26352D] font-semibold placeholder-[#647067]/60 focus:outline-none focus:border-[#E66A32] focus:ring-2 focus:ring-[#FFF6F0] shadow-2xs"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-slate-700 font-bold mb-1">Promotional Image URL *</label>
+                      <label className="block text-[#26352D] font-bold mb-1">Promotional Image URL *</label>
                       <input
                         type="url"
                         required
                         placeholder="https://images.unsplash.com/..."
                         value={promImage}
                         onChange={(e) => setPromImage(e.target.value)}
-                        className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 shadow-2xs"
+                        className="w-full bg-[#FAF7F2] border border-[#E8E5DF] rounded-xl px-3 py-2 text-[#26352D] font-semibold placeholder-[#647067]/60 focus:outline-none focus:border-[#E66A32] focus:ring-2 focus:ring-[#FFF6F0] shadow-2xs"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-slate-700 font-bold mb-1">Promotion Title</label>
+                      <label className="block text-[#26352D] font-bold mb-1">Promotion Title</label>
                       <input
                         type="text"
                         placeholder="e.g. Grand Festival Offer 2026"
                         value={promTitle}
                         onChange={(e) => setPromTitle(e.target.value)}
-                        className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 shadow-2xs"
+                        className="w-full bg-[#FAF7F2] border border-[#E8E5DF] rounded-xl px-3 py-2 text-[#26352D] font-semibold placeholder-[#647067]/60 focus:outline-none focus:border-[#E66A32] focus:ring-2 focus:ring-[#FFF6F0] shadow-2xs"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-slate-700 font-bold mb-1">Offer Tagline / Highlight</label>
+                      <label className="block text-[#26352D] font-bold mb-1">Offer Tagline / Highlight</label>
                       <input
                         type="text"
                         placeholder="e.g. Flat 20% OFF on all items"
                         value={promOfferText}
                         onChange={(e) => setPromOfferText(e.target.value)}
-                        className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 shadow-2xs"
+                        className="w-full bg-[#FAF7F2] border border-[#E8E5DF] rounded-xl px-3 py-2 text-[#26352D] font-semibold placeholder-[#647067]/60 focus:outline-none focus:border-[#E66A32] focus:ring-2 focus:ring-[#FFF6F0] shadow-2xs"
                       />
                     </div>
 
                     <div className="grid grid-cols-2 gap-2">
                       <div>
-                        <label className="block text-slate-700 font-bold mb-1">Promotion Type</label>
+                        <label className="block text-[#26352D] font-bold mb-1">Promotion Type</label>
                         <select
                           value={promType}
                           onChange={(e) => setPromType(e.target.value as PromotionType)}
-                          className="w-full bg-white border border-slate-300 rounded-xl px-2.5 py-2 text-slate-900 font-semibold focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 shadow-2xs"
+                          className="w-full bg-[#FAF7F2] border border-[#E8E5DF] rounded-xl px-2.5 py-2 text-[#26352D] font-semibold focus:outline-none focus:border-[#E66A32] focus:ring-2 focus:ring-[#FFF6F0] shadow-2xs"
                         >
                           <option value="HOMEPAGE_FEATURED">Homepage Featured</option>
                           <option value="FEATURED_BUSINESS">Featured Business Ticker</option>
@@ -1881,11 +2478,11 @@ export default function AdminDashboardPage() {
                       </div>
 
                       <div>
-                        <label className="block text-slate-700 font-bold mb-1">Placement Target</label>
+                        <label className="block text-[#26352D] font-bold mb-1">Placement Target</label>
                         <select
                           value={promPlacement}
                           onChange={(e) => setPromPlacement(e.target.value)}
-                          className="w-full bg-white border border-slate-300 rounded-xl px-2.5 py-2 text-slate-900 font-semibold focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 shadow-2xs"
+                          className="w-full bg-[#FAF7F2] border border-[#E8E5DF] rounded-xl px-2.5 py-2 text-[#26352D] font-semibold focus:outline-none focus:border-[#E66A32] focus:ring-2 focus:ring-[#FFF6F0] shadow-2xs"
                         >
                           <option value="Homepage Top Banner">Homepage Top Banner</option>
                           <option value="Photography Header">Photography Header</option>
@@ -1898,28 +2495,28 @@ export default function AdminDashboardPage() {
 
                     <div className="grid grid-cols-2 gap-2">
                       <div>
-                        <label className="block text-slate-700 font-bold mb-1">Start Date</label>
+                        <label className="block text-[#26352D] font-bold mb-1">Start Date</label>
                         <input
                           type="date"
                           value={promStartDate}
                           onChange={(e) => setPromStartDate(e.target.value)}
-                          className="w-full bg-white border border-slate-300 rounded-xl px-2 py-1.5 text-slate-900 font-semibold focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 shadow-2xs"
+                          className="w-full bg-[#FAF7F2] border border-[#E8E5DF] rounded-xl px-2 py-1.5 text-[#26352D] font-semibold focus:outline-none focus:border-[#E66A32] focus:ring-2 focus:ring-[#FFF6F0] shadow-2xs"
                         />
                       </div>
                       <div>
-                        <label className="block text-slate-700 font-bold mb-1">End Date (Expiry)</label>
+                        <label className="block text-[#26352D] font-bold mb-1">End Date (Expiry)</label>
                         <input
                           type="date"
                           value={promEndDate}
                           onChange={(e) => setPromEndDate(e.target.value)}
-                          className="w-full bg-white border border-slate-300 rounded-xl px-2 py-1.5 text-slate-900 font-semibold focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 shadow-2xs"
+                          className="w-full bg-[#FAF7F2] border border-[#E8E5DF] rounded-xl px-2 py-1.5 text-[#26352D] font-semibold focus:outline-none focus:border-[#E66A32] focus:ring-2 focus:ring-[#FFF6F0] shadow-2xs"
                         />
                       </div>
                     </div>
 
                     <button
                       type="submit"
-                      className="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs flex items-center justify-center gap-2 shadow-lg transition-all mt-2"
+                      className="w-full py-3 rounded-xl bg-[#E66A32] hover:bg-[#D45B25] text-white font-extrabold text-xs flex items-center justify-center gap-2 shadow-xs transition-all mt-2 cursor-pointer"
                     >
                       <Sparkles className="w-4 h-4" />
                       <span>Publish Live on Website</span>
@@ -1930,39 +2527,39 @@ export default function AdminDashboardPage() {
                 {/* Active Promotions List */}
                 <div className="lg:col-span-2 space-y-4">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                      <Sparkles className="w-4 h-4 text-blue-600" />
+                    <h3 className="text-sm font-bold text-[#26352D] flex items-center gap-2">
+                      <Sparkles className="w-4 h-4 text-[#E66A32]" />
                       <span>Current Campaigns ({promotions.length})</span>
                     </h3>
-                    <button onClick={fetchPromotions} className="text-xs text-blue-600 hover:underline flex items-center gap-1">
+                    <button onClick={fetchPromotions} className="text-xs text-[#E66A32] hover:underline flex items-center gap-1 cursor-pointer">
                       <RefreshCw className="w-3 h-3" /> Refresh
                     </button>
                   </div>
 
                   {loadingPromotions ? (
-                    <div className="p-8 text-center text-slate-500 text-xs">Loading promotions...</div>
+                    <div className="p-8 text-center text-[#647067] text-xs">Loading promotions...</div>
                   ) : promotions.length === 0 ? (
-                    <div className="p-8 text-center text-slate-500 text-xs bg-white rounded-2xl border border-slate-200">
+                    <div className="p-8 text-center text-[#647067] text-xs bg-white rounded-2xl border border-[#E8E5DF]">
                       No promotion campaigns published yet.
                     </div>
                   ) : (
                     <div className="space-y-3">
                       {promotions.map((p) => (
-                        <div key={p.id} className="p-4 rounded-2xl bg-white border border-slate-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                        <div key={p.id} className="p-4 rounded-2xl bg-white border border-[#E8E5DF] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xs">
                           <div className="flex items-center gap-3">
                             {p.bannerImage && (
                               <img src={p.bannerImage} alt={p.businessName} className="w-16 h-12 object-cover rounded-xl shrink-0" />
                             )}
                             <div className="space-y-1">
                               <div className="flex items-center gap-2">
-                                <span className="px-2 py-0.5 rounded bg-blue-600 text-white font-extrabold text-[10px] uppercase">
+                                <span className="px-2 py-0.5 rounded bg-[#E66A32] text-white font-extrabold text-[10px] uppercase">
                                   {p.badgeLabel || 'PROMOTED'}
                                 </span>
-                                <span className="text-[11px] font-semibold text-blue-600">{p.placement}</span>
+                                <span className="text-[11px] font-semibold text-[#26352D]">{p.placement}</span>
                               </div>
-                              <h4 className="text-sm font-bold text-slate-900">{p.businessName}</h4>
-                              {p.offerText && <p className="text-xs text-slate-700 font-semibold">{p.offerText}</p>}
-                              <p className="text-[10px] text-slate-500">Valid: {p.startDate} to {p.endDate}</p>
+                              <h4 className="text-sm font-bold text-[#26352D]">{p.businessName}</h4>
+                              {p.offerText && <p className="text-xs text-[#647067] font-semibold">{p.offerText}</p>}
+                              <p className="text-[10px] text-[#647067]">Valid: {p.startDate} to {p.endDate}</p>
                             </div>
                           </div>
 
@@ -1998,7 +2595,7 @@ export default function AdminDashboardPage() {
                   <h3 className="text-lg font-bold text-slate-900">Korutla Local Businesses ({businesses.length})</h3>
                   <p className="text-xs text-slate-500">Manage listings, toggle RK verified badge, pin to featured section.</p>
                 </div>
-                <button onClick={() => setActiveTab('add-business')} className="px-3.5 py-2 rounded-xl bg-blue-600 text-white font-extrabold text-xs flex items-center gap-1.5">
+                <button onClick={() => setActiveTab('add-business')} className="px-3.5 py-2 rounded-xl bg-[#E66A32] hover:bg-[#D45B25] text-white font-extrabold text-xs flex items-center gap-1.5 shadow-sm">
                   <Plus className="w-4 h-4" /> Add New Business
                 </button>
               </div>
@@ -2029,11 +2626,11 @@ export default function AdminDashboardPage() {
                             onClick={() => handleToggleVerifyBiz(b.id)}
                             className={`px-2.5 py-1 rounded-full text-[10px] font-bold flex items-center gap-1 ${
                               b.isVerified
-                                ? 'bg-blue-50 text-blue-700 border border-blue-200'
+                                ? 'bg-[#FFF6F0] text-[#E66A32] border border-[#F8CFBE]'
                                 : 'bg-slate-100 text-slate-500'
                             }`}
                           >
-                            <CheckCircle2 className="w-3 h-3 text-blue-600" />
+                            <CheckCircle2 className="w-3 h-3 text-[#E66A32]" />
                             <span>{b.isVerified ? 'VERIFIED' : 'Not Verified'}</span>
                           </button>
                         </td>
@@ -2075,7 +2672,7 @@ export default function AdminDashboardPage() {
           {activeTab === 'add-business' && (
             <div className="max-w-2xl mx-auto space-y-4">
               <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                <Plus className="w-5 h-5 text-blue-600" />
+                <Plus className="w-5 h-5 text-[#E66A32]" />
                 <span>Register New Business in Korutla</span>
               </h3>
               <form onSubmit={handleAddBusiness} className="p-6 bg-white rounded-2xl border border-slate-200 space-y-4 text-xs">
@@ -2087,7 +2684,7 @@ export default function AdminDashboardPage() {
                     placeholder="e.g. Royal Sweets & Bakery"
                     value={newBizName}
                     onChange={(e) => setNewBizName(e.target.value)}
-                    className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-semibold placeholder-slate-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:outline-none transition-all shadow-2xs"
+                    className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-semibold placeholder-slate-400 focus:border-[#E66A32] focus:ring-2 focus:ring-[#E66A32]/20 focus:outline-none transition-all shadow-2xs"
                   />
                 </div>
 
@@ -2097,12 +2694,13 @@ export default function AdminDashboardPage() {
                     <select
                       value={newBizCategory}
                       onChange={(e) => setNewBizCategory(e.target.value)}
-                      className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-semibold focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:outline-none transition-all shadow-2xs"
+                      className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-semibold focus:border-[#E66A32] focus:ring-2 focus:ring-[#E66A32]/20 focus:outline-none transition-all shadow-2xs"
                     >
+                      <option value="clothing">Clothing Stores</option>
+                      <option value="shopping">Shopping &amp; Apparel</option>
                       <option value="food">Food &amp; Dining</option>
                       <option value="groceries">Groceries &amp; Marts</option>
                       <option value="photography">Photography &amp; Studios</option>
-                      <option value="shopping">Shopping &amp; Apparel</option>
                       <option value="services">Services &amp; Repair</option>
                       <option value="hospitals">Hospitals &amp; Doctors</option>
                       <option value="jobs">Local Jobs</option>
@@ -2116,7 +2714,7 @@ export default function AdminDashboardPage() {
                       placeholder="e.g. Bakery & Confectionery"
                       value={newBizSubCategory}
                       onChange={(e) => setNewBizSubCategory(e.target.value)}
-                      className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-semibold placeholder-slate-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:outline-none transition-all shadow-2xs"
+                      className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-semibold placeholder-slate-400 focus:border-[#E66A32] focus:ring-2 focus:ring-[#E66A32]/20 focus:outline-none transition-all shadow-2xs"
                     />
                   </div>
                 </div>
@@ -2129,7 +2727,7 @@ export default function AdminDashboardPage() {
                       placeholder="+91 98480 12345"
                       value={newBizPhone}
                       onChange={(e) => setNewBizPhone(e.target.value)}
-                      className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-semibold placeholder-slate-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:outline-none transition-all shadow-2xs"
+                      className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-semibold placeholder-slate-400 focus:border-[#E66A32] focus:ring-2 focus:ring-[#E66A32]/20 focus:outline-none transition-all shadow-2xs"
                     />
                   </div>
                   <div>
@@ -2138,7 +2736,7 @@ export default function AdminDashboardPage() {
                       type="text"
                       value={newBizTiming}
                       onChange={(e) => setNewBizTiming(e.target.value)}
-                      className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-semibold placeholder-slate-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:outline-none transition-all shadow-2xs"
+                      className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-semibold placeholder-slate-400 focus:border-[#E66A32] focus:ring-2 focus:ring-[#E66A32]/20 focus:outline-none transition-all shadow-2xs"
                     />
                   </div>
                 </div>
@@ -2150,7 +2748,7 @@ export default function AdminDashboardPage() {
                     placeholder="e.g. Main Road, Korutla"
                     value={newBizAddress}
                     onChange={(e) => setNewBizAddress(e.target.value)}
-                    className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-semibold placeholder-slate-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:outline-none transition-all shadow-2xs"
+                    className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-semibold placeholder-slate-400 focus:border-[#E66A32] focus:ring-2 focus:ring-[#E66A32]/20 focus:outline-none transition-all shadow-2xs"
                   />
                 </div>
 
@@ -2160,7 +2758,7 @@ export default function AdminDashboardPage() {
                     type="url"
                     value={newBizImage}
                     onChange={(e) => setNewBizImage(e.target.value)}
-                    className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-semibold placeholder-slate-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:outline-none transition-all shadow-2xs"
+                    className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-semibold placeholder-slate-400 focus:border-[#E66A32] focus:ring-2 focus:ring-[#E66A32]/20 focus:outline-none transition-all shadow-2xs"
                   />
                 </div>
 
@@ -2170,7 +2768,7 @@ export default function AdminDashboardPage() {
                     id="v-check"
                     checked={newBizVerified}
                     onChange={(e) => setNewBizVerified(e.target.checked)}
-                    className="w-4 h-4 rounded text-blue-700 focus:ring-blue-500"
+                    className="w-4 h-4 rounded text-[#E66A32] focus:ring-[#E66A32] accent-[#E66A32]"
                   />
                   <label htmlFor="v-check" className="text-slate-800 font-bold">
                     Grant Royal Korutla Verified Badge
@@ -2179,7 +2777,7 @@ export default function AdminDashboardPage() {
 
                 <button
                   type="submit"
-                  className="w-full py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs shadow-lg hover:shadow-blue-500/25 transition-all"
+                  className="w-full py-3.5 rounded-xl bg-[#E66A32] hover:bg-[#D45B25] text-white font-extrabold text-xs shadow-sm transition-all"
                 >
                   Save Business Listing
                 </button>
@@ -2191,7 +2789,7 @@ export default function AdminDashboardPage() {
           {activeTab === 'edit-business' && (
             <div className="max-w-2xl mx-auto space-y-4">
               <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                <Edit3 className="w-5 h-5 text-blue-600" />
+                <Edit3 className="w-5 h-5 text-[#E66A32]" />
                 <span>Edit Business Details {editingBiz ? `(${editingBiz.name})` : ''}</span>
               </h3>
               {editingBiz ? (
@@ -2203,7 +2801,7 @@ export default function AdminDashboardPage() {
                       required
                       value={newBizName}
                       onChange={(e) => setNewBizName(e.target.value)}
-                      className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-semibold placeholder-slate-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:outline-none transition-all shadow-2xs"
+                      className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-semibold placeholder-slate-400 focus:border-[#E66A32] focus:ring-2 focus:ring-[#E66A32]/20 focus:outline-none transition-all shadow-2xs"
                     />
                   </div>
 
@@ -2213,12 +2811,13 @@ export default function AdminDashboardPage() {
                       <select
                         value={newBizCategory}
                         onChange={(e) => setNewBizCategory(e.target.value)}
-                        className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-semibold focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:outline-none transition-all shadow-2xs"
+                        className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-semibold focus:border-[#E66A32] focus:ring-2 focus:ring-[#E66A32]/20 focus:outline-none transition-all shadow-2xs"
                       >
+                        <option value="clothing">Clothing Stores</option>
+                        <option value="shopping">Shopping &amp; Apparel</option>
                         <option value="food">Food &amp; Dining</option>
                         <option value="groceries">Groceries &amp; Marts</option>
                         <option value="photography">Photography &amp; Studios</option>
-                        <option value="shopping">Shopping &amp; Apparel</option>
                         <option value="services">Services &amp; Repair</option>
                         <option value="hospitals">Hospitals &amp; Doctors</option>
                         <option value="jobs">Local Jobs</option>
@@ -2231,7 +2830,7 @@ export default function AdminDashboardPage() {
                         type="text"
                         value={newBizSubCategory}
                         onChange={(e) => setNewBizSubCategory(e.target.value)}
-                        className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-semibold placeholder-slate-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:outline-none transition-all shadow-2xs"
+                        className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-semibold placeholder-slate-400 focus:border-[#E66A32] focus:ring-2 focus:ring-[#E66A32]/20 focus:outline-none transition-all shadow-2xs"
                       />
                     </div>
                   </div>
@@ -2243,7 +2842,7 @@ export default function AdminDashboardPage() {
                         type="text"
                         value={newBizPhone}
                         onChange={(e) => setNewBizPhone(e.target.value)}
-                        className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-semibold placeholder-slate-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:outline-none transition-all shadow-2xs"
+                        className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-semibold placeholder-slate-400 focus:border-[#E66A32] focus:ring-2 focus:ring-[#E66A32]/20 focus:outline-none transition-all shadow-2xs"
                       />
                     </div>
                     <div>
@@ -2252,7 +2851,7 @@ export default function AdminDashboardPage() {
                         type="text"
                         value={newBizTiming}
                         onChange={(e) => setNewBizTiming(e.target.value)}
-                        className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-semibold placeholder-slate-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:outline-none transition-all shadow-2xs"
+                        className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-semibold placeholder-slate-400 focus:border-[#E66A32] focus:ring-2 focus:ring-[#E66A32]/20 focus:outline-none transition-all shadow-2xs"
                       />
                     </div>
                   </div>
@@ -2263,7 +2862,7 @@ export default function AdminDashboardPage() {
                       type="text"
                       value={newBizAddress}
                       onChange={(e) => setNewBizAddress(e.target.value)}
-                      className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-semibold placeholder-slate-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:outline-none transition-all shadow-2xs"
+                      className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-semibold placeholder-slate-400 focus:border-[#E66A32] focus:ring-2 focus:ring-[#E66A32]/20 focus:outline-none transition-all shadow-2xs"
                     />
                   </div>
 
@@ -2273,7 +2872,7 @@ export default function AdminDashboardPage() {
                       type="url"
                       value={newBizImage}
                       onChange={(e) => setNewBizImage(e.target.value)}
-                      className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-semibold placeholder-slate-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:outline-none transition-all shadow-2xs"
+                      className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-semibold placeholder-slate-400 focus:border-[#E66A32] focus:ring-2 focus:ring-[#E66A32]/20 focus:outline-none transition-all shadow-2xs"
                     />
                   </div>
 
@@ -2283,7 +2882,7 @@ export default function AdminDashboardPage() {
                       id="ve-check"
                       checked={newBizVerified}
                       onChange={(e) => setNewBizVerified(e.target.checked)}
-                      className="w-4 h-4 rounded text-blue-700 focus:ring-blue-500"
+                      className="w-4 h-4 rounded text-[#E66A32] focus:ring-[#E66A32] accent-[#E66A32]"
                     />
                     <label htmlFor="ve-check" className="text-slate-800 font-bold">
                       Royal Korutla Verified Badge Active
@@ -2293,7 +2892,7 @@ export default function AdminDashboardPage() {
                   <div className="flex gap-2">
                     <button
                       type="submit"
-                      className="flex-1 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs shadow-lg hover:shadow-blue-500/25 transition-all"
+                      className="flex-1 py-3.5 rounded-xl bg-[#E66A32] hover:bg-[#D45B25] text-white font-extrabold text-xs shadow-sm transition-all"
                     >
                       Update Changes
                     </button>
@@ -2308,7 +2907,7 @@ export default function AdminDashboardPage() {
                 </form>
               ) : (
                 <div className="p-8 text-center text-slate-500 bg-white rounded-2xl border border-slate-200 text-xs">
-                  Please select a business from the <button onClick={() => setActiveTab('businesses')} className="text-blue-600 underline">Businesses tab</button> to edit.
+                  Please select a business from the <button onClick={() => setActiveTab('businesses')} className="text-[#E66A32] underline font-bold">Businesses tab</button> to edit.
                 </div>
               )}
             </div>
@@ -2318,7 +2917,7 @@ export default function AdminDashboardPage() {
           {activeTab === 'homepage-content' && (
             <div className="space-y-6">
               <div className="p-5 rounded-2xl bg-white border border-slate-200 space-y-2">
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 text-xs font-bold">
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#FFF6F0] text-[#E66A32] border border-[#F8CFBE] text-xs font-bold">
                   <Eye className="w-3.5 h-3.5" />
                   <span>Homepage Content &amp; Layout Manager</span>
                 </div>
@@ -2332,7 +2931,7 @@ export default function AdminDashboardPage() {
                 {/* Hero Slides */}
                 <div className="p-5 rounded-2xl bg-white border border-slate-200 space-y-4">
                   <h3 className="text-sm font-bold text-slate-900 flex items-center justify-between pb-2 border-b border-slate-200">
-                    <span className="flex items-center gap-2"><Layers className="w-4 h-4 text-blue-600" /> Hero Slides ({heroSlides.length})</span>
+                    <span className="flex items-center gap-2"><Layers className="w-4 h-4 text-[#E66A32]" /> Hero Slides ({heroSlides.length})</span>
                   </h3>
 
                   <form onSubmit={handleAddSlide} className="space-y-3 text-xs bg-slate-50 p-4 rounded-xl border border-slate-200">
@@ -2343,14 +2942,14 @@ export default function AdminDashboardPage() {
                       placeholder="Slide Main Title (e.g. Festival Season Sale)"
                       value={newSlideTitle}
                       onChange={(e) => setNewSlideTitle(e.target.value)}
-                      className="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 shadow-2xs"
+                      className="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-[#E66A32] focus:ring-2 focus:ring-[#E66A32]/20 shadow-2xs"
                     />
                     <input
                       type="text"
                       placeholder="Subtitle (e.g. Up to 40% discount across stores)"
                       value={newSlideSubtitle}
                       onChange={(e) => setNewSlideSubtitle(e.target.value)}
-                      className="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 shadow-2xs"
+                      className="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-[#E66A32] focus:ring-2 focus:ring-[#E66A32]/20 shadow-2xs"
                     />
                     <div className="grid grid-cols-2 gap-2">
                       <input
@@ -2358,14 +2957,14 @@ export default function AdminDashboardPage() {
                         placeholder="Button Text"
                         value={newSlideCtaText}
                         onChange={(e) => setNewSlideCtaText(e.target.value)}
-                        className="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 shadow-2xs"
+                        className="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-[#E66A32] focus:ring-2 focus:ring-[#E66A32]/20 shadow-2xs"
                       />
                       <input
                         type="text"
                         placeholder="Button Link (e.g. /offers)"
                         value={newSlideCtaLink}
                         onChange={(e) => setNewSlideCtaLink(e.target.value)}
-                        className="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 shadow-2xs"
+                        className="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-[#E66A32] focus:ring-2 focus:ring-[#E66A32]/20 shadow-2xs"
                       />
                     </div>
                     <input
@@ -2373,9 +2972,9 @@ export default function AdminDashboardPage() {
                       placeholder="Background Image URL"
                       value={newSlideBg}
                       onChange={(e) => setNewSlideBg(e.target.value)}
-                      className="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 shadow-2xs"
+                      className="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-[#E66A32] focus:ring-2 focus:ring-[#E66A32]/20 shadow-2xs"
                     />
-                    <button type="submit" className="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white font-extrabold rounded-lg">
+                    <button type="submit" className="w-full py-2 bg-[#E66A32] hover:bg-[#D45B25] text-white font-extrabold rounded-lg shadow-sm transition-all">
                       Add Hero Slide
                     </button>
                   </form>
@@ -2401,7 +3000,7 @@ export default function AdminDashboardPage() {
                 {/* Featured Business Reordering */}
                 <div className="p-5 rounded-2xl bg-white border border-slate-200 space-y-4">
                   <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2 pb-2 border-b border-slate-200">
-                    <Crown className="w-4 h-4 text-blue-600" />
+                    <Crown className="w-4 h-4 text-[#E66A32]" />
                     <span>Featured Businesses Order</span>
                   </h3>
                   <p className="text-xs text-slate-500">Reorder featured listings shown on homepage carousel:</p>
@@ -2462,11 +3061,11 @@ export default function AdminDashboardPage() {
                       onClick={() => handleToggleVerifyBiz(b.id)}
                       className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1 ${
                         b.isVerified
-                          ? 'bg-blue-50 text-blue-700 border border-blue-700'
-                          : 'bg-slate-100 text-slate-700 hover:bg-blue-900'
+                          ? 'bg-[#FFF6F0] text-[#E66A32] border border-[#F8CFBE]'
+                          : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                       }`}
                     >
-                      <CheckCircle2 className="w-3.5 h-3.5 text-blue-600" />
+                      <CheckCircle2 className="w-3.5 h-3.5 text-[#E66A32]" />
                       <span>{b.isVerified ? 'VERIFIED' : 'Grant Badge'}</span>
                     </button>
                   </div>
@@ -2479,14 +3078,14 @@ export default function AdminDashboardPage() {
           {activeTab === 'offers' && (
             <div className="space-y-4">
               <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                <Tag className="w-5 h-5 text-blue-600" />
+                <Tag className="w-5 h-5 text-[#E66A32]" />
                 <span>Town Offers &amp; Discounts ({offers.length})</span>
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 {offers.map((off) => (
                   <div key={off.id} className="p-4 rounded-2xl bg-white border border-slate-200 space-y-2">
                     <img src={off.image} alt={off.title} className="w-full h-28 object-cover rounded-xl" />
-                    <span className="px-2 py-0.5 rounded bg-blue-600 text-white font-black text-[10px]">{off.discount}</span>
+                    <span className="px-2 py-0.5 rounded bg-[#E66A32] text-white font-black text-[10px]">{off.discount}</span>
                     <h4 className="text-xs font-bold text-slate-900">{off.title}</h4>
                     <p className="text-[11px] text-slate-500">{off.businessName}</p>
                   </div>
@@ -2499,7 +3098,7 @@ export default function AdminDashboardPage() {
           {activeTab === 'food' && (
             <div className="space-y-4">
               <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                <Utensils className="w-5 h-5 text-blue-600" />
+                <Utensils className="w-5 h-5 text-[#E66A32]" />
                 <span>Restaurant Dishes &amp; Menus ({foodItems.length})</span>
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -2509,7 +3108,7 @@ export default function AdminDashboardPage() {
                       <img src={dish.image} alt={dish.name} className="w-12 h-12 rounded-xl object-cover" />
                       <div>
                         <h4 className="text-xs font-bold text-slate-900">{dish.name}</h4>
-                        <p className="text-[10px] text-blue-600 font-extrabold">₹{dish.price}</p>
+                        <p className="text-[10px] text-[#E66A32] font-extrabold">₹{dish.price}</p>
                       </div>
                     </div>
                     <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${dish.isVeg ? 'bg-emerald-50 text-emerald-800' : 'bg-rose-50 text-rose-800'}`}>
@@ -2527,7 +3126,7 @@ export default function AdminDashboardPage() {
               {/* Header Banner */}
               <div className="p-6 rounded-2xl bg-white border border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-xs">
                 <div>
-                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-xs font-bold mb-2">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FFF6F0] border border-[#F8CFBE] text-[#E66A32] text-xs font-bold mb-2">
                     <Briefcase className="w-3.5 h-3.5" />
                     <span>Jobs Module &amp; Visual Customizer</span>
                   </div>
@@ -2547,7 +3146,7 @@ export default function AdminDashboardPage() {
                   </button>
                   <button
                     onClick={handleOpenAddJobModal}
-                    className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-extrabold flex items-center gap-2 shadow-md hover:shadow-blue-500/20 transition-all"
+                    className="px-4 py-2.5 rounded-xl bg-[#E66A32] hover:bg-[#D45B25] text-white text-xs font-extrabold flex items-center gap-2 shadow-sm transition-all"
                   >
                     <Plus className="w-4 h-4" />
                     <span>Add New Job Vacancy</span>
@@ -2560,7 +3159,7 @@ export default function AdminDashboardPage() {
                 <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-xs">
                   <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Total Vacancies</p>
                   <p className="text-2xl font-black text-slate-900 mt-1">{jobs.length}</p>
-                  <span className="text-[10px] text-blue-600 font-semibold mt-1 inline-block">Active in Korutla</span>
+                  <span className="text-[10px] text-[#E66A32] font-semibold mt-1 inline-block">Active in Korutla</span>
                 </div>
                 <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-xs">
                   <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Urgent Badges</p>
@@ -2588,7 +3187,7 @@ export default function AdminDashboardPage() {
                     placeholder="Search by title, shop, location..."
                     value={jobAdminSearch}
                     onChange={(e) => setJobAdminSearch(e.target.value)}
-                    className="w-full bg-white border border-slate-300 rounded-xl pl-9 pr-4 py-2 text-xs text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
+                    className="w-full bg-white border border-slate-300 rounded-xl pl-9 pr-4 py-2 text-xs text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-[#E66A32] focus:ring-2 focus:ring-[#E66A32]/20"
                   />
                 </div>
 
@@ -2597,7 +3196,7 @@ export default function AdminDashboardPage() {
                     onClick={() => setJobAdminCategoryFilter('All')}
                     className={`px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition-all ${
                       jobAdminCategoryFilter === 'All'
-                        ? 'bg-blue-600 text-white shadow-xs'
+                        ? 'bg-[#E66A32] text-white shadow-xs'
                         : 'bg-slate-100 text-slate-600 hover:text-slate-900 hover:bg-slate-200'
                     }`}
                   >
@@ -2611,7 +3210,7 @@ export default function AdminDashboardPage() {
                         onClick={() => setJobAdminCategoryFilter(cat)}
                         className={`px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition-all ${
                           jobAdminCategoryFilter === cat
-                            ? 'bg-blue-600 text-white shadow-xs'
+                            ? 'bg-[#E66A32] text-white shadow-xs'
                             : 'bg-slate-100 text-slate-600 hover:text-slate-900 hover:bg-slate-200'
                         }`}
                       >
@@ -2625,7 +3224,7 @@ export default function AdminDashboardPage() {
               {/* Job Listings Grid */}
               {loadingJobs ? (
                 <div className="p-12 text-center bg-white rounded-2xl border border-slate-200 text-xs text-slate-500 font-bold">
-                  <RefreshCw className="w-5 h-5 mx-auto mb-2 animate-spin text-blue-600" />
+                  <RefreshCw className="w-5 h-5 mx-auto mb-2 animate-spin text-[#E66A32]" />
                   Loading local jobs...
                 </div>
               ) : jobs.filter((j) => {
@@ -2641,7 +3240,7 @@ export default function AdminDashboardPage() {
                   <p className="text-sm font-bold text-slate-800">No job openings found matching your criteria.</p>
                   <button
                     onClick={() => { setJobAdminSearch(''); setJobAdminCategoryFilter('All'); }}
-                    className="px-4 py-2 rounded-xl bg-blue-600 text-white font-bold text-xs hover:bg-blue-700"
+                    className="px-4 py-2 rounded-xl bg-[#E66A32] text-white font-bold text-xs hover:bg-[#D45B25]"
                   >
                     Clear Filters
                   </button>
@@ -2786,7 +3385,7 @@ export default function AdminDashboardPage() {
                             <div className="flex items-center gap-2">
                               <button
                                 onClick={() => handleStartEditJob(job)}
-                                className="px-3 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold flex items-center gap-1 transition-all border border-blue-200"
+                                className="px-3 py-1.5 rounded-xl bg-[#FFF6F0] hover:bg-[#F8CFBE] text-[#E66A32] text-xs font-bold flex items-center gap-1 transition-all border border-[#F8CFBE]"
                               >
                                 <Edit3 className="w-3.5 h-3.5" />
                                 <span>Edit &amp; Style</span>
@@ -2813,7 +3412,7 @@ export default function AdminDashboardPage() {
                     {/* Modal Header */}
                     <div className="flex items-center justify-between pb-4 border-b border-slate-200">
                       <div>
-                        <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 text-xs font-bold mb-1">
+                        <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#FFF6F0] text-[#E66A32] border border-[#F8CFBE] text-xs font-bold mb-1">
                           <Palette className="w-3.5 h-3.5" />
                           <span>Interactive Module Customizer</span>
                         </div>
@@ -2844,7 +3443,7 @@ export default function AdminDashboardPage() {
                               placeholder="e.g. Sales Executive, Cashier, Head Cook"
                               value={jobTitle}
                               onChange={(e) => setJobTitle(e.target.value)}
-                              className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
+                              className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-[#E66A32] focus:ring-2 focus:ring-[#E66A32]/20"
                             />
                           </div>
 
@@ -2857,7 +3456,7 @@ export default function AdminDashboardPage() {
                                 placeholder="e.g. Royal Supermarket"
                                 value={jobShopName}
                                 onChange={(e) => setJobShopName(e.target.value)}
-                                className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
+                                className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-[#E66A32] focus:ring-2 focus:ring-[#E66A32]/20"
                               />
                             </div>
                             <div className="space-y-1">
@@ -2865,7 +3464,7 @@ export default function AdminDashboardPage() {
                               <select
                                 value={jobCategory}
                                 onChange={(e) => setJobCategory(e.target.value)}
-                                className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-semibold focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
+                                className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-semibold focus:outline-none focus:border-[#E66A32] focus:ring-2 focus:ring-[#E66A32]/20"
                               >
                                 {JOB_CATEGORIES.map((cat) => (
                                   <option key={cat} value={cat}>{cat}</option>
@@ -2882,7 +3481,7 @@ export default function AdminDashboardPage() {
                                 placeholder="e.g. ₹15,000 - ₹20,000 / month"
                                 value={jobSalary}
                                 onChange={(e) => setJobSalary(e.target.value)}
-                                className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
+                                className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-[#E66A32] focus:ring-2 focus:ring-[#E66A32]/20"
                               />
                             </div>
                             <div className="space-y-1">
@@ -2890,7 +3489,7 @@ export default function AdminDashboardPage() {
                               <select
                                 value={jobType}
                                 onChange={(e) => setJobType(e.target.value as any)}
-                                className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-semibold focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
+                                className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-semibold focus:outline-none focus:border-[#E66A32] focus:ring-2 focus:ring-[#E66A32]/20"
                               >
                                 <option value="Full-time">Full-time</option>
                                 <option value="Part-time">Part-time</option>
@@ -2908,7 +3507,7 @@ export default function AdminDashboardPage() {
                                 placeholder="e.g. Freshers Welcome or 1+ Years"
                                 value={jobExperience}
                                 onChange={(e) => setJobExperience(e.target.value)}
-                                className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
+                                className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-[#E66A32] focus:ring-2 focus:ring-[#E66A32]/20"
                               />
                             </div>
                             <div className="space-y-1">
@@ -2918,7 +3517,7 @@ export default function AdminDashboardPage() {
                                 placeholder="e.g. Gandhi Road, Korutla"
                                 value={jobLocation}
                                 onChange={(e) => setJobLocation(e.target.value)}
-                                className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
+                                className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-[#E66A32] focus:ring-2 focus:ring-[#E66A32]/20"
                               />
                             </div>
                           </div>
@@ -2932,7 +3531,7 @@ export default function AdminDashboardPage() {
                                 placeholder="e.g. +91 98480 12345"
                                 value={jobPhone}
                                 onChange={(e) => setJobPhone(e.target.value)}
-                                className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
+                                className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-[#E66A32] focus:ring-2 focus:ring-[#E66A32]/20"
                               />
                             </div>
                             <div className="space-y-1">
@@ -2942,7 +3541,7 @@ export default function AdminDashboardPage() {
                                 placeholder="e.g. +91 98480 12345"
                                 value={jobWhatsapp}
                                 onChange={(e) => setJobWhatsapp(e.target.value)}
-                                className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
+                                className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-[#E66A32] focus:ring-2 focus:ring-[#E66A32]/20"
                               />
                             </div>
                           </div>
@@ -2954,7 +3553,7 @@ export default function AdminDashboardPage() {
                               placeholder="Brief description of responsibilities and work timings..."
                               value={jobDescription}
                               onChange={(e) => setJobDescription(e.target.value)}
-                              className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
+                              className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-[#E66A32] focus:ring-2 focus:ring-[#E66A32]/20"
                             />
                           </div>
 
@@ -2965,7 +3564,7 @@ export default function AdminDashboardPage() {
                               placeholder="e.g. Punctual, Basic Math, Telugu & Hindi speaking"
                               value={jobRequirements}
                               onChange={(e) => setJobRequirements(e.target.value)}
-                              className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
+                              className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-[#E66A32] focus:ring-2 focus:ring-[#E66A32]/20"
                             />
                           </div>
 
@@ -2975,7 +3574,7 @@ export default function AdminDashboardPage() {
                                 type="checkbox"
                                 checked={jobVerified}
                                 onChange={(e) => setJobVerified(e.target.checked)}
-                                className="w-4 h-4 rounded text-blue-600"
+                                className="w-4 h-4 rounded text-[#E66A32] focus:ring-[#E66A32] accent-[#E66A32]"
                               />
                               <span>Royal Verified Listing</span>
                             </label>
@@ -2996,9 +3595,9 @@ export default function AdminDashboardPage() {
                           <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3.5 text-xs">
                             <div className="flex items-center justify-between pb-2 border-b border-slate-200">
                               <span className="font-extrabold text-slate-900 flex items-center gap-1.5">
-                                <Palette className="w-4 h-4 text-blue-600" /> Card Theme &amp; Colors
+                                <Palette className="w-4 h-4 text-[#E66A32]" /> Card Theme &amp; Colors
                               </span>
-                              <span className="text-[10px] uppercase font-bold text-blue-600 bg-blue-100 px-2 py-0.5 rounded">
+                              <span className="text-[10px] uppercase font-bold text-[#E66A32] bg-[#FFF6F0] border border-[#F8CFBE] px-2 py-0.5 rounded">
                                 {jobCardColorTheme}
                               </span>
                             </div>
@@ -3060,7 +3659,7 @@ export default function AdminDashboardPage() {
                                 placeholder="Or enter custom badge text..."
                                 value={jobBadgeLabel}
                                 onChange={(e) => setJobBadgeLabel(e.target.value)}
-                                className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
+                                className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-[#E66A32] focus:ring-2 focus:ring-[#E66A32]/20"
                               />
                             </div>
 
@@ -3089,7 +3688,7 @@ export default function AdminDashboardPage() {
                           <div>
                             <div className="flex items-center justify-between mb-1.5">
                               <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1">
-                                <Eye className="w-3.5 h-3.5 text-blue-600" /> Live Website Card Preview:
+                                <Eye className="w-3.5 h-3.5 text-[#E66A32]" /> Live Website Card Preview:
                               </span>
                               <span className="text-[10px] text-emerald-600 font-bold">Real-time sync</span>
                             </div>
@@ -3171,7 +3770,7 @@ export default function AdminDashboardPage() {
                         </button>
                         <button
                           type="submit"
-                          className="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-extrabold flex items-center gap-2 shadow-lg transition-all"
+                          className="px-6 py-2.5 rounded-xl bg-[#E66A32] hover:bg-[#D45B25] text-white text-xs font-extrabold flex items-center gap-2 shadow-sm transition-all"
                         >
                           <Sparkles className="w-4 h-4" />
                           <span>{editingJob ? 'Save & Update Vacancy' : 'Publish Job Vacancy'}</span>
@@ -3484,7 +4083,7 @@ export default function AdminDashboardPage() {
                         <td className="p-3 text-slate-700">{u.email}</td>
                         <td className="p-3">
                           <span className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold ${
-                            u.role === 'ADMIN' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-700'
+                            u.role === 'ADMIN' ? 'bg-[#E66A32] text-white' : 'bg-slate-100 text-slate-700'
                           }`}>
                             {u.role}
                           </span>
@@ -3502,7 +4101,7 @@ export default function AdminDashboardPage() {
           {activeTab === 'settings' && (
             <div className="max-w-xl space-y-4">
               <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                <SettingsIcon className="w-5 h-5 text-blue-600" />
+                <SettingsIcon className="w-5 h-5 text-[#E66A32]" />
                 <span>Platform Settings &amp; Configuration</span>
               </h3>
               <div className="p-6 bg-white rounded-2xl border border-slate-200 space-y-4 text-xs">
@@ -3512,7 +4111,7 @@ export default function AdminDashboardPage() {
                     type="text"
                     value={siteName}
                     onChange={(e) => setSiteName(e.target.value)}
-                    className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 shadow-2xs"
+                    className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-[#E66A32] focus:ring-2 focus:ring-[#E66A32]/20 shadow-2xs"
                   />
                 </div>
 
@@ -3522,7 +4121,7 @@ export default function AdminDashboardPage() {
                     type="text"
                     value={supportPhone}
                     onChange={(e) => setSupportPhone(e.target.value)}
-                    className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 shadow-2xs"
+                    className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-[#E66A32] focus:ring-2 focus:ring-[#E66A32]/20 shadow-2xs"
                   />
                 </div>
 
@@ -3532,7 +4131,7 @@ export default function AdminDashboardPage() {
                     type="email"
                     value={supportEmail}
                     onChange={(e) => setSupportEmail(e.target.value)}
-                    className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 shadow-2xs"
+                    className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-semibold placeholder-slate-400 focus:outline-none focus:border-[#E66A32] focus:ring-2 focus:ring-[#E66A32]/20 shadow-2xs"
                   />
                 </div>
 
@@ -3553,7 +4152,7 @@ export default function AdminDashboardPage() {
 
                 <button
                   onClick={() => showToast('Platform settings saved successfully.')}
-                  className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold shadow-md transition-all"
+                  className="w-full py-2.5 rounded-xl bg-[#E66A32] hover:bg-[#D45B25] text-white font-extrabold shadow-sm transition-all"
                 >
                   Save Settings
                 </button>
@@ -3567,7 +4166,7 @@ export default function AdminDashboardPage() {
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
                   <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                    <Award className="w-5 h-5 text-blue-600" />
+                    <Award className="w-5 h-5 text-[#E66A32]" />
                     <span>Royal Points &amp; Rewards Management</span>
                   </h3>
                   <p className="text-xs text-slate-500 font-medium">
@@ -3587,7 +4186,7 @@ export default function AdminDashboardPage() {
               <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
                 <div className="p-4 bg-white rounded-2xl border border-slate-200 space-y-1">
                   <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Current Ledger Balance</span>
-                  <p className="text-2xl font-black text-blue-600">{rewardsAdminData.summary.balance.toLocaleString()} Pts</p>
+                  <p className="text-2xl font-black text-[#E66A32]">{rewardsAdminData.summary.balance.toLocaleString()} Pts</p>
                   <span className="text-[10px] font-semibold text-slate-500">≈ ₹{rewardsAdminData.summary.equivalentRupees} value</span>
                 </div>
 
@@ -3617,7 +4216,7 @@ export default function AdminDashboardPage() {
                   {/* Manual Adjustment Form */}
                   <div className="p-5 bg-white rounded-2xl border border-slate-200 space-y-4">
                     <h4 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                      <Plus className="w-4 h-4 text-blue-600" />
+                      <Plus className="w-4 h-4 text-[#E66A32]" />
                       <span>Manual Points Adjustment</span>
                     </h4>
                     <form onSubmit={handleAdjustPoints} className="space-y-3 text-xs">
@@ -3659,7 +4258,7 @@ export default function AdminDashboardPage() {
 
                       <button
                         type="submit"
-                        className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold transition-colors shadow-xs"
+                        className="w-full py-2.5 rounded-xl bg-[#E66A32] hover:bg-[#D45B25] text-white font-extrabold transition-colors shadow-sm"
                       >
                         Submit Points Adjustment
                       </button>
@@ -3669,7 +4268,7 @@ export default function AdminDashboardPage() {
                   {/* Transactions History */}
                   <div className="p-5 bg-white rounded-2xl border border-slate-200 space-y-3">
                     <h4 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                      <HistoryIcon className="w-4 h-4 text-blue-600" />
+                      <HistoryIcon className="w-4 h-4 text-[#E66A32]" />
                       <span>Point Transactions History</span>
                     </h4>
 
@@ -3697,7 +4296,7 @@ export default function AdminDashboardPage() {
                   {/* Add Voucher Form */}
                   <div className="p-5 bg-white rounded-2xl border border-slate-200 space-y-4">
                     <h4 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                      <Gift className="w-4 h-4 text-blue-600" />
+                      <Gift className="w-4 h-4 text-[#E66A32]" />
                       <span>Add Store Discount Voucher</span>
                     </h4>
                     <form onSubmit={handleAddRewardVoucher} className="space-y-3 text-xs">
@@ -3762,7 +4361,7 @@ export default function AdminDashboardPage() {
 
                       <button
                         type="submit"
-                        className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold transition-colors shadow-xs"
+                        className="w-full py-2.5 rounded-xl bg-[#E66A32] hover:bg-[#D45B25] text-white font-extrabold transition-colors shadow-sm"
                       >
                         Add Reward Voucher
                       </button>
@@ -3772,7 +4371,7 @@ export default function AdminDashboardPage() {
                   {/* Existing Vouchers List */}
                   <div className="p-5 bg-white rounded-2xl border border-slate-200 space-y-3">
                     <h4 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                      <Gift className="w-4 h-4 text-blue-600" />
+                      <Gift className="w-4 h-4 text-[#E66A32]" />
                       <span>Active Reward Vouchers ({rewardsAdminData.vouchers.length})</span>
                     </h4>
 
@@ -3780,7 +4379,7 @@ export default function AdminDashboardPage() {
                       {rewardsAdminData.vouchers.map((voucher) => (
                         <div key={voucher.id} className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between text-xs">
                           <div className="space-y-0.5">
-                            <span className="text-[10px] font-bold text-blue-600 uppercase tracking-wider block">{voucher.businessName}</span>
+                            <span className="text-[10px] font-bold text-[#E66A32] uppercase tracking-wider block">{voucher.businessName}</span>
                             <h5 className="font-bold text-slate-900">{voucher.title}</h5>
                             <p className="text-[10px] text-slate-500 font-medium">Cost: {voucher.pointsCost} Pts • Code: <code className="font-mono font-bold">{voucher.code}</code></p>
                           </div>
@@ -3983,7 +4582,7 @@ export default function AdminDashboardPage() {
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                   <div>
                     <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                      <Shield className="w-5 h-5 text-blue-600" />
+                      <Shield className="w-5 h-5 text-[#E66A32]" />
                       <span>Admin User Accounts &amp; Permissions</span>
                     </h3>
                     <p className="text-xs text-slate-500 font-medium">
@@ -4007,7 +4606,7 @@ export default function AdminDashboardPage() {
                   </div>
                   <div className="p-4 bg-white rounded-2xl border border-slate-200 space-y-1">
                     <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Super Admins</span>
-                    <p className="text-2xl font-black text-blue-600">{adminAccountsList.filter(u => u.role === 'SUPER_ADMIN').length}</p>
+                    <p className="text-2xl font-black text-[#E66A32]">{adminAccountsList.filter(u => u.role === 'SUPER_ADMIN').length}</p>
                   </div>
                   <div className="p-4 bg-white rounded-2xl border border-slate-200 space-y-1">
                     <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Active Admins</span>
@@ -4019,7 +4618,7 @@ export default function AdminDashboardPage() {
                   {/* Left Column: Create Admin Form */}
                   <div className="lg:col-span-1 p-5 bg-white rounded-2xl border border-slate-200 space-y-4">
                     <h4 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                      <Plus className="w-4 h-4 text-blue-600" />
+                      <Plus className="w-4 h-4 text-[#E66A32]" />
                       <span>Create Authorized Admin</span>
                     </h4>
 
@@ -4074,7 +4673,7 @@ export default function AdminDashboardPage() {
 
                       <button
                         type="submit"
-                        className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold transition-colors shadow-xs"
+                        className="w-full py-2.5 rounded-xl bg-[#E66A32] hover:bg-[#D45B25] text-white font-extrabold transition-colors shadow-sm"
                       >
                         Add Authorized Admin
                       </button>
@@ -4084,7 +4683,7 @@ export default function AdminDashboardPage() {
                   {/* Right Column: Admin Accounts List */}
                   <div className="lg:col-span-2 p-5 bg-white rounded-2xl border border-slate-200 space-y-4">
                     <h4 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                      <Users className="w-4 h-4 text-blue-600" />
+                      <Users className="w-4 h-4 text-[#E66A32]" />
                       <span>Authorized Admin Accounts List ({adminAccountsList.length})</span>
                     </h4>
 
@@ -4112,7 +4711,7 @@ export default function AdminDashboardPage() {
                                     <div className="font-bold text-slate-900 flex items-center gap-1.5">
                                       <span>{user.name}</span>
                                       {isSelf && (
-                                        <span className="text-[9px] px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 font-extrabold border border-blue-200">
+                                        <span className="text-[9px] px-1.5 py-0.5 rounded bg-[#FFF6F0] text-[#E66A32] font-extrabold border border-[#F8CFBE]">
                                           You
                                         </span>
                                       )}
@@ -4122,7 +4721,7 @@ export default function AdminDashboardPage() {
                                   <td className="py-3">
                                     <span className={`px-2 py-0.5 rounded text-[10px] font-extrabold border uppercase ${
                                       isSuper
-                                        ? 'bg-blue-50 text-blue-700 border-blue-200'
+                                        ? 'bg-[#FFF6F0] text-[#E66A32] border-[#F8CFBE]'
                                         : 'bg-slate-100 text-slate-700 border-slate-200'
                                     }`}>
                                       {user.role}
@@ -4236,7 +4835,7 @@ export default function AdminDashboardPage() {
                     </button>
                     <button
                       type="submit"
-                      className="px-4 py-2 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700"
+                      className="px-4 py-2 rounded-xl bg-[#E66A32] text-white font-bold hover:bg-[#D45B25] shadow-sm"
                     >
                       Save Changes
                     </button>
@@ -4274,7 +4873,7 @@ export default function AdminDashboardPage() {
                     </button>
                     <button
                       type="submit"
-                      className="px-4 py-2 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700"
+                      className="px-4 py-2 rounded-xl bg-[#E66A32] text-white font-bold hover:bg-[#D45B25] cursor-pointer"
                     >
                       Reset Password
                     </button>
@@ -4285,16 +4884,16 @@ export default function AdminDashboardPage() {
           )}
 
           {/* FALLBACK FOR OTHER TABS */}
-          {!['dashboard', 'photography', 'promotions', 'businesses', 'add-business', 'edit-business', 'verify-business', 'homepage-content', 'offers', 'food', 'jobs', 'users', 'royal-points', 'admin-management', 'settings'].includes(activeTab) && (
-            <div className="p-8 text-center space-y-3 bg-white rounded-2xl border border-slate-200">
-              <div className="w-12 h-12 rounded-2xl bg-blue-50 border border-blue-200 flex items-center justify-center mx-auto text-blue-600">
+          {!['dashboard', 'categories', 'enquiries', 'representatives', 'photography', 'promotions', 'businesses', 'add-business', 'edit-business', 'verify-business', 'homepage-content', 'offers', 'food', 'jobs', 'users', 'royal-points', 'admin-management', 'settings', 'emergency', 'stories'].includes(activeTab) && (
+            <div className="p-8 text-center space-y-3 bg-white rounded-2xl border border-[#E8E5DF]">
+              <div className="w-12 h-12 rounded-2xl bg-[#FFF6F0] border border-[#F8CFBE] flex items-center justify-center mx-auto text-[#E66A32]">
                 <Crown className="w-6 h-6" />
               </div>
-              <h3 className="text-base font-bold text-slate-900 capitalize">{activeTab.replace('-', ' ')} Module</h3>
-              <p className="text-xs text-slate-500 max-w-sm mx-auto">
+              <h3 className="text-base font-bold text-[#26352D] capitalize">{activeTab.replace('-', ' ')} Module</h3>
+              <p className="text-xs text-[#647067] max-w-sm mx-auto">
                 Module active &amp; connected to Royal Korutla database. Real-time updates active.
               </p>
-              <button onClick={() => setActiveTab('dashboard')} className="px-4 py-2 rounded-xl bg-slate-100 text-slate-800 text-xs font-bold hover:bg-slate-200">
+              <button onClick={() => setActiveTab('dashboard')} className="px-4 py-2 rounded-xl bg-[#FAF7F2] hover:bg-[#F4EFE7] text-[#26352D] border border-[#E8E5DF] text-xs font-bold cursor-pointer">
                 Return to Dashboard Overview
               </button>
             </div>

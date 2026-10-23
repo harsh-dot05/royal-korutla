@@ -12,7 +12,7 @@ export const CategoryGrid: React.FC = () => {
   const filteredCategories = CATEGORIES.filter((cat) => {
     if (activeTab === 'all') return true;
     if (activeTab === 'essentials') return ['food', 'groceries', 'hospitals'].includes(cat.slug);
-    if (activeTab === 'lifestyle') return ['shopping', 'education', 'public-places', 'photography'].includes(cat.slug);
+    if (activeTab === 'lifestyle') return ['clothing', 'shopping', 'education', 'public-places', 'photography'].includes(cat.slug);
     if (activeTab === 'services') return ['services', 'jobs', 'real-estate'].includes(cat.slug);
     return true;
   });
