@@ -13,7 +13,7 @@ export const Footer: React.FC = () => {
   const whatsappUrl = getRoyalKorutlaWhatsAppUrl(WHATSAPP_PREFILLED_MESSAGES.footerSupport);
 
   return (
-    <footer className="bg-white border-t border-[#E8E5DF] text-[#647067] pt-10 pb-8 mt-12">
+    <footer className="bg-white border-t border-[#E8E5DF] text-[#647067] pt-10 pb-20 md:pb-8 mt-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-8 pb-8 border-b border-[#E8E5DF]">
           {/* Col 1: Branding & Intro */}

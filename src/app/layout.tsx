@@ -16,14 +16,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="scroll-smooth">
-      <head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `try{localStorage.setItem('nl-hud:public:v1','true');}catch(e){}`,
-          }}
-        />
-      </head>
       <body className="min-h-screen bg-[#FAF7F2] text-[#26352D] antialiased selection:bg-[#E66A32] selection:text-white flex flex-col justify-between">
+        {/* Netlify platform HUD script aborts if either canonical element exists in the DOM */}
+        <div id="nl-badge-frame" className="hidden" aria-hidden="true" tabIndex={-1} />
+        <div id="nl-hud-frame" className="hidden" aria-hidden="true" tabIndex={-1} />
         {children}
         <FloatingWhatsApp />
         <MobileBottomNav />
