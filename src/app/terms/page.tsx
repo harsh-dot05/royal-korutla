@@ -1,7 +1,11 @@
 import React from 'react';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
-import { ShieldCheck, FileCheck, Scale, Award, Info } from 'lucide-react';
+import { ShieldCheck, FileCheck, Scale, Award, Info, Mail } from 'lucide-react';
+import {
+  ROYAL_KORUTLA_OFFICIAL_EMAIL,
+  ROYAL_KORUTLA_PHONE_DISPLAY,
+} from '@/config/contact';
 
 export const metadata = {
   title: 'Terms & Conditions | Royal Korutla Directory Platform',
@@ -70,6 +74,23 @@ export default function TermsPage() {
             </h2>
             <p className="text-[#647067]">
               Royal Korutla serves as an information and discovery platform connecting local businesses with residents. Direct transactions, service quality, and agreement negotiations between customers and listed merchants remain solely between those parties.
+            </p>
+          </section>
+
+          <section className="space-y-2 p-5 rounded-2xl bg-white border border-[#E6E4DF] shadow-xs">
+            <h2 className="text-base font-bold text-[#26352D] flex items-center gap-2">
+              <Mail className="w-4 h-4 text-[#E66A32]" />
+              5. Customer Support &amp; Grievances
+            </h2>
+            <p className="text-[#647067]">
+              For any questions, grievances, or platform support, please contact our official team via email at{' '}
+              <a
+                href={`mailto:${ROYAL_KORUTLA_OFFICIAL_EMAIL}`}
+                className="font-bold text-[#26352D] hover:text-[#E66A32] underline"
+              >
+                {ROYAL_KORUTLA_OFFICIAL_EMAIL}
+              </a>{' '}
+              or reach us on our official WhatsApp helpline at {ROYAL_KORUTLA_PHONE_DISPLAY}.
             </p>
           </section>
         </div>

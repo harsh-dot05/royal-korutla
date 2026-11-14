@@ -45,7 +45,7 @@ backend/
 
 Derived strictly from Royal Korutla frontend requirements:
 
-1. **User**: Single Owner Admin (`admin@royalkorutla.com`), Business Owners, Customers.
+1. **User**: Single Owner Admin (`royalkorutla.in@gmail.com`), Business Owners, Customers.
 2. **Category**: 12 Korutla categories (`food`, `groceries`, `shopping`, `services`, `hospitals`, `education`, `public-places`, `jobs`, `real-estate`, `businesses`, `offers`, `photography`).
 3. **Business**: Local town business listings, verified badges, featured status, ratings, reviews, opening hours, tags.
 4. **PhotographyBusiness**: Korutla photo studios, camera rentals, wedding photography, portfolio galleries.
@@ -84,7 +84,7 @@ FRONTEND_URL=http://localhost:3000
 DATABASE_URL="postgresql://postgres:password@localhost:5432/royalkorutla?schema=public"
 JWT_SECRET=rk_super_secret_jwt_key_korutla_2026
 COOKIE_SECRET=rk_cookie_secret_key_2026
-ADMIN_EMAIL=admin@royalkorutla.com
+ADMIN_EMAIL=royalkorutla.in@gmail.com
 ADMIN_PASSWORD=RoyalKorutla@Owner2026!
 ```
 

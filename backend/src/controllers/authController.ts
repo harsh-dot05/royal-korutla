@@ -65,10 +65,10 @@ export const loginAdmin = async (req: Request, res: Response) => {
 
     // 2. Fallback check against env variables or supported admin credentials
     const isOwner =
+      cleanEmail === 'royalkorutla.in@gmail.com' ||
       cleanEmail === 'sirsillaharshitha05@gmail.com' ||
       cleanEmail === envAdminEmail ||
-      cleanEmail === 'admin@royalkorutla.com' ||
-      cleanEmail === 'admin@example.com';
+      cleanEmail === 'admin@royalkorutla.com';
 
     const validPasswords = [
       env.ADMIN_PASSWORD,

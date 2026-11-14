@@ -1,5 +1,4 @@
 import crypto from 'crypto';
-import { UserRole } from '@/types';
 
 export interface AdminUser {
   id: string;
@@ -38,33 +37,37 @@ export function verifyPassword(password: string, storedHash: string): boolean {
   }
 }
 
-// Default initial credentials from environment
-const ENV_ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@royalkorutla.com';
-const ENV_ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'RoyalKorutla';
+// Official Royal Korutla Admin Login Email
+export const OFFICIAL_ADMIN_EMAIL = 'royalkorutla.in@gmail.com';
+const ADMIN_PASSWORD_FALLBACK = 'RoyalKorutla';
 
-// In-memory admin users store, initialized with owner account as SUPER_ADMIN
+function getAdminPassword(): string {
+  return process.env.ADMIN_PASSWORD || ADMIN_PASSWORD_FALLBACK;
+}
+
+// In-memory admin users store, initialized with official owner account as SUPER_ADMIN
 let adminUsersStore: AdminUser[] = [
   {
     id: 'admin-super-001',
     name: 'Royal Korutla Owner',
-    email: ENV_ADMIN_EMAIL.trim().toLowerCase(),
-    password_hash: hashPassword(ENV_ADMIN_PASSWORD),
+    email: OFFICIAL_ADMIN_EMAIL,
+    password_hash: hashPassword(getAdminPassword()),
     role: 'SUPER_ADMIN',
     is_active: true,
     created_at: new Date('2026-01-01').toISOString(),
   },
 ];
 
-// Optional secondary owner email if configured in env
-if (process.env.ADMIN_EMAIL && process.env.ADMIN_EMAIL.trim().toLowerCase() !== 'admin@royalkorutla.com') {
-  const secondaryEmail = process.env.ADMIN_EMAIL.trim().toLowerCase();
-  const existing = adminUsersStore.find(u => u.email === secondaryEmail);
+// If custom ADMIN_EMAIL is set in environment, also register it as authorized admin
+const envAdminEmail = process.env.ADMIN_EMAIL ? process.env.ADMIN_EMAIL.trim().toLowerCase() : '';
+if (envAdminEmail && envAdminEmail !== OFFICIAL_ADMIN_EMAIL) {
+  const existing = adminUsersStore.find(u => u.email === envAdminEmail);
   if (!existing) {
     adminUsersStore.push({
       id: 'admin-super-002',
-      name: 'Primary Owner',
-      email: secondaryEmail,
-      password_hash: hashPassword(process.env.ADMIN_PASSWORD || 'RoyalKorutla'),
+      name: 'Authorized Admin Owner',
+      email: envAdminEmail,
+      password_hash: hashPassword(getAdminPassword()),
       role: 'SUPER_ADMIN',
       is_active: true,
       created_at: new Date().toISOString(),

@@ -47,6 +47,7 @@ import {
 import { SafeAdminUser } from '@/lib/adminStore';
 import { PRESET_HERO_IMAGES } from '@/lib/heroBannersStore';
 import { CommunityPhotoModeration } from '@/components/admin/CommunityPhotoModeration';
+import { ROYAL_KORUTLA_OFFICIAL_EMAIL } from '@/config/contact';
 import {
   Shield,
   Sparkles,
@@ -309,7 +310,7 @@ export default function AdminDashboardPage() {
 
   // Users State
   const [usersList, setUsersList] = useState([
-    { id: 'usr-1', name: 'Royal Korutla Owner', email: 'admin@royalkorutla.com', role: 'ADMIN', phone: '+91 98480 11223', status: 'ACTIVE', joinedDate: '2026-01-01' },
+    { id: 'usr-1', name: 'Royal Korutla Owner', email: 'royalkorutla.in@gmail.com', role: 'ADMIN', phone: '+91 98480 11223', status: 'ACTIVE', joinedDate: '2026-01-01' },
     { id: 'usr-2', name: 'Mohammed Ahmed (Royal Biryani)', email: 'ahmed@royalbiryani.com', role: 'BUSINESS_OWNER', phone: '+91 98765 43210', status: 'ACTIVE', joinedDate: '2026-02-10' },
     { id: 'usr-3', name: 'Srinivas Goud', email: 'srinivas.korutla@gmail.com', role: 'CUSTOMER', phone: '+91 94401 88776', status: 'ACTIVE', joinedDate: '2026-03-05' },
     { id: 'usr-4', name: 'Ravali Textiles', email: 'ravali.textiles@gmail.com', role: 'BUSINESS_OWNER', phone: '+91 98492 55443', status: 'ACTIVE', joinedDate: '2026-03-12' },
@@ -357,7 +358,7 @@ export default function AdminDashboardPage() {
   // Settings State
   const [siteName, setSiteName] = useState('Royal Korutla Directory');
   const [supportPhone, setSupportPhone] = useState('+91 98480 12345');
-  const [supportEmail, setSupportEmail] = useState('support@royalkorutla.com');
+  const [supportEmail, setSupportEmail] = useState(ROYAL_KORUTLA_OFFICIAL_EMAIL);
   const [maintenanceMode, setMaintenanceMode] = useState(false);
 
   // Categories State & Management
@@ -5476,7 +5477,7 @@ export default function AdminDashboardPage() {
                         <input
                           type="email"
                           required
-                          placeholder="e.g. ramesh.admin@royalkorutla.com"
+                          placeholder="e.g. ramesh.admin@royalkorutla.in"
                           value={newAdminEmail}
                           onChange={(e) => setNewAdminEmail(e.target.value)}
                           className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 font-medium focus:outline-none"

@@ -90,7 +90,7 @@ export default function AdminLoginPage() {
                 id="admin-email"
                 type="email"
                 required
-                placeholder="admin@royalkorutla.com"
+                placeholder="royalkorutla.in@gmail.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full bg-[#FAF7F2] border border-[#E8E5DF] rounded-xl px-3.5 py-3 text-xs text-[#26352D] font-semibold placeholder-[#647067]/60 focus:outline-none focus:border-[#E66A32] focus:ring-2 focus:ring-[#FFF6F0] shadow-2xs"

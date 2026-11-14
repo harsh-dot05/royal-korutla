@@ -2,11 +2,12 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Crown, MapPin, MessageCircle, Heart, Shield, Phone } from 'lucide-react';
+import { Crown, MapPin, MessageCircle, Heart, Shield, Phone, Mail } from 'lucide-react';
 import {
   getRoyalKorutlaWhatsAppUrl,
   WHATSAPP_PREFILLED_MESSAGES,
   ROYAL_KORUTLA_PHONE_DISPLAY,
+  ROYAL_KORUTLA_OFFICIAL_EMAIL,
 } from '@/config/contact';
 
 export const Footer: React.FC = () => {
@@ -46,6 +47,14 @@ export const Footer: React.FC = () => {
               >
                 <MessageCircle className="w-4 h-4 text-[#25D366]" />
                 <span>WhatsApp: {ROYAL_KORUTLA_PHONE_DISPLAY}</span>
+              </a>
+              <a
+                href={`mailto:${ROYAL_KORUTLA_OFFICIAL_EMAIL}`}
+                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white hover:bg-[#FAF7F2] text-[#647067] hover:text-[#26352D] border border-[#E8E5DF] text-xs font-semibold transition-colors"
+                title={`Email Royal Korutla at ${ROYAL_KORUTLA_OFFICIAL_EMAIL}`}
+              >
+                <Mail className="w-3.5 h-3.5 text-[#E66A32]" />
+                <span>{ROYAL_KORUTLA_OFFICIAL_EMAIL}</span>
               </a>
               <Link
                 href="/contact"
@@ -170,6 +179,15 @@ export const Footer: React.FC = () => {
                 <Link href="/contact" className="hover:text-[#E66A32] transition-colors">
                   Contact &amp; WhatsApp Support
                 </Link>
+              </li>
+              <li>
+                <a
+                  href={`mailto:${ROYAL_KORUTLA_OFFICIAL_EMAIL}`}
+                  className="hover:text-[#E66A32] transition-colors"
+                  title="Official Email"
+                >
+                  Email: {ROYAL_KORUTLA_OFFICIAL_EMAIL}
+                </a>
               </li>
               <li>
                 <Link href="/terms" className="hover:text-[#E66A32] transition-colors">

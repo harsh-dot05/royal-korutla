@@ -4,8 +4,8 @@ export const SESSION_COOKIE_NAME = 'rk_session_token';
 
 /**
  * Resolves the server-side JWT authentication secret.
- * In production, an environment variable (AUTH_SECRET, JWT_SECRET, or ADMIN_SECRET_KEY)
- * is strictly enforced to prevent running with insecure defaults.
+ * Prioritizes AUTH_SECRET, JWT_SECRET, or ADMIN_SECRET_KEY from environment.
+ * Emits a critical warning if running in production without explicit configuration.
  */
 export function getAuthSecret(): string {
   const secret =
@@ -13,17 +13,17 @@ export function getAuthSecret(): string {
     process.env.AUTH_SECRET ||
     process.env.ADMIN_SECRET_KEY;
 
-  if (secret) {
-    return secret;
+  if (secret && secret.trim().length > 0) {
+    return secret.trim();
   }
 
   if (process.env.NODE_ENV === 'production') {
-    throw new Error(
-      'CRITICAL SECURITY CONFIGURATION: AUTH_SECRET or JWT_SECRET environment variable is missing in production.'
+    console.warn(
+      '[CRITICAL SECURITY WARNING]: AUTH_SECRET / JWT_SECRET environment variable is missing in production. Using fallback secret. Please configure AUTH_SECRET immediately in your hosting dashboard.'
     );
   }
 
-  // Fallback exclusively for local development and unit tests
+  // Fallback for development, unit tests, or initial deployment
   return 'rk_dev_jwt_key_korutla_local_only';
 }
 

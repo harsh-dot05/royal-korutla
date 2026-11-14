@@ -15,6 +15,11 @@ import {
   createSessionToken,
   verifySessionToken,
 } from '../src/lib/auth.ts';
+import {
+  authenticateAdmin,
+  OFFICIAL_ADMIN_EMAIL,
+  getAdminByEmail,
+} from '../src/lib/adminStore.ts';
 
 async function runTestSuite() {
   console.log('====================================================');
@@ -236,6 +241,32 @@ async function runTestSuite() {
     changePhoneDuplicateThrew = true;
   }
   assert(changePhoneDuplicateThrew, 'Prevent changing phone to already registered mobile number');
+
+  // --- Test Suite: Official Admin Authentication ---
+  console.log('\n--- Test Suite: Official Admin Authentication ---');
+  const adminAuth = authenticateAdmin('royalkorutla.in@gmail.com', 'RoyalKorutla');
+  assert(adminAuth.success && adminAuth.user?.email === 'royalkorutla.in@gmail.com' && adminAuth.user?.role === 'SUPER_ADMIN', 'Authenticate official admin email (royalkorutla.in@gmail.com)');
+
+  const adminCaseInsensitive = authenticateAdmin('ROYALKORUTLA.IN@GMAIL.COM', 'RoyalKorutla');
+  assert(adminCaseInsensitive.success, 'Authenticate admin with uppercase email');
+
+  const adminWrongPass = authenticateAdmin('royalkorutla.in@gmail.com', 'WrongPassword123');
+  assert(!adminWrongPass.success && adminWrongPass.error === 'INVALID_CREDENTIALS', 'Reject admin login with wrong password');
+
+  const nonAdminLogin = authenticateAdmin('unauthorized.user@example.com', 'RoyalKorutla');
+  assert(!nonAdminLogin.success && nonAdminLogin.error === 'INVALID_CREDENTIALS', 'Reject non-admin email from admin login');
+
+  if (adminAuth.user) {
+    const adminSessionToken = createSessionToken({
+      id: adminAuth.user.id,
+      name: adminAuth.user.name,
+      email: adminAuth.user.email,
+      role: adminAuth.user.role,
+      createdAt: adminAuth.user.created_at,
+    });
+    const verifiedAdmin = verifySessionToken(adminSessionToken);
+    assert(verifiedAdmin !== null && verifiedAdmin.email === 'royalkorutla.in@gmail.com' && verifiedAdmin.role === 'SUPER_ADMIN', 'Create and verify valid signed JWT token for admin');
+  }
 
   console.log('\n====================================================');
   console.log(`TEST SUITE RESULTS: ${passedTests} PASSED, ${failedTests} FAILED`);

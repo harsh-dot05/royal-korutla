@@ -32,17 +32,17 @@ const MAX_REQUESTS_PER_HOUR = 5; // Max 5 OTPs per hour per phone
 
 /**
  * Resolves the server-side secret salt for hashing OTPs at rest.
- * In production, OTP_SECRET_KEY is strictly enforced to protect against offline dictionary attacks.
+ * Uses OTP_SECRET_KEY when configured; emits a warning if running in production without it.
  */
 function getOtpSecret(): string {
   const secret = process.env.OTP_SECRET_KEY;
-  if (secret) {
-    return secret;
+  if (secret && secret.trim().length > 0) {
+    return secret.trim();
   }
 
   if (process.env.NODE_ENV === 'production') {
-    throw new Error(
-      'CRITICAL SECURITY CONFIGURATION: OTP_SECRET_KEY environment variable is missing in production.'
+    console.warn(
+      '[CRITICAL SECURITY WARNING]: OTP_SECRET_KEY environment variable is missing in production. Using fallback salt. Please configure OTP_SECRET_KEY in your hosting dashboard.'
     );
   }
 

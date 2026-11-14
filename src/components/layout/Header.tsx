@@ -23,6 +23,7 @@ import {
   AlertCircle,
   Users,
   MessageCircle,
+  Mail,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { MobileNav } from './MobileNav';
@@ -30,6 +31,7 @@ import {
   getRoyalKorutlaWhatsAppUrl,
   WHATSAPP_PREFILLED_MESSAGES,
   ROYAL_KORUTLA_PHONE_DISPLAY,
+  ROYAL_KORUTLA_OFFICIAL_EMAIL,
 } from '@/config/contact';
 
 export const Header: React.FC = () => {
@@ -180,6 +182,17 @@ export const Header: React.FC = () => {
               >
                 <MessageCircle className="w-4 h-4 text-[#25D366]" />
                 <span className="hidden xl:inline">WhatsApp</span>
+              </a>
+
+              {/* Official Email Shortcut */}
+              <a
+                href={`mailto:${ROYAL_KORUTLA_OFFICIAL_EMAIL}`}
+                className="hidden 2xl:inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-[#FAF7F2] hover:bg-[#FFF6F0] border border-[#E8E5DF] hover:border-[#F8CFBE] text-[#26352D] hover:text-[#E66A32] text-xs font-bold transition-colors"
+                title={`Email Royal Korutla: ${ROYAL_KORUTLA_OFFICIAL_EMAIL}`}
+                aria-label={`Email Royal Korutla at ${ROYAL_KORUTLA_OFFICIAL_EMAIL}`}
+              >
+                <Mail className="w-4 h-4 text-[#E66A32]" />
+                <span>Email</span>
               </a>
 
               {/* Customer Account / Sign In */}

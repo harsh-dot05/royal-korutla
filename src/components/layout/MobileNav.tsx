@@ -24,12 +24,14 @@ import {
   MessageCircle,
   Phone,
   User,
+  Mail,
 } from 'lucide-react';
 import { CATEGORIES } from '../../data/mockData';
 import {
   getRoyalKorutlaWhatsAppUrl,
   WHATSAPP_PREFILLED_MESSAGES,
   ROYAL_KORUTLA_PHONE_DISPLAY,
+  ROYAL_KORUTLA_OFFICIAL_EMAIL,
 } from '@/config/contact';
 
 interface MobileNavProps {
@@ -276,6 +278,13 @@ export const MobileNav: React.FC<MobileNavProps> = ({ isOpen, onClose }) => {
           >
             <MessageCircle className="w-4 h-4 fill-white text-[#25D366]" />
             <span>WhatsApp Support: {ROYAL_KORUTLA_PHONE_DISPLAY}</span>
+          </a>
+          <a
+            href={`mailto:${ROYAL_KORUTLA_OFFICIAL_EMAIL}`}
+            className="w-full py-2 px-3 rounded-xl bg-white border border-[#E8E5DF] text-[#26352D] hover:text-[#E66A32] font-semibold text-xs flex items-center justify-center gap-1.5 transition-colors"
+          >
+            <Mail className="w-3.5 h-3.5 text-[#E66A32]" />
+            <span>{ROYAL_KORUTLA_OFFICIAL_EMAIL}</span>
           </a>
           <p className="font-bold text-[#26352D]">Royal Korutla</p>
           <p className="text-[10px] mt-0.5">Everything in Korutla</p>

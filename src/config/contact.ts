@@ -17,7 +17,18 @@ export const ROYAL_KORUTLA_PHONE_DISPLAY = '+91 9963261741';
 // Town address details
 export const ROYAL_KORUTLA_ADDRESS = 'Korutla, Jagtial District, Telangana - 505326';
 export const ROYAL_KORUTLA_SUPPORT_HOURS = '8:00 AM – 10:00 PM (Monday – Sunday)';
-export const ROYAL_KORUTLA_OFFICIAL_EMAIL = 'support@royalkorutla.com';
+export const ROYAL_KORUTLA_OFFICIAL_EMAIL = 'royalkorutla.in@gmail.com';
+
+/**
+ * Builds a standard mailto link to the official Royal Korutla email.
+ */
+export function getRoyalKorutlaEmailUrl(subject?: string, body?: string): string {
+  const params = new URLSearchParams();
+  if (subject) params.append('subject', subject);
+  if (body) params.append('body', body);
+  const query = params.toString();
+  return query ? `mailto:${ROYAL_KORUTLA_OFFICIAL_EMAIL}?${query}` : `mailto:${ROYAL_KORUTLA_OFFICIAL_EMAIL}`;
+}
 
 // Standard prefilled messages for different Royal Korutla enquiry types
 export const WHATSAPP_PREFILLED_MESSAGES = {

@@ -1,11 +1,12 @@
 import React from 'react';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
-import { Shield, Lock, Eye, FileText, CheckCircle, MessageCircle } from 'lucide-react';
+import { Shield, Lock, Eye, FileText, CheckCircle, MessageCircle, Mail } from 'lucide-react';
 import {
   getRoyalKorutlaWhatsAppUrl,
   WHATSAPP_PREFILLED_MESSAGES,
   ROYAL_KORUTLA_PHONE_DISPLAY,
+  ROYAL_KORUTLA_OFFICIAL_EMAIL,
 } from '@/config/contact';
 
 export const metadata = {
@@ -93,7 +94,14 @@ export default function PrivacyPolicyPage() {
                 <MessageCircle className="w-3.5 h-3.5 text-[#25D366]" />
                 <span>{ROYAL_KORUTLA_PHONE_DISPLAY}</span>
               </a>{' '}
-              or reach out via the admin portal.
+              or email us at{' '}
+              <a
+                href={`mailto:${ROYAL_KORUTLA_OFFICIAL_EMAIL}`}
+                className="inline-flex items-center gap-1 font-bold text-[#26352D] hover:text-[#E66A32] underline"
+              >
+                <Mail className="w-3.5 h-3.5 text-[#E66A32]" />
+                <span>{ROYAL_KORUTLA_OFFICIAL_EMAIL}</span>
+              </a>.
             </p>
           </section>
         </div>

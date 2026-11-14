@@ -14,11 +14,13 @@ import {
   Clock,
   ShieldCheck,
   Sparkles,
+  Mail,
 } from 'lucide-react';
 import {
   ROYAL_KORUTLA_PHONE_DISPLAY,
   ROYAL_KORUTLA_ADDRESS,
   ROYAL_KORUTLA_SUPPORT_HOURS,
+  ROYAL_KORUTLA_OFFICIAL_EMAIL,
   getRoyalKorutlaWhatsAppUrl,
   WHATSAPP_PREFILLED_MESSAGES,
 } from '@/config/contact';
@@ -126,12 +128,20 @@ export default function ContactPage() {
                 <Phone className="w-4 h-4 text-[#E66A32]" />
                 <span>Call {ROYAL_KORUTLA_PHONE_DISPLAY}</span>
               </a>
+
+              <a
+                href={`mailto:${ROYAL_KORUTLA_OFFICIAL_EMAIL}`}
+                className="inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl bg-white hover:bg-[#FAF7F2] border border-[#E8E5DF] text-[#26352D] font-bold text-sm transition-colors"
+              >
+                <Mail className="w-4 h-4 text-[#E66A32]" />
+                <span>Email {ROYAL_KORUTLA_OFFICIAL_EMAIL}</span>
+              </a>
             </div>
           </div>
         </div>
 
         {/* Info Strip */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="p-4 rounded-2xl bg-white border border-[#E8E5DF] shadow-xs flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-[#FFF6F0] flex items-center justify-center text-[#E66A32] shrink-0">
               <MapPin className="w-5 h-5" />
@@ -149,6 +159,21 @@ export default function ContactPage() {
             <div>
               <p className="text-xs font-bold text-[#26352D]">Support Availability</p>
               <p className="text-[11px] text-[#647067]">{ROYAL_KORUTLA_SUPPORT_HOURS}</p>
+            </div>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-white border border-[#E8E5DF] shadow-xs flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-[#FFF6F0] flex items-center justify-center text-[#E66A32] shrink-0">
+              <Mail className="w-5 h-5" />
+            </div>
+            <div>
+              <p className="text-xs font-bold text-[#26352D]">Official Email</p>
+              <a
+                href={`mailto:${ROYAL_KORUTLA_OFFICIAL_EMAIL}`}
+                className="text-[11px] text-[#647067] hover:text-[#E66A32] font-semibold transition-colors break-all"
+              >
+                {ROYAL_KORUTLA_OFFICIAL_EMAIL}
+              </a>
             </div>
           </div>
 

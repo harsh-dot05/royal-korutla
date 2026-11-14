@@ -82,11 +82,14 @@ export async function POST(request: Request) {
 
     return response;
   } catch (error) {
+    console.error('[Admin Login Exception]:', error);
+    const errorMsg = error instanceof Error ? error.message : 'Server authentication error';
     return NextResponse.json(
       {
         success: false,
         error: 'SERVER_ERROR',
         message: 'Failed to process Admin login',
+        details: process.env.NODE_ENV !== 'production' ? errorMsg : undefined,
       },
       { status: 500 }
     );

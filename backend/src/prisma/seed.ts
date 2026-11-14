@@ -7,7 +7,7 @@ async function main() {
   console.log('🌱 Starting Royal Korutla Database Seeding...');
 
   // 1. Seed Owner Admin User
-  const adminEmail = process.env.ADMIN_EMAIL || 'admin@royalkorutla.com';
+  const adminEmail = process.env.ADMIN_EMAIL || 'royalkorutla.in@gmail.com';
   const adminPassword = process.env.ADMIN_PASSWORD || 'RoyalKorutla@Owner2026!';
   const passwordHash = bcrypt.hashSync(adminPassword, 10);
 

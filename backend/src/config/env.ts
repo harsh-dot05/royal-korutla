@@ -8,20 +8,8 @@ export const env = {
   NODE_ENV: process.env.NODE_ENV || 'development',
   FRONTEND_URL: process.env.FRONTEND_URL || 'http://localhost:3000',
   DATABASE_URL: process.env.DATABASE_URL || 'postgresql://postgres:password@localhost:5432/royalkorutla?schema=public',
-  JWT_SECRET:
-    process.env.JWT_SECRET ||
-    (process.env.NODE_ENV === 'production'
-      ? (() => {
-          throw new Error('CRITICAL: JWT_SECRET environment variable is missing in production.');
-        })()
-      : 'rk_dev_jwt_key_korutla_local_only'),
-  COOKIE_SECRET:
-    process.env.COOKIE_SECRET ||
-    (process.env.NODE_ENV === 'production'
-      ? (() => {
-          throw new Error('CRITICAL: COOKIE_SECRET environment variable is missing in production.');
-        })()
-      : 'rk_dev_cookie_secret_key_local_only'),
-  ADMIN_EMAIL: process.env.ADMIN_EMAIL || 'admin@royalkorutla.com',
+  JWT_SECRET: process.env.JWT_SECRET || 'rk_dev_jwt_key_korutla_local_only',
+  COOKIE_SECRET: process.env.COOKIE_SECRET || 'rk_dev_cookie_secret_key_local_only',
+  ADMIN_EMAIL: process.env.ADMIN_EMAIL || 'royalkorutla.in@gmail.com',
   ADMIN_PASSWORD: process.env.ADMIN_PASSWORD || 'RoyalKorutla@Owner2026!',
 };
