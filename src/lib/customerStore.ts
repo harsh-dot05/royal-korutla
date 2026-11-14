@@ -1,4 +1,4 @@
-import { CustomerUser, CustomerUserType } from '@/types';
+import type { CustomerUser, CustomerUserType } from '@/types';
 
 /**
  * Normalizes Indian phone numbers into standard E.164 format: +91XXXXXXXXXX

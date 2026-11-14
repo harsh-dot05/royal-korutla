@@ -41,17 +41,22 @@ enum PointTransactionType {
 }
 
 model User {
-  id           String   @id @default(uuid())
-  name         String
-  email        String   @unique
-  passwordHash String
-  role         Role     @default(CUSTOMER)
-  phone        String?
-  status       String   @default("ACTIVE")
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id              String   @id @default(uuid())
+  name            String
+  email           String?  @unique
+  passwordHash    String?
+  role            Role     @default(CUSTOMER)
+  phone           String?  @unique
+  userType        String?  @default("KORUTLA_RESIDENT")
+  wardNumber      Int?
+  villageName     String?
+  isPhoneVerified Boolean  @default(false)
+  status          String   @default("ACTIVE")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   @@index([email])
+  @@index([phone])
   @@index([role])
 }
 

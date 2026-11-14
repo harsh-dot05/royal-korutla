@@ -23,6 +23,7 @@ import {
   Users,
   MessageCircle,
   Phone,
+  User,
 } from 'lucide-react';
 import { CATEGORIES } from '../../data/mockData';
 import {
@@ -115,6 +116,15 @@ export const MobileNav: React.FC<MobileNavProps> = ({ isOpen, onClose }) => {
             >
               <Home className="w-4 h-4 text-[#E66A32]" />
               <span>Home</span>
+            </Link>
+
+            <Link
+              href="/profile"
+              onClick={onClose}
+              className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#FAF7F2] text-[#26352D] hover:text-[#E66A32] font-semibold text-xs transition-colors"
+            >
+              <User className="w-4 h-4 text-[#E66A32]" />
+              <span>Citizen Account &amp; Profile</span>
             </Link>
 
             <Link

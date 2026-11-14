@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
   Crown,
@@ -38,6 +38,26 @@ export const Header: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedLocation, setSelectedLocation] = useState('Korutla Town (Wards 1-33)');
   const [isLocationDropdownOpen, setIsLocationDropdownOpen] = useState(false);
+  const [currentUser, setCurrentUser] = useState<{ name: string; role: string } | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+    async function checkAuth() {
+      try {
+        const res = await fetch('/api/auth/me');
+        const data = await res.json();
+        if (isMounted && data.authenticated && data.user) {
+          setCurrentUser(data.user);
+        }
+      } catch {
+        // Not authenticated
+      }
+    }
+    checkAuth();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -163,14 +183,33 @@ export const Header: React.FC = () => {
               </a>
 
               {/* Customer Account / Sign In */}
-              <Link
-                href="/login"
-                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-[#FAF7F2] hover:bg-[#F4EFE7] border border-[#E8E5DF] text-[#26352D] text-xs font-semibold transition-colors"
-                title="Customer Sign In"
-              >
-                <User className="w-4 h-4 text-[#26352D]" />
-                <span className="hidden lg:inline">Sign In</span>
-              </Link>
+              {currentUser ? (
+                <Link
+                  href={
+                    currentUser.role === 'ADMIN' || currentUser.role === 'SUPER_ADMIN'
+                      ? '/admin'
+                      : currentUser.role === 'BUSINESS_OWNER'
+                      ? '/business/dashboard'
+                      : '/profile'
+                  }
+                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-[#FFF6F0] hover:bg-[#FFEADA] border border-[#F8CFBE] text-[#26352D] text-xs font-bold transition-colors"
+                  title="My Profile & Account"
+                >
+                  <User className="w-4 h-4 text-[#E66A32]" />
+                  <span className="hidden lg:inline max-w-[100px] truncate">
+                    {currentUser.name.split(' ')[0]}
+                  </span>
+                </Link>
+              ) : (
+                <Link
+                  href="/login"
+                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-[#FAF7F2] hover:bg-[#F4EFE7] border border-[#E8E5DF] text-[#26352D] text-xs font-semibold transition-colors"
+                  title="Customer Sign In"
+                >
+                  <User className="w-4 h-4 text-[#26352D]" />
+                  <span className="hidden lg:inline">Sign In</span>
+                </Link>
+              )}
 
               {/* Cart Shortcut */}
               <Link

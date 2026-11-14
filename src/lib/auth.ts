@@ -1,13 +1,31 @@
-import { UserSession } from '@/types';
+import type { UserSession } from '@/types';
 
 export const SESSION_COOKIE_NAME = 'rk_session_token';
 
-// Unified Server-side JWT Secret Key
-const AUTH_SECRET =
-  process.env.JWT_SECRET ||
-  process.env.AUTH_SECRET ||
-  process.env.ADMIN_SECRET_KEY ||
-  'rk_super_secret_jwt_key_korutla_2026';
+/**
+ * Resolves the server-side JWT authentication secret.
+ * In production, an environment variable (AUTH_SECRET, JWT_SECRET, or ADMIN_SECRET_KEY)
+ * is strictly enforced to prevent running with insecure defaults.
+ */
+export function getAuthSecret(): string {
+  const secret =
+    process.env.JWT_SECRET ||
+    process.env.AUTH_SECRET ||
+    process.env.ADMIN_SECRET_KEY;
+
+  if (secret) {
+    return secret;
+  }
+
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error(
+      'CRITICAL SECURITY CONFIGURATION: AUTH_SECRET or JWT_SECRET environment variable is missing in production.'
+    );
+  }
+
+  // Fallback exclusively for local development and unit tests
+  return 'rk_dev_jwt_key_korutla_local_only';
+}
 
 function base64UrlEncode(str: string): string {
   if (typeof Buffer !== 'undefined') {
@@ -78,7 +96,7 @@ export function createSessionToken(session: UserSession): string {
       iat,
     })
   );
-  const signature = signHmac(`${header}.${payload}`, AUTH_SECRET);
+  const signature = signHmac(`${header}.${payload}`, getAuthSecret());
   return `${header}.${payload}.${signature}`;
 }
 
@@ -89,10 +107,16 @@ export function verifySessionToken(token: string | undefined | null): UserSessio
   if (!token || typeof token !== 'string') return null;
 
   const parts = token.split('.');
-  if (parts.length < 2) return null;
+  if (parts.length !== 3) return null;
 
   try {
-    const payloadPart = parts.length === 3 ? parts[1] : parts[0];
+    const [headerPart, payloadPart, signaturePart] = parts;
+    const expectedSignature = signHmac(`${headerPart}.${payloadPart}`, getAuthSecret());
+
+    if (signaturePart !== expectedSignature) {
+      return null; // Forged or tampered token
+    }
+
     const jsonStr = base64UrlDecode(payloadPart);
     const decoded = JSON.parse(jsonStr) as {
       id?: string;
@@ -119,8 +143,8 @@ export function verifySessionToken(token: string | undefined | null): UserSessio
           (decoded.role === 'BUSINESS_OWNER'
             ? 'Business Owner'
             : decoded.role === 'CUSTOMER'
-            ? 'Royal Korutla Resident'
-            : 'Royal Korutla Owner (Admin)'),
+              ? 'Royal Korutla Resident'
+              : 'Royal Korutla Owner (Admin)'),
         email: decoded.email || '',
         role: decoded.role,
         phone: decoded.phone,

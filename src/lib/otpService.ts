@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import { CustomerUserType } from '@/types';
+import type { CustomerUserType } from '@/types';
 
 interface PendingRegistrationData {
   name: string;
@@ -30,13 +30,30 @@ const RESEND_COOLDOWN_MS = 60 * 1000; // 60 seconds
 const MAX_ATTEMPTS = 3; // 3 wrong attempts allowed
 const MAX_REQUESTS_PER_HOUR = 5; // Max 5 OTPs per hour per phone
 
-const OTP_SECRET = process.env.OTP_SECRET_KEY || 'rk_whatsapp_otp_secret_salt_korutla_2026';
+/**
+ * Resolves the server-side secret salt for hashing OTPs at rest.
+ * In production, OTP_SECRET_KEY is strictly enforced to protect against offline dictionary attacks.
+ */
+function getOtpSecret(): string {
+  const secret = process.env.OTP_SECRET_KEY;
+  if (secret) {
+    return secret;
+  }
+
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error(
+      'CRITICAL SECURITY CONFIGURATION: OTP_SECRET_KEY environment variable is missing in production.'
+    );
+  }
+
+  return 'rk_dev_otp_secret_salt_korutla_local_only';
+}
 
 /**
  * Hash the 6-digit OTP with server salt so raw OTP is never stored in plain text
  */
 function hashOtp(otp: string): string {
-  return crypto.createHmac('sha256', OTP_SECRET).update(otp).digest('hex');
+  return crypto.createHmac('sha256', getOtpSecret()).update(otp).digest('hex');
 }
 
 /**
