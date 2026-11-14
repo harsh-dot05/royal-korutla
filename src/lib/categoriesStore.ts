@@ -1,7 +1,7 @@
-import { Category, CategorySlug } from '@/types';
+import { Category } from '@/types';
 import { CATEGORIES } from '@/data/mockData';
 
-let categoriesStore: Category[] = JSON.parse(JSON.stringify(CATEGORIES));
+const categoriesStore: Category[] = JSON.parse(JSON.stringify(CATEGORIES));
 
 export function getAllCategories(): Category[] {
   return categoriesStore;

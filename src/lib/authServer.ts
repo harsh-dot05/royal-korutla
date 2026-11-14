@@ -7,6 +7,7 @@ import {
   getBusinessOwnerByEmail,
   getBusinessOwnerById,
 } from '@/lib/businessOwnersStore';
+import { findCustomerById, findCustomerByPhone } from '@/lib/customerStore';
 
 /**
  * Authenticate Admin credentials securely on server-side
@@ -101,8 +102,22 @@ export function getSessionFromRequest(request: Request): UserSession | null {
 
   if (!session) return null;
 
-  // Enforce dynamic active check for Business Owners
-  if (session.role === 'BUSINESS_OWNER') {
+  // Enforce dynamic active check for Customer
+  if (session.role === 'CUSTOMER') {
+    const customer = session.id
+      ? findCustomerById(session.id)
+      : session.phone
+      ? findCustomerByPhone(session.phone)
+      : null;
+    if (customer) {
+      session.name = customer.name;
+      session.phone = customer.phone;
+      session.userType = customer.userType;
+      session.wardNumber = customer.wardNumber;
+      session.villageName = customer.villageName;
+    }
+  } else if (session.role === 'BUSINESS_OWNER') {
+    // Enforce dynamic active check for Business Owners
     const dbOwner = session.id
       ? getBusinessOwnerById(session.id)
       : getBusinessOwnerByEmail(session.email);
@@ -112,7 +127,7 @@ export function getSessionFromRequest(request: Request): UserSession | null {
       session.name = dbOwner.name;
       session.email = dbOwner.email;
     }
-  } else {
+  } else if (session.role === 'ADMIN' || session.role === 'SUPER_ADMIN') {
     // Dynamic database check for Admins
     const dbAdmin = session.id ? getAdminById(session.id) : getAdminByEmail(session.email);
     if (dbAdmin) {
@@ -124,6 +139,35 @@ export function getSessionFromRequest(request: Request): UserSession | null {
   }
 
   return session;
+}
+
+/**
+ * Enforce Customer authorization on API routes.
+ */
+export function requireCustomerApi(request: Request): {
+  errorResponse: NextResponse | null;
+  session: UserSession | null;
+} {
+  const session = getSessionFromRequest(request);
+
+  if (!session) {
+    return {
+      errorResponse: NextResponse.json(
+        {
+          success: false,
+          error: 'UNAUTHORIZED',
+          message: 'Authentication required. Please sign in.',
+        },
+        { status: 401 }
+      ),
+      session: null,
+    };
+  }
+
+  return {
+    errorResponse: null,
+    session,
+  };
 }
 
 /**

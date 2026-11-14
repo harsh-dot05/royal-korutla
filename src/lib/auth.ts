@@ -67,8 +67,12 @@ export function createSessionToken(session: UserSession): string {
     JSON.stringify({
       id: session.id,
       name: session.name,
-      email: session.email,
+      email: session.email || '',
       role: session.role,
+      phone: session.phone,
+      userType: session.userType,
+      wardNumber: session.wardNumber,
+      villageName: session.villageName,
       businessId: session.businessId,
       exp,
       iat,
@@ -95,24 +99,34 @@ export function verifySessionToken(token: string | undefined | null): UserSessio
       name?: string;
       email?: string;
       role?: UserSession['role'];
+      phone?: string;
+      userType?: UserSession['userType'];
+      wardNumber?: number | null;
+      villageName?: string | null;
       businessId?: string;
       exp?: number;
       iat?: number;
     };
 
-    if (decoded && decoded.email && decoded.role) {
+    if (decoded && (decoded.email || decoded.phone) && decoded.role) {
       if (decoded.exp && decoded.exp < Date.now() / 1000) {
         return null; // Token expired
       }
       return {
-        id: decoded.id || 'admin-owner-001',
+        id: decoded.id || 'usr-cust-001',
         name:
           decoded.name ||
           (decoded.role === 'BUSINESS_OWNER'
             ? 'Business Owner'
+            : decoded.role === 'CUSTOMER'
+            ? 'Royal Korutla Resident'
             : 'Royal Korutla Owner (Admin)'),
-        email: decoded.email,
+        email: decoded.email || '',
         role: decoded.role,
+        phone: decoded.phone,
+        userType: decoded.userType,
+        wardNumber: decoded.wardNumber,
+        villageName: decoded.villageName,
         businessId: decoded.businessId,
         createdAt: decoded.iat
           ? new Date(decoded.iat * 1000).toISOString()

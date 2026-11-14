@@ -37,6 +37,8 @@ export const WHATSAPP_PREFILLED_MESSAGES = {
     'Hi Royal Korutla! I need assistance with placing a local order in Korutla.',
   customerHelp:
     'Hi Royal Korutla! I need help with my account, orders, or local services in Korutla.',
+  photoSubmission:
+    'Hi Royal Korutla! I would like to submit a photo for "Korutla Through Your Lens". I confirm I took this photo, own the rights to it, and grant permission for public display with attribution.',
 } as const;
 
 /**

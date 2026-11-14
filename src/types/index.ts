@@ -372,11 +372,31 @@ export interface StoryReel {
 
 export type UserRole = 'CUSTOMER' | 'BUSINESS_OWNER' | 'ADMIN' | 'SUPER_ADMIN';
 
+export type CustomerUserType = 'KORUTLA_RESIDENT' | 'NON_LOCAL';
+
+export interface CustomerUser {
+  id: string;
+  name: string;
+  phone: string; // E.164 normalized format (+91XXXXXXXXXX)
+  userType: CustomerUserType;
+  wardNumber?: number | null; // 1 to 33 if KORUTLA_RESIDENT
+  villageName?: string | null; // Required if NON_LOCAL
+  role: 'CUSTOMER';
+  isVerified: boolean;
+  points?: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface UserSession {
   id: string;
   name: string;
   email: string;
   role: UserRole;
+  phone?: string;
+  userType?: CustomerUserType;
+  wardNumber?: number | null;
+  villageName?: string | null;
   businessId?: string;
   createdAt: string;
 }
@@ -415,6 +435,41 @@ export interface PhotographyBusiness {
   galleryImages: string[];
   rating?: number;
   reviewCount?: number;
+}
+
+export type CommunityPhotoCategory =
+  | 'Streets & Landmarks'
+  | 'Festivals & Celebrations'
+  | 'Nature & Landscapes'
+  | 'Food & Markets'
+  | 'Architecture & Everyday Life'
+  | 'Culture & Community';
+
+export type CommunityPhotoStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
+
+export interface CommunityPhoto {
+  id: string;
+  title: string;
+  category: CommunityPhotoCategory;
+  imageUrl: string;
+  altText: string;
+  photographerName: string;
+  caption?: string;
+  location?: string;
+  instagram?: string;
+  portfolioUrl?: string;
+  status: CommunityPhotoStatus;
+  permissionConfirmed: boolean;
+  permissionConfirmedAt?: string;
+  permissionNotes?: string;
+  isPublished: boolean;
+  publishedAt?: string;
+  moderatedBy?: string;
+  moderatedAt?: string;
+  rejectionReason?: string;
+  featuredOnHome?: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export type Business = LocalBusiness;

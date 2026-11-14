@@ -15,6 +15,7 @@ import { GrocerySpotlight } from '@/components/home/GrocerySpotlight';
 import { JobsSpotlight } from '@/components/home/JobsSpotlight';
 import { CategoryGrid } from '@/components/categories/CategoryGrid';
 import { StoriesReelsSection } from '@/components/home/StoriesReelsSection';
+import { CommunityPhotographySection } from '@/components/home/CommunityPhotographySection';
 import { Footer } from '@/components/layout/Footer';
 
 export default function Home() {
@@ -68,9 +69,12 @@ export default function Home() {
 
         {/* 12. Stories / Reels */}
         <StoriesReelsSection />
+
+        {/* 13. Community Photography: Korutla Through Your Lens */}
+        <CommunityPhotographySection />
       </main>
 
-      {/* 13. Footer */}
+      {/* 14. Footer */}
       <Footer />
     </div>
   );
