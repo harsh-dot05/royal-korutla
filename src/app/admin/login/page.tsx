@@ -1,12 +1,15 @@
 'use client';
 
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useState, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { Shield, Lock, Mail, AlertCircle, ArrowLeft, KeyRound, CheckCircle2 } from 'lucide-react';
+import { Shield, Lock, Mail, AlertCircle, ArrowLeft, KeyRound, CheckCircle2, RefreshCw } from 'lucide-react';
 
-export default function AdminLoginPage() {
-  const router = useRouter();
+function AdminLoginForm() {
+  const searchParams = useSearchParams();
+  const rawRedirect = searchParams.get('redirect') || '/admin';
+  const targetUrl = rawRedirect.startsWith('/') && !rawRedirect.startsWith('//') ? rawRedirect : '/admin';
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -21,7 +24,7 @@ export default function AdminLoginPage() {
       const res = await fetch('/api/admin/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email: email.trim().toLowerCase(), password }),
       });
 
       const data = await res.json();
@@ -35,18 +38,100 @@ export default function AdminLoginPage() {
       if (data.token) {
         try {
           localStorage.setItem('rk_session_token', data.token);
-        } catch (e) {}
+        } catch (e) {
+          // ignore localStorage access errors
+        }
       }
 
-      // Successful login -> Redirect to /admin
-      router.replace('/admin');
-      router.refresh();
+      // Perform a full browser navigation to guarantee HTTP cookies are sent and Edge Middleware activates cleanly
+      window.location.href = targetUrl;
+
+      // Failsafe timeout in case navigation is delayed
+      setTimeout(() => {
+        setLoading(false);
+      }, 5000);
     } catch (err) {
       setError('Invalid admin credentials.');
       setLoading(false);
     }
   };
 
+  return (
+    <div className="bg-white rounded-2xl p-6 sm:p-8 border border-[#E8E5DF] shadow-xs space-y-5">
+      {error && (
+        <div className="p-3.5 rounded-lg bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold flex items-center gap-2">
+          <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+          <span>{error}</span>
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} className="space-y-4 text-xs">
+        <div>
+          <label htmlFor="admin-email" className="block font-bold text-[#26352D] mb-1 flex items-center gap-1.5">
+            <Mail className="w-3.5 h-3.5 text-[#E66A32]" />
+            <span>Admin Email Address</span>
+          </label>
+          <input
+            id="admin-email"
+            type="email"
+            required
+            disabled={loading}
+            placeholder="royalkorutla.in@gmail.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full bg-[#FAF7F2] border border-[#E8E5DF] rounded-xl px-3.5 py-3 text-xs text-[#26352D] font-semibold placeholder-[#647067]/60 focus:outline-none focus:border-[#E66A32] focus:ring-2 focus:ring-[#FFF6F0] shadow-2xs disabled:opacity-60"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="admin-password" className="block font-bold text-[#26352D] mb-1 flex items-center gap-1.5">
+            <KeyRound className="w-3.5 h-3.5 text-[#E66A32]" />
+            <span>Admin Password</span>
+          </label>
+          <input
+            id="admin-password"
+            type="password"
+            required
+            disabled={loading}
+            placeholder="••••••••••••"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full bg-[#FAF7F2] border border-[#E8E5DF] rounded-xl px-3.5 py-3 text-xs text-[#26352D] font-semibold placeholder-[#647067]/60 focus:outline-none focus:border-[#E66A32] focus:ring-2 focus:ring-[#FFF6F0] shadow-2xs disabled:opacity-60"
+          />
+        </div>
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full py-3.5 rounded-xl bg-[#E66A32] hover:bg-[#D45B25] text-white font-bold text-xs flex items-center justify-center gap-2 transition-colors shadow-xs disabled:opacity-50 cursor-pointer"
+        >
+          {loading ? (
+            <span className="inline-flex items-center gap-2">
+              <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+              <span>Verifying Credentials...</span>
+            </span>
+          ) : (
+            <>
+              <Lock className="w-4 h-4" />
+              <span>Access Dashboard</span>
+            </>
+          )}
+        </button>
+      </form>
+
+      <div className="pt-3 border-t border-[#E8E5DF] text-center text-[11px] text-[#647067] space-y-1">
+        <p className="font-semibold text-[#26352D] flex items-center justify-center gap-1">
+          <CheckCircle2 className="w-3.5 h-3.5 text-[#E66A32]" /> Server Authorization Active
+        </p>
+        <p className="text-[10px] text-[#647067]">
+          Restricted access. Unauthenticated attempts are logged.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+export default function AdminLoginPage() {
   return (
     <div className="min-h-screen bg-[#FAF7F2] text-[#26352D] flex flex-col justify-between p-4 sm:p-6 lg:p-8">
       {/* Top Bar */}
@@ -72,72 +157,14 @@ export default function AdminLoginPage() {
           </p>
         </div>
 
-        <div className="bg-white rounded-2xl p-6 sm:p-8 border border-[#E8E5DF] shadow-xs space-y-5">
-          {error && (
-            <div className="p-3.5 rounded-lg bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
-              <span>{error}</span>
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-4 text-xs">
-            <div>
-              <label htmlFor="admin-email" className="block font-bold text-[#26352D] mb-1 flex items-center gap-1.5">
-                <Mail className="w-3.5 h-3.5 text-[#E66A32]" />
-                <span>Admin Email Address</span>
-              </label>
-              <input
-                id="admin-email"
-                type="email"
-                required
-                placeholder="royalkorutla.in@gmail.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-[#FAF7F2] border border-[#E8E5DF] rounded-xl px-3.5 py-3 text-xs text-[#26352D] font-semibold placeholder-[#647067]/60 focus:outline-none focus:border-[#E66A32] focus:ring-2 focus:ring-[#FFF6F0] shadow-2xs"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="admin-password" className="block font-bold text-[#26352D] mb-1 flex items-center gap-1.5">
-                <KeyRound className="w-3.5 h-3.5 text-[#E66A32]" />
-                <span>Admin Password</span>
-              </label>
-              <input
-                id="admin-password"
-                type="password"
-                required
-                placeholder="••••••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-[#FAF7F2] border border-[#E8E5DF] rounded-xl px-3.5 py-3 text-xs text-[#26352D] font-semibold placeholder-[#647067]/60 focus:outline-none focus:border-[#E66A32] focus:ring-2 focus:ring-[#FFF6F0] shadow-2xs"
-              />
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-3.5 rounded-xl bg-[#E66A32] hover:bg-[#D45B25] text-white font-bold text-xs flex items-center justify-center gap-2 transition-colors shadow-xs disabled:opacity-50 cursor-pointer"
-            >
-              {loading ? (
-                <span>Verifying Credentials...</span>
-              ) : (
-                <>
-                  <Lock className="w-4 h-4" />
-                  <span>Access Dashboard</span>
-                </>
-              )}
-            </button>
-          </form>
-
-          <div className="pt-3 border-t border-[#E8E5DF] text-center text-[11px] text-[#647067] space-y-1">
-            <p className="font-semibold text-[#26352D] flex items-center justify-center gap-1">
-              <CheckCircle2 className="w-3.5 h-3.5 text-[#E66A32]" /> Server Authorization Active
-            </p>
-            <p className="text-[10px] text-[#647067]">
-              Unauthenticated access attempts are logged.
-            </p>
+        <Suspense fallback={
+          <div className="bg-white rounded-2xl p-6 sm:p-8 border border-[#E8E5DF] text-center py-12">
+            <RefreshCw className="w-5 h-5 text-[#E66A32] animate-spin mx-auto mb-2" />
+            <p className="text-xs text-[#647067]">Loading admin portal...</p>
           </div>
-        </div>
+        }>
+          <AdminLoginForm />
+        </Suspense>
       </div>
 
       {/* Footer copyright */}

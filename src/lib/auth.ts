@@ -1,3 +1,4 @@
+import { createHmac } from 'crypto';
 import type { UserSession } from '@/types';
 
 export const SESSION_COOKIE_NAME = 'rk_session_token';
@@ -50,14 +51,16 @@ function base64UrlDecode(str: string): string {
 
 function signHmac(data: string, secret: string): string {
   try {
-    // Dynamically resolve node:crypto only when running in Node.js server environment
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const nodeCrypto = require('crypto');
-    return nodeCrypto.createHmac('sha256', secret).update(data).digest('base64url');
+    return createHmac('sha256', secret).update(data).digest('base64url');
   } catch {
-    // Simple fallback signature for edge/browser contexts if needed
     return base64UrlEncode(`${data}.${secret.slice(0, 8)}`);
   }
+}
+
+import { signHmacWebCrypto } from './authEdge.ts';
+
+export async function signHmacAsync(data: string, secret: string): Promise<string> {
+  return signHmacWebCrypto(data, secret);
 }
 
 /**
@@ -163,6 +166,8 @@ export function verifySessionToken(token: string | undefined | null): UserSessio
 
   return null;
 }
+
+export { verifySessionTokenAsync, signHmacWebCrypto } from './authEdge.ts';
 
 /**
  * Helper to parse cookie string into key-value map

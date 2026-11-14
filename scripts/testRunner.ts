@@ -14,6 +14,7 @@ import {
 import {
   createSessionToken,
   verifySessionToken,
+  verifySessionTokenAsync,
 } from '../src/lib/auth.ts';
 import {
   authenticateAdmin,
@@ -265,7 +266,14 @@ async function runTestSuite() {
       createdAt: adminAuth.user.created_at,
     });
     const verifiedAdmin = verifySessionToken(adminSessionToken);
-    assert(verifiedAdmin !== null && verifiedAdmin.email === 'royalkorutla.in@gmail.com' && verifiedAdmin.role === 'SUPER_ADMIN', 'Create and verify valid signed JWT token for admin');
+    assert(verifiedAdmin !== null && verifiedAdmin.email === 'royalkorutla.in@gmail.com' && verifiedAdmin.role === 'SUPER_ADMIN', 'Create and verify valid signed JWT token for admin (Sync)');
+
+    const verifiedAdminAsync = await verifySessionTokenAsync(adminSessionToken);
+    assert(verifiedAdminAsync !== null && verifiedAdminAsync.email === 'royalkorutla.in@gmail.com' && verifiedAdminAsync.role === 'SUPER_ADMIN', 'Verify admin session with Edge-compatible Web Crypto HMAC (Async)');
+
+    const tamperedAdminToken = adminSessionToken.slice(0, -6) + 'xxxxxx';
+    const tamperedResult = await verifySessionTokenAsync(tamperedAdminToken);
+    assert(tamperedResult === null, 'Edge-compatible Web Crypto rejects tampered admin token signature');
   }
 
   console.log('\n====================================================');
