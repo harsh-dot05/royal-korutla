@@ -46,6 +46,7 @@ import {
 } from '@/types';
 import { SafeAdminUser } from '@/lib/adminStore';
 import { PRESET_HERO_IMAGES } from '@/lib/heroBannersStore';
+import { CommunityPhotoModeration } from '@/components/admin/CommunityPhotoModeration';
 import {
   Shield,
   Sparkles,
@@ -212,6 +213,7 @@ export default function AdminDashboardPage() {
   const [newBizVerified, setNewBizVerified] = useState(true);
 
   // Photography State
+  const [photoSubTab, setPhotoSubTab] = useState<'community' | 'studios'>('community');
   const [photographyList, setPhotographyList] = useState<PhotographyBusiness[]>(PHOTOGRAPHY_BUSINESSES);
   const [loadingPhoto, setLoadingPhoto] = useState(false);
   const [editingPhotoStudio, setEditingPhotoStudio] = useState<PhotographyBusiness | null>(null);
@@ -2389,18 +2391,57 @@ export default function AdminDashboardPage() {
           {/* TAB: PHOTOGRAPHY & STUDIOS MANAGEMENT */}
           {activeTab === 'photography' && (
             <div className="space-y-6">
-              <div className="p-5 rounded-2xl bg-[#FAF7F2] border border-[#E8E5DF] space-y-2">
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#FFF6F0] text-[#E66A32] text-xs font-bold border border-[#F8CFBE]">
-                  <Camera className="w-3.5 h-3.5 text-[#E66A32]" />
-                  <span>Photography &amp; Studios Content Management</span>
+              <div className="p-5 rounded-2xl bg-[#FAF7F2] border border-[#E8E5DF] space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div className="space-y-1">
+                    <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#FFF6F0] text-[#E66A32] text-xs font-bold border border-[#F8CFBE]">
+                      <Camera className="w-3.5 h-3.5 text-[#E66A32]" />
+                      <span>Photography Management Center</span>
+                    </div>
+                    <h2 className="text-xl font-bold text-[#26352D]">
+                      {photoSubTab === 'community'
+                        ? 'Korutla Through Your Lens — Moderation & Permission'
+                        : 'Commercial Studios & Wedding Photographers'}
+                    </h2>
+                    <p className="text-xs text-[#647067] max-w-2xl">
+                      {photoSubTab === 'community'
+                        ? 'Review community submissions, record verified publication permissions, approve or reject entries, and manage live public gallery photos.'
+                        : 'Add, edit, or manage Korutla photo studios, camera rentals, wedding photography teams, pricing, portfolio galleries, and contact details.'}
+                    </p>
+                  </div>
+
+                  {/* Sub-tab Switcher */}
+                  <div className="flex items-center gap-2 p-1 bg-white border border-[#E8E5DF] rounded-xl self-start sm:self-center shrink-0">
+                    <button
+                      onClick={() => setPhotoSubTab('community')}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                        photoSubTab === 'community'
+                          ? 'bg-[#26352D] text-white shadow-xs'
+                          : 'text-[#647067] hover:text-[#26352D]'
+                      }`}
+                    >
+                      Community Gallery
+                    </button>
+                    <button
+                      onClick={() => setPhotoSubTab('studios')}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                        photoSubTab === 'studios'
+                          ? 'bg-[#26352D] text-white shadow-xs'
+                          : 'text-[#647067] hover:text-[#26352D]'
+                      }`}
+                    >
+                      Commercial Studios ({photographyList.length})
+                    </button>
+                  </div>
                 </div>
-                <h2 className="text-xl font-bold text-[#26352D]">Manage Photography &amp; Studios</h2>
-                <p className="text-xs text-[#647067] max-w-2xl">
-                  Add, edit, or manage Korutla photo studios, camera rentals, wedding photography teams, pricing, portfolio galleries, and contact details.
-                </p>
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* View 1: Community Gallery Moderation */}
+              {photoSubTab === 'community' && <CommunityPhotoModeration />}
+
+              {/* View 2: Commercial Studios Directory */}
+              {photoSubTab === 'studios' && (
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Add/Edit Form */}
                 <div className="p-5 rounded-2xl bg-white border border-[#E8E5DF] space-y-4 shadow-xs">
                   <div className="flex items-center justify-between pb-2 border-b border-[#E8E5DF]">
@@ -2648,6 +2689,7 @@ export default function AdminDashboardPage() {
                   )}
                 </div>
               </div>
+              )}
             </div>
           )}
 
